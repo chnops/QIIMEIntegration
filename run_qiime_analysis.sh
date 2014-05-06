@@ -1,0 +1,144 @@
+#!/bin/bash
+
+#########################################################
+#														#
+#	Author: Aaron Sharp									#
+#	Contact: sharp.aaron.r@gmail.com					#
+#	Date begun: 05/06/2014								#
+#	Lab: Dr. Hofmockel, EEOB, Iowa State University		#
+#														#
+#########################################################
+
+RETURN_CODE=0
+PROFILE_FP=/macqiime/configs/bash_profile.txt
+
+echo "===================================================================="
+echo "Beginning QIIME Operational Taxonomic Unit (OTU) diversity analysis."
+echo "--------------------------------------------------------------------"
+
+## TODO universal, consistent treatment of errors
+printf "Sourcing necessary environment variables ... "
+$PROFILE_FP 2> /dev/null
+if [ $? -ne 0 ]
+	then
+		printf "FAIL\n\tSourcing failed; unable to read or execute file: $PROFILE_FP\n"
+		RETURN_CODE=3
+		exit $RETURN_CODE
+	else
+		printf "OK\n"
+fi
+
+MAP_FP=$1
+if [ ! $MAP_FP ]
+then
+	printf "FAIL\n\tNo map file specified.\n"
+	RETURN_CODE=4
+	exit $RETURN_CODE
+fi
+
+## TODO mapping_output might already exist in the working directory
+printf "Validating map file ($MAP_FP) ... "
+MAP_VALIDATION_RESULT=`validate_mapping_file.py -m $MAP_FP -s -o mapping_output`
+if [ "$MAP_VALIDATION_RESULT" != "No errors or warnings were found in mapping file." ]
+then
+	printf "FAIL\n\t$MAP_VALIDATION_RESULT\n"
+	RETURN_CODE=5
+	exit $RETURN_CODE
+else
+	rm -r mapping_output
+	printf "OK\n"
+fi
+
+echo "--------------------------------------------------------------------"
+
+## TODO results might already exist in the working directory
+RESULT_DIR=results
+mkdir $RESULT_DIR
+
+## TODO incorporate getopts()
+## TODO include sequence quality information
+SEQUENCE_FP=$2
+if [ ! $SEQUENCE_FP ]
+then
+	printf "FAIL\n\tNo sequence file specified.\n"
+	RETURN_CODE=6
+	exit $RETURN_CODE
+fi
+
+## TODO splitting_output might already exist in the working directory
+## TODO a separate quality file is uneccesary if sequences are in fastq format, but a different python script must be used
+printf "Splitting multiplexed libraries by barcode ... "
+LIBRARY_SPLITTING_RESULT=`split_libraries.py -f $SEQUENCE_FP -m $MAP_FP -o splitting_output`
+if [ $LIBRARY_SPLITTING_RESULT ]
+then
+	printf "FAIL\n\tUnable to split libraries ($LIBRARY_SPLITTING_RESULT)\n"
+	RETURN_CODE=7
+	exit $RETURN_CODE
+else
+	printf "OK\n"
+fi
+mv splitting_output/histograms.txt $RESULT_DIR/sequence_length_histogram.txt
+mv splitting_output/split_library_log.txt $RESULT_DIR/
+## TODO split_sequences.fna might already exist in the working directory
+mv splitting_output/seqs.fna split_sequences.fna
+rmdir splitting_output
+
+echo "--------------------------------------------------------------------"
+
+## TODO potentially implement de-noising at this step (would require .sff file)
+#####################################################
+#													#
+#	Here are all the commands normally				# 
+#		completed by the macro-script 				#
+#		pick_de_novo_otus.py						#
+#													#
+#	pick_otus.py -i split_sequences.fna -o otus/uclust_picked_otus 
+#	pick_rep_set.py -i otus/uclust_picked_otus/seqs_otus.txt -f ../qiime_overview_tutorial/split_library_output/seqs.fna -l otus/rep_set//seqs_rep_set.log -o otus/rep_set//seqs_rep_set.fasta 
+#	assign_taxonomy.py -o otus/uclust_assigned_taxonomy -i otus/rep_set//seqs_rep_set.fasta 
+#	make_otu_table.py -i otus/uclust_picked_otus/seqs_otus.txt -t otus/uclust_assigned_taxonomy/seqs_rep_set_tax_assignments.txt -o otus/otu_table.biom 
+#	align_seqs.py -i otus/rep_set//seqs_rep_set.fasta -o otus/pynast_aligned_seqs 
+#	filter_alignment.py -o otus/pynast_aligned_seqs -i otus/pynast_aligned_seqs/seqs_rep_set_aligned.fasta 
+#	make_phylogeny.py -i otus/pynast_aligned_seqs/seqs_rep_set_aligned_pfiltered.fasta -o otus/rep_set.tre 
+#													#
+#####################################################
+
+## TODO redirect errors to a file, then check its line count*
+## TODO otus may already exist in the working directory
+printf "Picking OTUs based on cross-sample sequence similarity ... "
+OTU_SELECTION_RESULT=`pick_otus.py -i split_sequences.fna -o otus/uclust_picked_otus`
+if [ $OTU_SELECTION_RESULT ]
+then
+	printf "FAIL\n\tUnable to pick OTUs ($OTU_SELECTION_RESULT)\n"
+	RETURN_CODE=8
+	exit $RETURN_CODE
+else
+	printf "OK\n"
+fi
+mv otus/uclust_picked_otus/split_sequences_clusters.uc $RESULT_DIR/uclust_clusters.log
+mv otus/uclust_picked_otus/split_sequences_otus.log $RESULT_DIR/uclust_otus.log
+## TODO otus.txt may already exist in the working directory
+mv otus/uclust_picked_otus/split_sequences_otus.txt otus.txt
+rmdir otus/uclust_picked_otus
+
+printf "Selecting representative sequence from each OTU ... "
+mkdir otus/rep_set
+## TODO files that are used multiple times (otus.txt, split_sequences.fna) should be referred to with variable names
+REPRESENTATIVE_SELECTION_RESULT=`pick_rep_set.py -i otus.txt -f split_sequences.fna -l otus/rep_set/seqs_rep_set.log -o otus/rep_set/seqs_rep_set.fasta`
+## TODO not effective error checking*
+if [ $REPRESENTATIVE_SELECTION_RESULT ]
+then
+	printf "FAIL\n\tUnable to select representative OTUs ($OTU_SELECTION_RESULT)\n"
+	RETURN_CODE=9
+	exit $RETURN_CODE
+else
+	printf "OK\n"
+fi
+mv otus/rep_set/seqs_rep_set.log $RESULT_DIR/uclust_representative_sequences.log
+## TODO representative_sequences.fasta may already exist, and it should be a variable, not a literal
+mv otus/rep_set/seqs_rep_set.fasta representative_sequences.fasta
+rmdir otus/rep_set/
+
+echo "--------------------------------------------------------------------"
+echo "Execution complete."
+echo "===================================================================="
+exit $RETURN_CODE
