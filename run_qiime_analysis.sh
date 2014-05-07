@@ -18,8 +18,7 @@ echo "--------------------------------------------------------------------"
 
 ## TODO universal, consistent treatment of errors
 printf "Sourcing necessary environment variables ... "
-## TODO this doesn't work...
-$PROFILE_FP 2> /dev/null
+source $PROFILE_FP 2> /dev/null
 if [ $? -ne 0 ]
 	then
 		printf "FAIL\n\tSourcing failed; unable to read or execute file: $PROFILE_FP\n"
@@ -191,11 +190,14 @@ then
 
 				## TODO should be a variable, maybe
 				rmdir otus/alignment
+				mv filtered_alignment.fasta $RESULT_DIR
 			fi
 		fi
 	fi
 	echo "--------------------------------------------------------------------"
 fi
+
+rmdir otus
 
 echo "--------------------------------------------------------------------"
 echo "Execution complete."
