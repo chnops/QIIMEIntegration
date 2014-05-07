@@ -18,12 +18,14 @@ echo "--------------------------------------------------------------------"
 
 ## TODO universal, consistent treatment of errors
 printf "Sourcing necessary environment variables ... "
+## TODO this doesn't work...
 $PROFILE_FP 2> /dev/null
 if [ $? -ne 0 ]
 	then
 		printf "FAIL\n\tSourcing failed; unable to read or execute file: $PROFILE_FP\n"
 		RETURN_CODE=3
 		exit $RETURN_CODE
+		## TODO still "finish" script by printing execution complete
 	else
 		printf "OK\n"
 fi
@@ -67,6 +69,7 @@ fi
 
 ## TODO splitting_output might already exist in the working directory
 ## TODO a separate quality file is uneccesary if sequences are in fastq format, but a different python script must be used
+## TODO possibly implement reverse primer deletion here
 printf "Splitting multiplexed libraries by barcode ... "
 LIBRARY_SPLITTING_RESULT=`split_libraries.py -f $SEQUENCE_FP -m $MAP_FP -o splitting_output`
 if [ $LIBRARY_SPLITTING_RESULT ]
@@ -139,6 +142,63 @@ mv otus/rep_set/seqs_rep_set.fasta representative_sequences.fasta
 rmdir otus/rep_set/
 
 echo "--------------------------------------------------------------------"
+
+## TODO might be false
+PERFORM_PHYLOGENY=true
+if [ $PERFORM_PHYLOGENY ]
+then
+	echo '--------------Performing steps for phylogeny analysis---------------'
+
+	## TODO make default options (intentionally being used) explicit in script
+	printf "Aligning representative OTU sequences ... "
+	ALIGN_SEQUENCE_RESULT=`align_seqs.py -i representative_sequences.fasta -o otus/alignment`
+	## TODO check otus/alignment/representative_sequences_failures.fasta, print warning**
+	if [ $ALIGN_SEQUENCE_RESULT ]
+	then
+		printf "FAIL\n\tUnable to align representative OTU sequences ($ALIGN_SEQUENCE_RESULT)\n"
+		printf "\tSkipping remaining phylogeny steps"
+	else
+		printf "OK\n"
+
+		mv otus/alignment/representative_sequences_log.txt $RESULT_DIR/rep_seq_alignment.log
+		## TODO only run this command if the file is empty**
+		rm otus/alignment/representative_sequences_failures.fasta
+
+		## TODO lanemask is a default; should be explicit
+		printf "Filtering alignment ... "
+		FILTER_SEQUENCE_RESULT=`filter_alignment.py -i otus/alignment/representative_sequences_aligned.fasta -o otus/alignment`
+
+		if [ $FILTER_SEQUENCE_RESULT ]
+		then
+			printf "FAIL\n\tUnable to filter sequence alignment ($FILTER_SEQUENCE_RESULT)\n"
+			printf "\tSkipping remaining phylogeny steps"
+		else
+			printf "OK\n"
+		
+			rm otus/alignment/representative_sequences_aligned.fasta
+			## TODO filtered_alignment.fasta may already exist in the working directory
+			mv otus/alignment/representative_sequences_aligned_pfiltered.fasta filtered_alignment.fasta
+
+			## TODO -t and -r are both defaults
+			## TODO filtered_alignment.fasta should be a variable
+			printf "Creating phylogeny from filtered alignment ... "
+			MAKE_PHYLOGENY_RESULT=`make_phylogeny.py -i filtered_alignment.fasta -l $RESULT_DIR/phylogeny.log -o $RESULT_DIR/phylogeny.tre`
+			if [ $MAKE_PHYLOGENY_RESULT ]
+			then
+				printf "FAIL\n\tUnable to make phylogeny ($MAKE_PHYLOGENY_RESULT)\n"
+			else
+				printf "OK\n"
+
+				## TODO should be a variable, maybe
+				rmdir otus/alignment
+			fi
+		fi
+	fi
+	echo "--------------------------------------------------------------------"
+fi
+
+echo "--------------------------------------------------------------------"
 echo "Execution complete."
 echo "===================================================================="
+## TODO create a separate folder for the results of this run.  Copy the input files into that folder.  Make a link called most recent, pointing to that run.
 exit $RETURN_CODE
