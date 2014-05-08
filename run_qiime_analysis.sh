@@ -67,6 +67,7 @@ then
 fi
 
 ## TODO possibly include identification of chimeric sequences
+## TODO possibly exclude sequences by BLAST as well
 
 ## TODO splitting_output might already exist in the working directory
 ## TODO a separate quality file is uneccesary if sequences are in fastq format, but a different python script must be used
@@ -251,5 +252,7 @@ echo "===================================================================="
 ## TODO create a separate folder for the results of this run.  Copy the input files into that folder.  Make a link called most recent, pointing to that run.
 ## TODO utilize functions
 ## TODO create GUI
+## TODO include CSS
+## TODO minimize javascript, and only include it once
 ## TODO implement check-points be creating un-writeable files
 exit $RETURN_CODE

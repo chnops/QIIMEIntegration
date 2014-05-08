@@ -1,7 +1,7 @@
 QIIMEIntegration
 ================
 
-I am working on incorporating QIIME into a workspace-specific pipeline. I keep notes and useful scripts here.
+I am working on incorporating QIIME into a workspace-specific pipeline. I keep notes and useful scripts here. The purpose of this project, overall, is to make it so that non-computer people run their raw data through the basic steps of the pipeline in a reasonable (short) amount of time without requiring much direction or assisstance.
 
 1. Installation
  * I used MacQIIME (http://www.wernerlab.org/software/macqiime) for easy installation. Out of box, most everything worked fine. 
@@ -19,8 +19,14 @@ As an initial step, I created a script (run_qiime_analysis.sh) that will perform
  h. Optionally perform taxonomy assignment
  i. Creat OTU table, the starting point for many of the QIIME analyses
 
+These steps make up the core QIIME functionality we care about for each analysis (more specialized steps do not need to be automated yet).
+
 3. Customization
 The format checking, de-multiplexing, quality trimming, and OTU selection are probably central to any analyses, therefore they are invariably performed. At the moment, they use mostly default parameters; however, they will allow customization once complete. Additionally, the choice to perform phylogenetic analysis is hard coded to yes. This must be changed before the project is complete, and is marked as a TODO item in the script. Like the phylogeny analysis, the taxonomy assignment is hard coded to be performed.
 
 4. Next step
-Make long term design decisions and address TODO items in the script. Also, become familiar with optional statistical analyses of the OTU table.
+Address TODO items in the script
+Look into closed OTU (do not perform own phylogeny, use whole greengenes tree)
+Create map from OTU identifier (e.g. denovo) name to sequence(s)
+Make sure trees are still readable by R
+Incorporate UniFrac
