@@ -199,29 +199,38 @@ then
 	echo "--------------------------------------------------------------------"
 fi
 
-## TODO make this step parallel, because it is so long
-## TODO this step isn't necessary; possibly remove it
-printf "Assigning OTUs to known taxonomies (this may be an extra long step) ... "
-## TODO remove this comment
-#TAXONOMY_ASSIGNMENT_RESULT=`assign_taxonomy.py -i representative_sequences.fasta -o taxonomies`
-## TODO remove this line
-TAXONOMY_ASSIGNMENT_RESULT=""
-if [ $TAXONOMY_ASSIGNMENT_RESULT ]
+## TODO might be false
+PERFORM_TAXONOMY_ASSIGNMENT=true
+if [ $PERFORM_TAXONOMY_ASSIGNMENT ]
 then
-	printf "FAIL\n\tUnable to assign taxonomies ($TAXONOMY_ASSIGNMENT_RESULT)\n"
-	RETURN_CODE=10
-	exit $RETURN_CODE
-else
-	printf "OK\n"
-
-	mv taxonomies/seqs_rep_set_tax_assignments.log $RESULT_DIR/taxonomy_assignment.log
-	## TODO move taxonomies/seqs_rep_set_tax_assignments.txt to the results or working directory***
-	rmdir taxonomies
+	## TODO make this step parallel, because it is so long
+	printf "Assigning OTUs to known taxonomies (this may be an extra long step) ... "
+	## TODO remove this comment
+	#TAXONOMY_ASSIGNMENT_RESULT=`assign_taxonomy.py -i representative_sequences.fasta -o taxonomies`
+	## TODO remove this line
+	TAXONOMY_ASSIGNMENT_RESULT=""
+	if [ $TAXONOMY_ASSIGNMENT_RESULT ]
+	then
+		printf "FAIL\n\tUnable to assign taxonomies ($TAXONOMY_ASSIGNMENT_RESULT)\n"
+		RETURN_CODE=10
+		exit $RETURN_CODE
+	else
+		printf "OK\n"
+	
+		mv taxonomies/seqs_rep_set_tax_assignments.log $RESULT_DIR/taxonomy_assignment.log
+		## TODO move taxonomies/seqs_rep_set_tax_assignments.txt to the results or working directory***
+		rmdir taxonomies
+	fi
 fi
 
 printf "Creating OTU table ... "
-## TODO rename taxonomies/seqs_rep_set_tax_assignments.txt***
-MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom -t taxonomies/seqs_rep_set_tax_assignments.txt`
+if [ $PERFORM_TAXONOMY_ASSIGNMENT ]
+then
+	## TODO rename taxonomies/seqs_rep_set_tax_assignments.txt***
+	MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom -t taxonomies/seqs_rep_set_tax_assignments.txt`
+else
+	MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom`
+fi
 if [ $MAKE_OTU_TABLE_RESULT ]
 then
 	printf "FAIL\n\tUnable to create OTU table\n"
