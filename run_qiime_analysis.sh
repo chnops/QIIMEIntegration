@@ -66,6 +66,8 @@ then
 	exit $RETURN_CODE
 fi
 
+## TODO possibly include identification of chimeric sequences
+
 ## TODO splitting_output might already exist in the working directory
 ## TODO a separate quality file is uneccesary if sequences are in fastq format, but a different python script must be used
 ## TODO possibly implement reverse primer deletion here
@@ -197,10 +199,48 @@ then
 	echo "--------------------------------------------------------------------"
 fi
 
+## TODO make this step parallel, because it is so long
+## TODO this step isn't necessary; possibly remove it
+printf "Assigning OTUs to known taxonomies (this may be an extra long step) ... "
+## TODO remove this comment
+#TAXONOMY_ASSIGNMENT_RESULT=`assign_taxonomy.py -i representative_sequences.fasta -o taxonomies`
+## TODO remove this line
+TAXONOMY_ASSIGNMENT_RESULT=""
+if [ $TAXONOMY_ASSIGNMENT_RESULT ]
+then
+	printf "FAIL\n\tUnable to assign taxonomies ($TAXONOMY_ASSIGNMENT_RESULT)\n"
+	RETURN_CODE=10
+	exit $RETURN_CODE
+else
+	printf "OK\n"
+
+	mv taxonomies/seqs_rep_set_tax_assignments.log $RESULT_DIR/taxonomy_assignment.log
+	## TODO move taxonomies/seqs_rep_set_tax_assignments.txt to the results or working directory***
+	rmdir taxonomies
+fi
+
+printf "Creating OTU table ... "
+## TODO rename taxonomies/seqs_rep_set_tax_assignments.txt***
+MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom -t taxonomies/seqs_rep_set_tax_assignments.txt`
+if [ $MAKE_OTU_TABLE_RESULT ]
+then
+	printf "FAIL\n\tUnable to create OTU table\n"
+	RETURN_CODE=11
+	exit $RETURN_CODE
+else
+	printf "OK\n"
+fi
+
+echo "--------------------------------------------------------------------"
+echo "----CHECKPOINT: OTU table created; begin statistic visualization----"
+
 rmdir otus
 
 echo "--------------------------------------------------------------------"
 echo "Execution complete."
 echo "===================================================================="
 ## TODO create a separate folder for the results of this run.  Copy the input files into that folder.  Make a link called most recent, pointing to that run.
+## TODO utilize functions
+## TODO create GUI
+## TODO implement check-points be creating un-writeable files
 exit $RETURN_CODE
