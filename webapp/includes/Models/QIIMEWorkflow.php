@@ -4,7 +4,9 @@ namespace Models;
 
 class QIIMEWorkflow implements WorkflowI {
 
+	private $database = NULL;
 	private $operatingSystem = NULL;
+
 	private $steps = array(
 		"login" => "Login",	
 		"select" => "Select/create project",
@@ -13,7 +15,12 @@ class QIIMEWorkflow implements WorkflowI {
 		"make_phylogeny" => "Perform phylogeny analysis [optional]",
 		"view" => "View results");
 
-	public function __construct(OperatingSystemI $operatingSystem) {
+	public function getSteps() {
+		return $this->steps;
+	}
+
+	public function __construct(\Database\DatabaseI $database, OperatingSystemI $operatingSystem) {
+		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
 	}
 
@@ -79,40 +86,59 @@ class QIIMEWorkflow implements WorkflowI {
 		}
 	}
 
-	public function getController($step, \Database\DatabaseI $database) {
-			switch($_REQUEST['step']) {
+	public function getController($step) {
+			switch($step) {
 			case "test":
-				return new \Controllers\TestController($database, $this);
+				return new \Controllers\TestController($this->database, $this);
 				break;
 			case "login":
-				return new \Controllers\LoginController($database, $this);
+				return new \Controllers\LoginController($this->database, $this);
 				break;
 			case "select":
-				return new \Controllers\SelectProjectController($database, $this);
+				return new \Controllers\SelectProjectController($this->database, $this);
 				break;
 			case "upload":
-				return new \Controllers\UploadController($database, $this);
+				return new \Controllers\UploadController($this->database, $this);
 				break;
 			case "make_otu":
-				return new \Controllers\MakeOtuController($database, $this);
+				return new \Controllers\MakeOtuController($this->database, $this);
 				break;
 			case "make_phylogeny":
-				return new \Controllers\MakePhylogenyController($database, $this);
+				return new \Controllers\MakePhylogenyController($this->database, $this);
 				break;
 			case "view":
-				return new \Controllers\ViewResultsController($database, $this);
+				return new \Controllers\ViewResultsController($this->database, $this);
 				break;
 			default:
-				return new \Controllers\LoginController($database, $this);
+				return new \Controllers\LoginController($this->database, $this);
 				break;
 			}
 	}
 
-	public function getSteps() {
-		return $this->steps;
+	public function getNewProject() {
+		return new QIIMEProject($this->database, $this, $this->operatingSystem);
 	}
-
-	public function getDefaultProject(\Database\DatabaseI $database) {
-		return new QIIMEProject($database, $this, $this->operatingSystem);
+	public function findProject($username, $projectId) {
+		$projectName = $this->database->getProjectName($username, $projectId);
+		if ($projectName == "ERROR") {
+			return NULL;
+		}
+		$project = $this->getNewProject();
+		$project->setName($projectName);
+		$project->setOwner($username);
+		$project->setId($projectId);
+		return $project;	
+	}
+	public function getAllProjects($username) {
+		$projectArrays = $this->database->getAllProjects($username);
+		$projects = array();
+		foreach ($projectArrays as $projectArray) {
+			$project = $this->getNewProject();
+			$project->setName($projectArray["name"]);
+			$project->setOwner($projectArray["owner"]);
+			$project->setId($projectArray["id"]);
+			$projects[] = $project;	
+		}
+		return $projects;
 	}
 }
