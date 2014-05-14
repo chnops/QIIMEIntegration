@@ -37,6 +37,10 @@ class PDODatabase implements DatabaseI {
 			$root = $result->fetchColumn(0);
 			$root += 1;
 
+			// TODO this functionality should be stored elsewhere, for example, the Roster object.
+			// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
+			system("mkdir projects/{$root}");
+
 			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (?, ?)");
 			if ($pdoStatement->execute(array($username, $root))) {
 				return true;

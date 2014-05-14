@@ -35,12 +35,6 @@ abstract class Project {
 	public function setName($name) {
 		$this->name = $name;
 	}
-	public function createUser($username) {
-		$root = $this->database->getHighestUserRoot() + 1;
-		$this->database->insertUser($username, $root);
-		system("mkdir projects/{$root}");
-	}
 
-	public abstract function createProject($username, $projectName);
-	
+	public abstract function beginProject();
 }

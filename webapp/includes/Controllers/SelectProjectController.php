@@ -6,9 +6,10 @@ class SelectProjectController extends Controller {
 
 	protected $subTitle = "Select a Project";
 
-	private $userName = "";
+	private $username = "";
 	private $projects = array();
-	private $pastProject = "";
+	private $pastProjectName = "";
+	private $project = NULL;
 	
 	public function parseSession() {
 		if (!isset($_SESSION['username'])) {
@@ -16,19 +17,21 @@ class SelectProjectController extends Controller {
 			$this->immediateResult = "You cannot choose a project if you aren't logged in.";
 			return;
 		}
-		$this->userName = $_SESSION['username'];
+		$this->username = $_SESSION['username'];
 
-		if (isset($_SESSION['project_name'])) {
-			$this->pastProject = $_SESSION['project_name'];
+		if (isset($_SESSION['project_id'])) {
+			$pastProjectId = $_SESSION['project_id'];
+			$pastProject = $this->workflow->findProject($this->username, $pastProjectId);
+			$this->pastProjectName = $pastProject->getName();
 			$this->hasPastResults = true;
-			$this->pastResults = "You are currently working on the project: {$this->pastProject}";
+			$this->pastResults = "You are currently working on the project: {$this->pastProjectName}";
 		}
 
-		$this->projects = $this->database->getAllProjects($this->userName);
+		$this->projects = $this->workflow->getAllProjects($this->username);
 	}
 
 	public function parseInput() {
-		if (!$this->userName) {
+		if (!$this->username) {
 			return;
 		}
 		if (!isset($_POST['project'])) {
@@ -36,41 +39,60 @@ class SelectProjectController extends Controller {
 		}
 		$this->hasImmediateResult = true;
 
-		$projectName = $_POST['project'];
-		$projectExists = $this->projectExists($projectName);
-
 		if ($_POST['create']) {
+			$projectName = $_POST['project'];
+			$projectExists = $this->projectNameExists($projectName);
+
 			if ($projectExists) {
 				$this->immediateResult = "A project with that name already exists. Did you mean to select it?";
-				$this->pastResults = "You are no longer working on the project: {$this->projectName}";
-				unset($_SESSION['project_name']); 
+				$this->pastResults = "You are no longer working on the project: {$this->pastProjectName}";
+				unset($_SESSION['project_id']); 
 			}
 			else {
-				$this->workflow->getDefaultProject($this->database)->createProject($this->userName, $projectName);
+				$project = $this->workflow->getNewProject();
+				$project->setName($projectName);
+				$project->setOwner($this->username);
+				$project->beginProject();
 				$this->immediateResult = "Successfully created project: {$projectName}";
-				$_SESSION['project_name'] = $projectName;
+				$_SESSION['project_id'] = $project->getId();
 				$this->hasPastResults = true;
 				$this->pastResults = "You are now working on the project: {$projectName}";
 			}
 		}
 		else {
-			if ($projectExists) {
-				$this->immediateResult = "Project selected: {$projectName}";
-				$_SESSION['project_name'] = $projectName;
+			$projectId = $_POST['project'];
+			$projectExists = $this->projectIdExists($projectId);
+			if ($projectExists) { 
+				$project = $this->workflow->findProject($this->username, $projectId);
+				$this->immediateResult = "Project selected: {$project->getName()}";
+				$_SESSION['project_id'] = $projectId;
 				$this->hasPastResults = true;
-				$this->pastResults = "You are now working on the project: {$projectName}";
+				$this->pastResults = "You are now working on the project: {$project->getName()}";
 			}
 			else {
 				$this->immediateResult = "No project with that name exists. Did you mean to create it?";
-				$this->pastResults = "You are no longer working on the project: {$this->projectName}";
-				unset($_SESSION['project_name']); 
+				$this->pastResults = "You are no longer working on the project: {$this->pastProjectName}";
+				unset($_SESSION['project_id']); 
 			}
 		}
 
 	}
 
-	private function projectExists($projectName) {
-		return in_array($projectName, $this->projects);
+	private function projectNameExists($projectName) {
+		foreach ($this->projects as $project) {
+			if ($project->getName() == $projectName) {
+				return true;
+			}
+		}
+		return false;
+	}
+	private function projectIdExists($projectId) {
+		foreach ($this->projects as $project) {
+			if ($project->getId() == $projectId) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function getInstructions() {
@@ -81,7 +103,7 @@ class SelectProjectController extends Controller {
 	}
 
 	public function getForm() {
-		$disabled = ($this->userName) ? "" : " disabled";
+		$disabled = ($this->username) ? "" : " disabled";
 		$selectForm = "";
 		if (!empty($this->projects)) {
 			$selectForm = "
@@ -91,7 +113,7 @@ class SelectProjectController extends Controller {
 
 			foreach ($this->projects as $project) {
 				$selectForm .= "<label style=\"display:block;\" for=\"project\">
-					<input type=\"radio\" name=\"project\" value=\"{$project['id']}\"{$disabled}>{$project['name']}</label>";
+					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}>{$project->getName()}</label>";
 			}
 
 			$selectForm .=	"<button type=\"submit\"{$disabled}>Select</button>

@@ -47,14 +47,14 @@ class LoginController extends Controller {
 	}
 
 	private function logIn($username) {
+		$_SESSION = array();
 		$_SESSION['username'] = $username;
 		$this->immediateResult = "You have successfully logged in.";
 		$this->hasPastResults = true;
 		$this->pastResults = "You are now logged in as {$username}";
 	}
 	private function createUser($username) {
-		$project = $this->workflow->getProject($this->database);
-		$project->createUser($username);
+		$this->database->createUser($username);
 
 		$this->logIn($username);
 		$this->immediateResult = "You have successfully created a new user.";
