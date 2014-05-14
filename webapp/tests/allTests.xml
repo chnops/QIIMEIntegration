@@ -3,5 +3,8 @@
        <testsuite name="Database">
            <directory>Database</directory>
        </testsuite>
+       <testsuite name="Models">
+           <directory>Models</directory>
+       </testsuite>
    </testsuites>
 </phpunit>
