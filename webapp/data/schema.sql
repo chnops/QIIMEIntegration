@@ -14,11 +14,3 @@ CREATE TABLE IF NOT EXISTS projects (
 	PRIMARY KEY (id, owner) ,
 	FOREIGN KEY (owner) REFERENCES users (username)
 	);
-
-CREATE TABLE IF NOT EXISTS files (
-	project_id INTEGER NOT NULL ,
-	project_owner VARCHAR(255) NOT NULL ,
-	name_from_owner VARCHAR(255) NOT NULL ,
-	name_on_system VARCHAR(255) NOT NULL ,
-	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
-	);
