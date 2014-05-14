@@ -11,10 +11,13 @@ abstract class Project {
 	protected $database;
 	protected $operatingSystem;
 
+	protected $scripts;
+
 	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
 		$this->workflow = $workflow;
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
+		$this->scripts = $this->getInitialScripts();
 	}
 
 	public function getOwner() {
@@ -35,6 +38,10 @@ abstract class Project {
 	public function setName($name) {
 		$this->name = $name;
 	}
+	public function getScripts() {
+		return $this->scripts;
+	}
 
 	public abstract function beginProject();
+	public abstract function getInitialScripts();
 }

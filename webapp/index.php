@@ -11,6 +11,11 @@ spl_autoload_register(function($class) {
 // Run the application
 $database = new \Database\PDODatabase();
 $operatingSystem = new \Models\MacOperatingSystem();
-$workflow = new \Models\QIIMEWorkflow($operatingSystem);
-$indexController = new \Controllers\IndexController($database, $workflow);
+$workflow = new \Models\QIIMEWorkflow($database, $operatingSystem);
+if (isset($_GET['shortcut'])) {
+	$indexController = new \Controllers\ShortcutController($database, $workflow);
+}
+else {
+	$indexController = new \Controllers\IndexController($database, $workflow);
+}
 $indexController->run();
