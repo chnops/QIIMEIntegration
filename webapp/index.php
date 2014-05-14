@@ -8,6 +8,9 @@ spl_autoload_register(function($class) {
 	require_once("./includes/" . str_replace("\\", "/", $class) . ".php");
 });
 
-// Display the page that the user would like to see
-$indexController = new IndexController();
+// Run the application
+$database = new \Database\PDODatabase();
+$operatingSystem = new \Models\MacOperatingSystem();
+$workflow = new \Models\QIIMEWorkflow($operatingSystem);
+$indexController = new \Controllers\IndexController($database, $workflow);
 $indexController->run();

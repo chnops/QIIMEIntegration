@@ -15,24 +15,34 @@
 		div#content,div#help{background-color:#ffcc66;border:2.5px solid;margin:.25em .5em;padding:.5em;}
 		div#content{width:67%;float:left;}
 		div#help{width:27%;float:right;}
+		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;}
+		a{color:#003366;cursor:pointer;}
 		a:link {color:#003366;text-decoration:none;font-style:italic;}
 		a:hover {background-color:#ffffcc;text-decoration:underline;}
+		label{display:block;}
+		input[disabled]{background-color:#999966;}
+		hr.small{width:25%;margin-left:0px;}
 	</style>
+<script type="text/javascript">
+	function toggleInstruction() {
+		var control = document.getElementById('instruction_controller');
+		var body = document.getElementById('instructions');
+		if (control.innerHTML == "hide") {
+			control.innerHTML = "show";
+			body.style.display = "none";
+		}
+		else {
+			control.innerHTML = "hide";
+			body.style.display = "inline";
+		}
+	}	
+</script>
 </head>
 <body>
 <div id="banner"><h1><?php echo $this->title  ?></h1><h2><?php echo $this->subTitle ?></h2></div>
 <div id="navigation"><table><tr>
 <?php
-$steps = array(
-	"login" => "Login",	
-	"select" => "Select/create project",
-	"upload" => "Upload files",
-	"make_otu" => "Create OTU table",
-	"make_phylogeny" => "Perform phylogeny analysis [optional]",
-	"view" => "View results");
-if (isset($_SESSION['username'])) {
-	$steps['login'] = "Login (" . htmlentities($_SESSION['username']) . ")";
-}
+$steps = $this->getWorkflow()->getSteps();
 if (isset($steps[$this->step])) {
 	$steps[$this->step] = "<strong>" . $steps[$this->step] . "</strong>";
 }
