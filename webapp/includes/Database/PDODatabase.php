@@ -43,7 +43,7 @@ class PDODatabase implements DatabaseI {
 
 			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (?, ?)");
 			if ($pdoStatement->execute(array($username, $root))) {
-				return true;
+				return $root;
 			}
 			else {
 				$errorInfo = $pdoStatement->errorInfo();
@@ -106,7 +106,7 @@ class PDODatabase implements DatabaseI {
 				"name" => $projectName,
 			));
 			if ($result) {
-				return true;
+				return $id;
 			}
 			else {
 				$errorInfo = $pdoStatement->errorInfo();

@@ -39,16 +39,18 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::createUser
 	 */
 	public function testCreateUser() {
+		$expectedRoot = 2;
 		$newUser = "asdfasdf";
-		$this->assertTrue($this->database->createUser($newUser));
+		$newRoot = $this->database->createUser($newUser);
+		$this->assertSame($expectedRoot, $newRoot);
 		$result = $this->pdo->query("SELECT * FROM users WHERE username = \"{$newUser}\"");
 		$result = $result->fetch(\PDO::FETCH_ASSOC);
-		$this->assertEquals(array("username" => "asdfasdf", "root" => 2), $result);
+		$this->assertEquals(array("username" => "asdfasdf", "root" => $expectedRoot), $result);
 
 		$this->assertFalse($this->database->createUser($newUser));
 		$result = $this->pdo->query("SELECT * FROM users WHERE username = \"{$newUser}\"");
 		$result = $result->fetch(\PDO::FETCH_ASSOC);
-		$this->assertEquals(array("username" => "asdfasdf", "root" => 2), $result);
+		$this->assertEquals(array("username" => "asdfasdf", "root" => $expectedRoot), $result);
 	}
 
 	/**
@@ -90,8 +92,10 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 		$projectName = "Proj3";
 		$this->assertFalse($this->database->createProject($badUsername, $projectName));
 
+		$expectedId = 3;
 		$goodUsername = "sharpa";
-		$this->assertTrue($this->database->createProject($goodUsername, $projectName));
+		$newId = $this->database->createProject($goodUsername, $projectName);
+		$this->assertSame($expectedId, $newId);
 		$result = $this->pdo->query("SELECT * FROM projects WHERE owner = \"{$goodUsername}\" AND name = \"{$projectName}\"");
 		$result = $result->fetch(\PDO::FETCH_ASSOC);
 		$expectedResult = array("id" => 3, "owner" => $goodUsername, "name" => $projectName);

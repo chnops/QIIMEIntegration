@@ -1,3 +1,4 @@
 taxonomies
 webapp/projects/*
 webapp/data/database.sqlite
+webapp/tests/data/*
