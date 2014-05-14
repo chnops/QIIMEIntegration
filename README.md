@@ -30,3 +30,6 @@ Look into closed OTU (do not perform own phylogeny, use whole greengenes tree)
 Create map from OTU identifier (e.g. denovo) name to sequence(s)
 Make sure trees are still readable by R
 Incorporate UniFrac
+
+5. Web App
+A really convenient way to run this automation would be through the GUI that a web application provides.  Users can look at all the options available to them without having to dig through mounds of manual pages. The web application will be written in PHP, because that is the language I am most familiar with.
