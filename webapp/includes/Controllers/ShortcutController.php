@@ -15,10 +15,13 @@ class ShortcutController extends Controller {
 	}
 
 	public function getInstructions() {
-		$instructions = "<script type=\"text/javascript\">document.getElementById('navigation').style.display = \"none\";</script>";
-		$instructions .= "<style>label input{display:block}</style>";
-		$instructions .= "This page will take you from start to finish on you QIIME analysis. You can find helpful tips in the box on the right.";
-		return $instructions;
+		$project = $this->workflow->getNewProject();
+		$this->help = $project->renderHelp();
+
+		$javascript = "<script type=\"text/javascript\">document.getElementById('navigation').style.display=\"none\"</script>";
+		$css = "<style>label input{display:block}</style>";
+		$instructions = "This page will take you from start to finish on you QIIME analysis. You can find helpful tips in the box on the right.";
+		return $javascript . $css . $instructions;
 	}
 
 	public function getForm() {

@@ -24,10 +24,13 @@ class ValidateMappingFile extends DefaultScript {
 		return "validate_mapping_file.py";
 	}
 	public function getScriptTitle() {
-		return "<h4>Map validation parameters</h4>";
+		return "Map validation parameters";
+	}
+	public function getScriptShortTitle() {
+		return "validate";
 	}
 	public function renderHelp() {
-		return "The purpose of this script is to take your map file, and tell you if you did it right.";
+		return "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to take your map file, and tell you if you did it right.</p>";
 	}
 
 }

@@ -18,7 +18,8 @@ abstract class DefaultScript implements ScriptI {
 		return $this->parameters;
 	}
 	public function renderAsForm() {
-		$content = $this->getScriptTitle() . "\n";
+		$content = "<h4>{$this->getScriptTitle()} 
+			(<a onclick=\"displayHelp('script_help_{$this->getScriptShortTitle()}');\">help</a>)</h4>\n";
 		foreach ($this->parameters as $parameter) {
 			$content .= $parameter->renderForForm() . "\n";
 		}
@@ -34,5 +35,6 @@ abstract class DefaultScript implements ScriptI {
 
 	public abstract function getScriptName();
 	public abstract function getScriptTitle();
+	public abstract function getScriptShortTitle();
 	public abstract function renderHelp();
 }

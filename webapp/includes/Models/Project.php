@@ -43,11 +43,11 @@ abstract class Project {
 	}
 	public function renderForm() {
 		$form = "<form method=\"POST\" enctype=\"multipart/form-data\">
-			<h4>Name your project</h4>
+			<h4>Name your project (<a onclick=\"displayHelp('script_help_name');\">help</a>)</h4>
 			<label>Project name: <input type=\"text\"/></label>
 			<label>Project owner: <input type=\"text\"/></label>
 			<hr class=\"small\"/>
-			<h4>Input files</h4>
+			<h4>Input files (<a onclick=\"displayHelp('script_help_upload');\">help</a>)</h4>
 			<label>Map file: <input type=\"file\"/></label>
 			<hr class=\"small\"/>";
 
@@ -58,6 +58,35 @@ abstract class Project {
 
 		$form .= "</form>";
 		return $form;
+	}
+	public function renderHelp() {
+		$javascript = "
+			<script type=\"text/javascript\">
+			var displayedHelp = null;
+			function displayHelp(id) {
+				if (displayedHelp != null) {
+					displayedHelp.style.display=\"none\";
+				}
+				displayedHelp = document.getElementById(id);
+				displayedHelp.style.display=\"block\";
+			}
+			</script>";
+		$css = "<style>div.script_help{display:none;}</style>";
+		$help = "<div class=\"script_help\" id=\"script_help_name\">";
+		$help .= "<p>Name your project</p>
+			<p>Choose something short, yet descriptive.  Any name will do.  For owner, put your own netID, or the netID of whoever will own the project.</p>";
+		$help .= "</div>";
+		$help .= "<div class=\"script_help\" id=\"script_help_upload\">";
+		$help .= "<p>Upload files</p>
+			<p>Upload a map file.  </p>";
+		$help .= "</div>";
+		foreach ($this->getScripts() as $script) {	
+			$help .= "<div class=\"script_help\" id=\"script_help_{$script->getScriptShortTitle()}\">";
+			$help .= $script->renderHelp();
+			$help .= "</div>";
+		}
+
+		return  $javascript . $css . $help;
 	}
 
 	public abstract function beginProject();
