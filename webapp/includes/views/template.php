@@ -20,6 +20,8 @@
 		a{color:#003366;cursor:pointer;}
 		a:link {color:#003366;text-decoration:none;font-style:italic;}
 		a:hover {background-color:#ffffcc;text-decoration:underline;}
+		a.button{font-style:normal;background-color:white;color:black;border:2px outset;padding:.25em;}
+		a.button:active {border:2px inset;}
 		label{display:block;margin:.5em 0em;}
 		input[disabled]{background-color:#999966;}
 		hr.small{width:25%;margin-left:0px;}

@@ -7,16 +7,16 @@ class ValidateMappingFile extends DefaultScript {
 	public function getInitialParameters() {
 		$required = true;
 		return array(
-			new DefaultParameter("--version", ""),
-			new DefaultParameter("--help", ""),
+			new VersionParameter("--version", ""),
+			new HelpParameter("--help", ""),
 			new DefaultParameter("-o", "mapping_output"),
-			new DefaultParameter("-verbose", "True"),
-			new DefaultParameter("--char_replace", "_"),
-			new DefaultParameter("--not_barcoded", "False"),
-			new DefaultParameter("--variable_len_barcodes", "False"),
-			new DefaultParameter("--disable_primer_check", "False"),
-			new DefaultParameter("-j", ""),
-			new DefaultParameter("--suppress_html", "False"),
+			new TrueFalseInvertedParameter("-verbose", "True"),
+			new TextArgumentParameter("--char_replace", "_"),
+			new TrueFalseParameter("--not_barcoded", "False"),
+			new TrueFalseParameter("--variable_len_barcodes", "False"),
+			new TrueFalseParameter("--disable_primer_check", "False"),
+			new TextArgumentParameter("-j", ""),
+			new TrueFalseParameter("--suppress_html", "False"),
 			new DefaultParameter("--mapping_fp", "", $required),
 		);
 	}

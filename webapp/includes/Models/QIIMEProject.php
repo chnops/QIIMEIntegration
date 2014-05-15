@@ -12,7 +12,7 @@ class QIIMEProject extends Project {
 	public function getInitialScripts() {
 		return array(
 			new \Models\Scripts\ValidateMappingFile($this->database, $this->operatingSystem),
-			new \Models\Scripts\SplitLibraries($this->database, $this->operatingSystem),
+//			new \Models\Scripts\SplitLibraries($this->database, $this->operatingSystem),
 		);
 	}
 

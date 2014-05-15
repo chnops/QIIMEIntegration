@@ -19,7 +19,7 @@ class ShortcutController extends Controller {
 		$this->help = $project->renderHelp();
 
 		$javascript = "<script type=\"text/javascript\">document.getElementById('navigation').style.display=\"none\"</script>";
-		$css = "<style>label input{display:block}</style>";
+		$css = "<style>input[type=\"text\"],input[type=\"file\"]{display:block}</style>";
 		$instructions = "This page will take you from start to finish on you QIIME analysis. You can find helpful tips in the box on the right.";
 		return $javascript . $css . $instructions;
 	}
