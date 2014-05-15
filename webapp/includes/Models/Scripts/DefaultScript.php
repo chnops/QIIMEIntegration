@@ -17,10 +17,10 @@ abstract class DefaultScript implements ScriptI {
 	public function getParameters() {
 		return $this->parameters;
 	}
-	public function renderForm() {
-		$content = $this->getScriptTitle();
+	public function renderAsForm() {
+		$content = $this->getScriptTitle() . "\n";
 		foreach ($this->parameters as $parameter) {
-			$content .= $parameter->renderForForm();
+			$content .= $parameter->renderForForm() . "\n";
 		}
 		return $content;
 	}

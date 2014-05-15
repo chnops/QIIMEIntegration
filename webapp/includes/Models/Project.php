@@ -41,6 +41,24 @@ abstract class Project {
 	public function getScripts() {
 		return $this->scripts;
 	}
+	public function renderForm() {
+		$form = "<form method=\"POST\" enctype=\"multipart/form-data\">
+			<h4>Name your project</h4>
+			<label>Project name: <input type=\"text\"/></label>
+			<label>Project owner: <input type=\"text\"/></label>
+			<hr class=\"small\"/>
+			<h4>Input files</h4>
+			<label>Map file: <input type=\"file\"/></label>
+			<hr class=\"small\"/>";
+
+		foreach ($this->getScripts() as $script) {
+			$form .= $script->renderAsForm();
+			$form .= "<hr class=\"small\"/>";
+		}
+
+		$form .= "</form>";
+		return $form;
+	}
 
 	public abstract function beginProject();
 	public abstract function getInitialScripts();

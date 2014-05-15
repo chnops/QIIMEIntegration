@@ -22,23 +22,7 @@ class ShortcutController extends Controller {
 	}
 
 	public function getForm() {
-		ob_start();
 		$project = $this->workflow->getNewProject();
-?>
-<form method="POST" enctype="multipart/form-data">
-<h4>Name your project</h4>
-<label>Project name: <input type="text"/></label>
-<label>Project owner: <input type="text"/></label>
-<hr class="small"/>
-<h4>Input files</h4>
-<label>Map file: <input type="file"/></label>
-<hr class="small"/>
-<?php
-		foreach ($project->getScripts() as $script) {
-			echo $script->renderForm();
-			echo "<hr class=\"small\"/>";
-		}
-		echo "</form>";
-		return ob_get_clean();
+		return $project->renderForm();
 	}
 }
