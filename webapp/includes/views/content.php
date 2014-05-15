@@ -16,4 +16,4 @@ echo "<p><em>Instructions (<a id=\"instruction_controller\" onclick=\"toggleInst
 
 echo "<hr/>";
 
-echo $this->getForm() . "\n";
+echo "<div class=\"form\">{$this->getForm()}</div>\n";

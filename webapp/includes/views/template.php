@@ -15,11 +15,12 @@
 		div#content,div#help{background-color:#ffcc66;border:2.5px solid;margin:.25em .5em;padding:.5em;}
 		div#content{width:67%;float:left;}
 		div#help{width:27%;float:right;}
+		div#content div.form{margin-left:2.5em;text-align:left;width:45%;border:2px #999966 ridge;padding:1em;}
 		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;}
 		a{color:#003366;cursor:pointer;}
 		a:link {color:#003366;text-decoration:none;font-style:italic;}
 		a:hover {background-color:#ffffcc;text-decoration:underline;}
-		label{display:block;}
+		label{display:block;margin:.5em 0em;}
 		input[disabled]{background-color:#999966;}
 		hr.small{width:25%;margin-left:0px;}
 	</style>

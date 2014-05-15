@@ -16,7 +16,7 @@ class DefaultParameter implements ParameterI {
 		return $this->name . " " . $this->value;
 	}
 	public function renderForForm() {
-		return "<label for=\"$this->name\">{$this->name}&nbsp;&nbsp;<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";
+		return "<label for=\"$this->name\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";
 	}
 	public function setValue($value) {
 		$this->value = $this->setValue;
