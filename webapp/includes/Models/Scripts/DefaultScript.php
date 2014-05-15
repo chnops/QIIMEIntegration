@@ -30,7 +30,7 @@ abstract class DefaultScript implements ScriptI {
 		foreach ($this->parameters as $parameter) {
 			$arbitraryScript .= $parameter->renderForOperatingSystem() . " ";
 		}
-		//TODO 	$this->operatingSystem->executeArbitraryScript($arbitraryScript);
+		$this->operatingSystem->executeArbitraryScript($arbitraryScript);
 		return $arbitraryScript;
 	}
 	public function processInput(array $input) {

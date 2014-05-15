@@ -47,7 +47,7 @@ abstract class Project {
 		$form = "<form method=\"POST\" enctype=\"multipart/form-data\">
 			<h4>Name your project (<a onclick=\"displayHelp('script_help_name');\">help</a>)</h4>
 			<label>Project name: <input type=\"text\" name=\"project_name\" value=\"{$projectName}\"/></label>
-			<label>Project owner: <input type=\"text\" name=\"project_owner\" value=\"{$owner}/></label>
+			<label>Project owner: <input type=\"text\" name=\"project_owner\" value=\"{$owner}\"/></label>
 			<hr class=\"small\"/>
 			<h4>Input files (<a onclick=\"displayHelp('script_help_upload');\">help</a>)</h4>
 			<label>Map file: <input type=\"file\" name=\"project_input_file\"/></label>

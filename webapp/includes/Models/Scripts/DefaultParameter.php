@@ -13,8 +13,11 @@ class DefaultParameter implements ParameterI {
 		$this->isRequired = $isRequired;
 	}
 	public function renderForOperatingSystem() {
-		$separator = (strlen($this->name) == 2) ? " " : "=";
-		return $this->name . $separator . $this->value;
+		if ($this->value) {
+			$separator = (strlen($this->name) == 2) ? " " : "=";
+			return $this->name . $separator . "'" . $this->value . "'";
+		}
+		return "";
 	}
 	public function renderForForm() {
 		return "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";

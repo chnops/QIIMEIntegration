@@ -9,7 +9,7 @@ class ValidateMappingFile extends DefaultScript {
 		return array(
 			"--version" => new VersionParameter("--version", ""),
 			"--help" => new HelpParameter("--help", ""),
-			"--output_fp" => new NewFileParameter("--output_fp", "mapping_output"),
+			"--output_dir" => new NewFileParameter("--output_dir", "mapping_output"),
 			"--verbose" => new TrueFalseInvertedParameter("--verbose", "True"),
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_"),
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded", "False"),
