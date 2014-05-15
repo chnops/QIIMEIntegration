@@ -24,7 +24,7 @@ class SelectProjectController extends Controller {
 			$pastProject = $this->workflow->findProject($this->username, $pastProjectId);
 			$this->pastProjectName = $pastProject->getName();
 			$this->hasPastResults = true;
-			$this->pastResults = "You are currently working on the project: {$this->pastProjectName}";
+			$this->pastResults = htmlentities("You are currently working on the project: {$this->pastProjectName}");
 		}
 
 		$this->projects = $this->workflow->getAllProjects($this->username);
@@ -75,7 +75,8 @@ class SelectProjectController extends Controller {
 				unset($_SESSION['project_id']); 
 			}
 		}
-
+		$this->immediateResult = htmlentities($this->immediateResult);
+		$this->pastResults = htmlentities($this->pastResults);
 	}
 
 	private function projectNameExists($projectName) {
@@ -112,8 +113,9 @@ class SelectProjectController extends Controller {
 				<input type=\"hidden\" name=\"create\" value=\"0\"{$disabled}>";
 
 			foreach ($this->projects as $project) {
+				$projectName = htmlentities($project->getName());
 				$selectForm .= "<label style=\"display:block;\" for=\"project\">
-					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}>{$project->getName()}</label>";
+					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}>{$projectName}</label>";
 			}
 
 			$selectForm .=	"<button type=\"submit\"{$disabled}>Select</button>

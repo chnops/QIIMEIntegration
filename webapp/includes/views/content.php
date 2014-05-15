@@ -1,12 +1,12 @@
 <?php echo "<h2>{$this->getSubtitle()}</h2>\n";
 
 if ($this->hasImmediateResult()) {
-	echo "<div class=\"result immediate\">" . htmlentities($this->getImmediateResult()) . "</div>\n";
+	echo "<div class=\"result immediate\">{$this->getImmediateResult()}</div>\n";
 	echo "<hr/>";
 }
 
 if ($this->hasPastResults()) {
-	echo "<div class=\"result past\">" . htmlentities($this->getPastResults()) . "</div>\n";
+	echo "<div class=\"result past\">{$this->getPastResults()}</div>\n";
 	echo "<hr/>";
 }
 

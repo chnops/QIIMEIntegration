@@ -16,7 +16,7 @@ class LoginController extends Controller {
 
 	public function parseInput() {
 		if (!isset($_POST['username'])) {
-			$this->pastResults = "You are currently logged in as {$this->userName}";
+			$this->pastResults = htmlentities("You are currently logged in as {$this->userName}");
 			return;
 		}
 		$this->hasImmediateResult = true;
@@ -44,6 +44,7 @@ class LoginController extends Controller {
 				$this->pastResults = "You are still logged in as {$this->userName}";
 			}
 		}
+		$this->pastResults = htmlentities($this->pastResults);
 	}
 
 	private function logIn($username) {
