@@ -11,7 +11,6 @@ class ShortcutController extends Controller {
 	}
 
 	public function parseInput() {
-		$this->sessionData = "No login required";
 		if (!empty($_POST)) {
 			$this->hasResult = true;
 			$project = $this->workflow->getNewProject();
@@ -32,5 +31,8 @@ class ShortcutController extends Controller {
 	public function getForm() {
 		$project = $this->workflow->getNewProject();
 		return $project->renderForm();
+	}
+	public function getSessionData() {
+		return "No login required";
 	}
 }
