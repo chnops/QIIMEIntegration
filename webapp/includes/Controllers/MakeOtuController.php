@@ -6,6 +6,10 @@ class MakeOtuController extends Controller {
 
 	protected $subTitle = "Make OTU Table";
 
+	public function retrievePastResults() {
+		return "Not yet implemented";
+	}
+
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
 			$this->isResultError = true;

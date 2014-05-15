@@ -19,6 +19,7 @@ abstract class Controller {
 	protected $isResultError = false;
 	protected $hasResult = false;
 	protected $result = "Result not yet implemented!";
+	private $pastResults = "";
 
 	public function __construct(\Database\DatabaseI $database, \Models\WorkflowI $workflow) {
 		$this->database = $database;
@@ -28,6 +29,7 @@ abstract class Controller {
 	}
 
 	public abstract function parseInput(); 
+
 	public function parseSession() {
 		if (!isset($_SESSION['username'])) {
 			return;
@@ -37,6 +39,11 @@ abstract class Controller {
 			return;
 		}
 		$this->project = $this->workflow->findProject($this->username, $_SESSION['project_id']);
+		$this->pastResults = $this->retrievePastResults();
+	}
+
+	public function retrievePastResults() {
+		return "";
 	}
 
 	public function isResultError() {
@@ -61,6 +68,12 @@ abstract class Controller {
 			$output .= ", but <strong>you have not selected a project.</strong>";
 		}
 		return $output;
+	}
+	public function hasPastResults() {
+		if ($this->pastResults) {
+			return true;
+		}
+		return false;
 	}
 	public function getInstructions() {
 		return "<div class=\"error\">Instructions not yet implemented!</div>";

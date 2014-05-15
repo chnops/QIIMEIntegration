@@ -6,6 +6,10 @@ class MakePhylogenyController extends Controller {
 
 	protected $subTitle = "Perform Phylogeny Analysis";
 
+	public function retrievePastResults() {
+		return "Not yet implemented";
+	}
+
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
 			$this->isResultError = true;

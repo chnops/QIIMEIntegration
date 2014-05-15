@@ -11,7 +11,11 @@ if ($this->hasResult()) {
 
 echo "<p><em>Instructions (<a id=\"instruction_controller\" onclick=\"toggleInstruction();\">hide</a>):</em></p><span id=\"instructions\">" .
    	$this->getInstructions() . "</span>\n";
-
 echo "<hr/>";
+
+if ($this->hasPastResults()) {
+	echo "This analysis has been run before... it feels so... familiar.";
+	echo "<hr/>";
+}
 
 echo "<div class=\"form\">{$this->getForm()}</div>\n";

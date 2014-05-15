@@ -6,6 +6,10 @@ class UploadController extends Controller {
 
 	protected $subTitle = "Upload a Map";
 
+	public function retrievePastResults() {
+		return "Not yet implement";
+	}
+
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
 			$this->isResultError = true;

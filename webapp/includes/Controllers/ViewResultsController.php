@@ -6,6 +6,10 @@ class ViewResultsController extends Controller {
 
 	protected $subTitle = "View Results";
 
+	public function retrievePastResults() {
+		return "Not yet implement";
+	}
+
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
 			$this->isResultError = true;
