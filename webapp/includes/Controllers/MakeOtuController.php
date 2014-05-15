@@ -6,17 +6,13 @@ class MakeOtuController extends Controller {
 
 	protected $subTitle = "Make OTU Table";
 
-	public function parseSession() {
-		if (!isset($_SESSION['username'])) {
-			$this->content .= "You cannot work on a project if you are not logged in!<br/>";
-		}
-		if (!isset($_SESSION['project'])) {
-			$this->content .= "You cannot work on a project if you haven't selected one!<br/>";
-		}
-	}
-
 	public function parseInput() {
-
+		if (!$this->username || !$this->project) {
+			$this->isResultError = true;
+			$this->hasResult = true;
+			$this->result = "In order to upload files, you must be logged in and have a project selected.";
+			return;
+		}
 	}
 
 	public function getInstructions() {

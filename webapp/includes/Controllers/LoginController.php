@@ -5,31 +5,19 @@ namespace Controllers;
 class LoginController extends Controller {
 
 	protected $subTitle = "Login";
-	private $userName = "";
-
-	public function parseSession() {
-		if (isset($_SESSION['username'])) {
-			$this->hasPastResults = true;
-			$this->userName = $_SESSION['username'];
-		}
-	}
 
 	public function parseInput() {
 		if (!isset($_POST['username'])) {
-			$this->pastResults = htmlentities("You are currently logged in as {$this->userName}");
 			return;
 		}
-		$this->hasImmediateResult = true;
+		$this->hasResult = true;
 		$username = $_POST['username'];
 		$userExists = $this->database->userExists($username);
 		
 		if ($_POST['create']) {
 			if ($userExists) {
-				$this->immediateResult = "That username is already taken.  Did you mean to log in?";
-				if (isset($_SESSION['username'])) {
-					$this->pastResults = "You are no longer logged in as {$_SESSION['username']}";
-					unset($_SESSION['username']); 
-				}
+				$this->isResultError = true;
+				$this->result = "That username is already taken.  Did you mean to log in?";
 			}
 			else {
 				$this->createUser($username);
@@ -40,25 +28,24 @@ class LoginController extends Controller {
 				$this->logIn($username);
 			}
 			else {
-				$this->immediateResult = "We found no record of your username.  Would you like to create one?";
-				$this->pastResults = "You are still logged in as {$this->userName}";
+				$this->isResultError = true;
+				$this->result = "We found no record of your username.  Would you like to create one?";
 			}
 		}
-		$this->pastResults = htmlentities($this->pastResults);
 	}
 
 	private function logIn($username) {
 		$_SESSION = array();
 		$_SESSION['username'] = $username;
-		$this->immediateResult = "You have successfully logged in.";
-		$this->hasPastResults = true;
-		$this->pastResults = "You are now logged in as {$username}";
+		$this->project = NULL;
+		$this->username = $username;
+		$this->result = "You have successfully logged in.";
 	}
 	private function createUser($username) {
 		$this->database->createUser($username);
 
 		$this->logIn($username);
-		$this->immediateResult = "You have successfully created a new user.";
+		$this->result = "You have successfully created a new user.";
 	}
 
 	public function getInstructions() {
@@ -71,7 +58,7 @@ class LoginController extends Controller {
 			<p>Log in (existing user)<br/>
 			<input type=\"hidden\" name=\"step\" value=\"{$this->step}\">
 			<input type=\"hidden\" name=\"create\" value=\"0\">
-			<label for=\"username\">User name: <input type=\"text\" name=\"username\"></label>
+			<label for=\"username\">User name: <input type=\"text\" name=\"username\" value=\"{$this->username}\"></label>
 			<button type=\"submit\">Log In</button></p>
 			</form>";
 		$createForm = "

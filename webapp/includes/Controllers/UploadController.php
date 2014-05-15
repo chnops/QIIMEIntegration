@@ -6,24 +6,13 @@ class UploadController extends Controller {
 
 	protected $subTitle = "Upload a Map";
 
-	private $userName = "";
-	private $projectName = "";
-	private $project = NULL;
-
-	public function parseSession() {
-		if (!isset($_SESSION['username']) || !isset($_SESSION['project_name'])) {
-			$this->hasImmedateResult = true;
-			$this->immediateResult = "In order to upload files, you must be <a href=\"index.php?step=login\">logged in</a>
-				and <a href=\"index.php?step=select\">have a project selected</a>";
+	public function parseInput() {
+		if (!$this->username || !$this->project) {
+			$this->isResultError = true;
+			$this->hasResult = true;
+			$this->result = "In order to upload files, you must be logged in and have a project selected.";
 			return;
 		}
-		$this->userName = $_SESSION['username'];
-		$this->projectName = $_SESSION['project_name'];
-
-		// TODO retrieve project
-	}
-
-	public function parseInput() {
 		if (isset($_FILES['map_file'])) {
 			echo $this->uploadFile($_FILES['map_file']);
 		}	

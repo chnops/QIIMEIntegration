@@ -6,57 +6,44 @@ class SelectProjectController extends Controller {
 
 	protected $subTitle = "Select a Project";
 
-	private $username = "";
 	private $projects = array();
-	private $pastProjectName = "";
-	private $project = NULL;
 	
 	public function parseSession() {
-		if (!isset($_SESSION['username'])) {
-			$this->hasImmediateResult = true;
-			$this->immediateResult = "You cannot choose a project if you aren't logged in.";
-			return;
+		parent::parseSession();
+		if ($this->username) {
+			$this->projects = $this->workflow->getAllProjects($this->username);
 		}
-		$this->username = $_SESSION['username'];
-
-		if (isset($_SESSION['project_id'])) {
-			$pastProjectId = $_SESSION['project_id'];
-			$pastProject = $this->workflow->findProject($this->username, $pastProjectId);
-			$this->pastProjectName = $pastProject->getName();
-			$this->hasPastResults = true;
-			$this->pastResults = htmlentities("You are currently working on the project: {$this->pastProjectName}");
-		}
-
-		$this->projects = $this->workflow->getAllProjects($this->username);
 	}
 
 	public function parseInput() {
 		if (!$this->username) {
+			$this->hasResult = true;
+			$this->isResultError = true;
+			$this->result = "You cannot choose a project if you aren't logged in.";
 			return;
 		}
 		if (!isset($_POST['project'])) {
 			return;
 		}
-		$this->hasImmediateResult = true;
+		$this->hasResult = true;
 
 		if ($_POST['create']) {
 			$projectName = $_POST['project'];
 			$projectExists = $this->projectNameExists($projectName);
 
 			if ($projectExists) {
-				$this->immediateResult = "A project with that name already exists. Did you mean to select it?";
-				$this->pastResults = "You are no longer working on the project: {$this->pastProjectName}";
-				unset($_SESSION['project_id']); 
+				$this->isResultError = true;
+				$this->result = "A project with that name already exists. Did you mean to select it?";
 			}
 			else {
 				$project = $this->workflow->getNewProject();
 				$project->setName($projectName);
 				$project->setOwner($this->username);
 				$project->beginProject();
-				$this->immediateResult = "Successfully created project: {$projectName}";
+				$this->projects[] = $project;
+				$this->result = "Successfully created project: " . htmlentities($projectName);
 				$_SESSION['project_id'] = $project->getId();
-				$this->hasPastResults = true;
-				$this->pastResults = "You are now working on the project: {$projectName}";
+				$this->project = $project;
 			}
 		}
 		else {
@@ -64,19 +51,15 @@ class SelectProjectController extends Controller {
 			$projectExists = $this->projectIdExists($projectId);
 			if ($projectExists) { 
 				$project = $this->workflow->findProject($this->username, $projectId);
-				$this->immediateResult = "Project selected: {$project->getName()}";
+				$this->result = "Project selected: " . htmlentities($project->getName());
 				$_SESSION['project_id'] = $projectId;
-				$this->hasPastResults = true;
-				$this->pastResults = "You are now working on the project: {$project->getName()}";
+				$this->project = $project;
 			}
 			else {
-				$this->immediateResult = "No project with that name exists. Did you mean to create it?";
-				$this->pastResults = "You are no longer working on the project: {$this->pastProjectName}";
-				unset($_SESSION['project_id']); 
+				$this->isResultError = true;
+				$this->result = "No project with that name exists. Did you mean to create it?";
 			}
 		}
-		$this->immediateResult = htmlentities($this->immediateResult);
-		$this->pastResults = htmlentities($this->pastResults);
 	}
 
 	private function projectNameExists($projectName) {
@@ -113,9 +96,11 @@ class SelectProjectController extends Controller {
 				<input type=\"hidden\" name=\"create\" value=\"0\"{$disabled}>";
 
 			foreach ($this->projects as $project) {
+				$checkedName = ($this->project) ? $this->project->getName() : "";
+				$checked = ($checkedName == $project->getName()) ? " checked" : "";
 				$projectName = htmlentities($project->getName());
 				$selectForm .= "<label style=\"display:block;\" for=\"project\">
-					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}>{$projectName}</label>";
+					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}{$checked}>{$projectName}</label>";
 			}
 
 			$selectForm .=	"<button type=\"submit\"{$disabled}>Select</button>

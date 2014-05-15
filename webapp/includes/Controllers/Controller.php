@@ -13,10 +13,12 @@ abstract class Controller {
 	protected $step;
 	private $content = "";
 
-	protected $hasImmediateResult = false;
-	protected $immediateResult = "<div class=\"error\">Immediate result not yet implemented!</div>";
-	protected $hasPastResults = false;
-	protected $pastResults = "<div class=\"error\">Past results not yet implemented!</div>";
+	protected $username = "";
+	protected $project = NULL;
+
+	protected $isResultError = false;
+	protected $hasResult = false;
+	protected $result = "Result not yet implemented!";
 
 	public function __construct(\Database\DatabaseI $database, \Models\WorkflowI $workflow) {
 		$this->database = $database;
@@ -26,19 +28,39 @@ abstract class Controller {
 	}
 
 	public abstract function parseInput(); 
-	public abstract function parseSession();
+	public function parseSession() {
+		if (!isset($_SESSION['username'])) {
+			return;
+		}
+		$this->username = $_SESSION['username'];
+		if (!isset($_SESSION['project_id'])) {
+			return;
+		}
+		$this->project = $this->workflow->findProject($this->username, $_SESSION['project_id']);
+	}
 
-	public function hasImmediateResult() {
-		return $this->hasImmediateResult;
+	public function isResultError() {
+		return $this->isResultError;
 	}
-	public function getImmediateResult() {
-		return $this->immediateResult;
+	public function hasResult() {
+		return $this->hasResult;
 	}
-	public function hasPastResults() {
-		return $this->hasPastResults;
+	public function getResult() {
+		return $this->result;
 	}
-	public function getPastResults() {
-		return $this->pastResults;
+	public function getSessionData() {
+		if (!$this->username) {
+			return "You are not logged on.";
+		}
+		$output =  "You are currently logged in as <strong>" . htmlentities($this->username) . "</strong>";
+
+		if ($this->project) {
+			$output .= ", and you have selected the project <strong>" . htmlentities($this->project->getName()) . "</strong>";
+		}
+		else {
+			$output .= ", but <strong>you have not selected a project.</strong>";
+		}
+		return $output;
 	}
 	public function getInstructions() {
 		return "<div class=\"error\">Instructions not yet implemented!</div>";

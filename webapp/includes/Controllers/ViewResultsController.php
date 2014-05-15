@@ -6,16 +6,12 @@ class ViewResultsController extends Controller {
 
 	protected $subTitle = "View Results";
 
-	public function parseSession() {
-		if (!isset($_SESSION['username'])) {
-			$this->content .= "You are not corrently logged in.<br/>";
-		}
-		if (!isset($_SESSION['project'])) {
-			$this->content .= "You have not currently selected a project.<br/>";
-		}
-	}
-
 	public function parseInput() {
+		if (!$this->username || !$this->project) {
+			$this->isResultError = true;
+			$this->hasResult = true;
+			$this->result = "In order to upload files, you must be logged in and have a project selected.";
+		}
 		if (!isset($_POST['page'])) {
 			return;
 		}

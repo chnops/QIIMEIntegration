@@ -7,15 +7,15 @@ class ShortcutController extends Controller {
 	protected $subTitle = "Full Analysis";
 
 	public function parseSession() {
-		$this->help = "";
+		return;
 	}
 
 	public function parseInput() {
-		$this->hasPastResult = false;
+		$this->sessionData = "No login required";
 		if (!empty($_POST)) {
-			$this->hasImmediateResult = true;
+			$this->hasResult = true;
 			$project = $this->workflow->getNewProject();
-			$this->immediateResult = $project->processInput($_POST);
+			$this->result = $project->processInput($_POST);
 		}
 	}
 

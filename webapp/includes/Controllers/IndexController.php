@@ -19,10 +19,10 @@ class IndexController extends Controller {
 		}
 	}
 
-	public function hasImmediateResult() {return false;}
-	public function getImmediateResult() {return;}
-	public function hasPastResults() {return false;}
-	public function getPastResults() {return;}
+	public function hasResult() {return false;}
+	public function getResult() {return;}
+	public function hasSessionData() {return false;}
+	public function getSessionData() {return;}
 	public function getInstructions() {return "";}
 	public function getForm() {return "";}
 
