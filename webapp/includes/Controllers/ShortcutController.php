@@ -11,7 +11,12 @@ class ShortcutController extends Controller {
 	}
 
 	public function parseInput() {
-		// TODO handle ALL form data!
+		$this->hasPastResult = false;
+		if (!empty($_POST)) {
+			$this->hasImmediateResult = true;
+			$project = $this->workflow->getNewProject();
+			$this->immediateResult = $project->processInput($_POST);
+		}
 	}
 
 	public function getInstructions() {

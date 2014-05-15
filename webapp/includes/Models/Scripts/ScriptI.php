@@ -12,4 +12,5 @@ interface ScriptI {
 	public function getParameters();
 	public function renderHelp();
 	public function run();
+	public function processInput(array $input);
 }

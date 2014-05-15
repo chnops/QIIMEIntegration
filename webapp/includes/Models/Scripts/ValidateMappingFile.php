@@ -7,17 +7,17 @@ class ValidateMappingFile extends DefaultScript {
 	public function getInitialParameters() {
 		$required = true;
 		return array(
-			new VersionParameter("--version", ""),
-			new HelpParameter("--help", ""),
-			new NewFileParameter("--output_fp", "mapping_output"),
-			new TrueFalseInvertedParameter("--verbose", "True"),
-			new TextArgumentParameter("--char_replace", "_"),
-			new TrueFalseParameter("--not_barcoded", "False"),
-			new TrueFalseParameter("--variable_len_barcodes", "False"),
-			new TrueFalseParameter("--disable_primer_check", "False"),
-			new TextArgumentParameter("-j", ""),
-			new TrueFalseParameter("--suppress_html", "False"),
-			new OldFileParameter("--mapping_fp", "", $required),
+			"--version" => new VersionParameter("--version", ""),
+			"--help" => new HelpParameter("--help", ""),
+			"--output_fp" => new NewFileParameter("--output_fp", "mapping_output"),
+			"--verbose" => new TrueFalseInvertedParameter("--verbose", "True"),
+			"--char_replace" => new TextArgumentParameter("--char_replace", "_"),
+			"--not_barcoded" => new TrueFalseParameter("--not_barcoded", "False"),
+			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes", "False"),
+			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check", "False"),
+			"-j" => new TextArgumentParameter("-j", ""),
+			"--suppress_html" => new TrueFalseParameter("--suppress_html", "False"),
+			"--mapping_fp" => new OldFileParameter("--mapping_fp", "", $required),
 		);
 	}
 	public function getScriptName() {

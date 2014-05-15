@@ -30,7 +30,15 @@ abstract class DefaultScript implements ScriptI {
 		foreach ($this->parameters as $parameter) {
 			$arbitraryScript .= $parameter->renderForOperatingSystem() . " ";
 		}
-		$this->operatingSystem->executeArbitraryScript($arbitraryScript);
+		//TODO 	$this->operatingSystem->executeArbitraryScript($arbitraryScript);
+		return $arbitraryScript;
+	}
+	public function processInput(array $input) {
+		foreach ($input as $inputName => $inputValue) {
+			$parameter = $this->parameters[$inputName];
+			$parameter->setValue($inputValue);
+		}
+		return "Once this is working, it will run the script:<br/>{$this->run()}<br/>";
 	}
 
 	public abstract function getScriptName();
