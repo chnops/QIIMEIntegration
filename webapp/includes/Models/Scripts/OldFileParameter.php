@@ -2,8 +2,8 @@
 
 namespace Models\Scripts;
 
-class ChoiceParameter extends DefaultParameter {
-	private $options = array("one", "two");
+class OldFileParameter extends DefaultParameter {
+	private $options = array("dbOne", "dbTwo");
 	public function renderForForm() {
 		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\">\n";
 		foreach ($this->options as $option) {

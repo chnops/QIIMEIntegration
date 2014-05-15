@@ -9,15 +9,15 @@ class ValidateMappingFile extends DefaultScript {
 		return array(
 			new VersionParameter("--version", ""),
 			new HelpParameter("--help", ""),
-			new DefaultParameter("-o", "mapping_output"),
-			new TrueFalseInvertedParameter("-verbose", "True"),
+			new NewFileParameter("--output_fp", "mapping_output"),
+			new TrueFalseInvertedParameter("--verbose", "True"),
 			new TextArgumentParameter("--char_replace", "_"),
 			new TrueFalseParameter("--not_barcoded", "False"),
 			new TrueFalseParameter("--variable_len_barcodes", "False"),
 			new TrueFalseParameter("--disable_primer_check", "False"),
 			new TextArgumentParameter("-j", ""),
 			new TrueFalseParameter("--suppress_html", "False"),
-			new DefaultParameter("--mapping_fp", "", $required),
+			new OldFileParameter("--mapping_fp", "", $required),
 		);
 	}
 	public function getScriptName() {
