@@ -65,8 +65,32 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch (OperatingSystemException $ex) {
 			$this->assertEquals("mkdir failed: 1", $ex->getMessage());
 		}
-
 		system("rmdir {$this->newHome}/1");
+
+		try {
+			$this->operatingSystem->createDir("1");
+		}
+		catch (OperatingSystemException $ex) {
+			$this->fail("Failed to create directory {$this->newHome}/\"1\": " . $ex->getMessage());
+		}
+		system("rmdir {$this->newHome}/1");
+
+		system("mkdir {$this->newHome}/2");
+		try {
+			$this->operatingSystem->createDir("2/1");
+		}
+		catch (OperatingSystemException $ex) {
+			$this->fail("Failed to create directory {$this->newHome}/2/1: " . $ex->getMessage());
+		}
+		system("rmdir {$this->newHome}/2/1;
+			rmdir {$this->newHome}/2");
+
+		try {
+			$this->operatingSystem->createDir("2/notAValidFileName");
+		}
+		catch (OperatingSystemException $ex) {
+			$this->assertEquals("Invalid file name: 2/notAValidFileName", $ex->getMessage());
+		}
 	}
 
 	/**

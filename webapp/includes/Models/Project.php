@@ -98,8 +98,9 @@ abstract class Project {
 		if (!$systemFileName) {
 			return false;
 		}
-		// TODO add system file informaiton (user root/projects) to name
-		return $systemFileName;
+		$fullFileName = $this->operatingSystem->getHome() .
+			$this->database->getUserRoot($this->owner) . "/" . $this->id . "/" . $systemFileName;
+		return $fullFileName;
 	}
 	public function retrieveAllUploadedFiles() {
 		$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
