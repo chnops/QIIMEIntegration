@@ -4,7 +4,8 @@ namespace Database;
 
 interface DatabaseI {
 
-	public function __construct();
+	// TODO this is only temporary, until the Roster object is created
+	public function __construct(\Models\OperatingSystemI $operatingSystem);
 
 	public function userExists($username);
 	public function createUser($username);

@@ -4,6 +4,7 @@ namespace Database;
 
 class PDODatabase implements DatabaseI {
 
+	private $operatingSystem = NULL;
 	private static $dsn = "sqlite:data/database.sqlite";
 	public static function overwriteDSN($newDSN) {
 		PDODatabase::$dsn = $newDSN;
@@ -11,10 +12,11 @@ class PDODatabase implements DatabaseI {
 
 	private $pdo = NULL;
 
-	public function __construct() {
+	public function __construct(\Models\OperatingSystemI $operatingSystem) {
 		$pdo = new \PDO(PDODatabase::$dsn);
 		$pdo->exec("PRAGMA foreign_keys=ON");
 		$this->pdo = $pdo;
+		$this->operatingSystem = $operatingSystem;
 	}
 
 	public function userExists($username) {
@@ -37,12 +39,13 @@ class PDODatabase implements DatabaseI {
 			$root = $result->fetchColumn(0);
 			$root += 1;
 
-			// TODO this functionality should be stored elsewhere, for example, the Roster object.
-			// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
-			system("mkdir projects/{$root}");
-
 			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (?, ?)");
 			if ($pdoStatement->execute(array($username, $root))) {
+
+				// TODO this functionality should be stored elsewhere, for example, the Roster object.
+				// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
+				$this->operatingSystem->createDir($root);
+
 				return $root;
 			}
 			else {

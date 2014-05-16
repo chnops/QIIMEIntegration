@@ -3,8 +3,9 @@
 namespace Models;
 
 interface OperatingSystemI {
-	public function getRelativeReference();
-	public function setRelativeReference($reference);
+	public function overwriteHome($newHome);
+	public function getHome();
 	public function createDir($name);
-	public function getDirContents($name);
+	public function executeArbitraryScript($script);
+	public function isValidFileName($name);
 }

@@ -13,8 +13,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 		PDODatabase::overwriteDSN(PDODatabaseTest::$testDSN);
 	}
 	public function setUp() {
+		$operatingSystem = new \Models\MacOperatingSystem();
+		$operatingSystem->overwriteHome("./data/projects");
+		$this->database = new PDODatabase($operatingSystem);
+
 		$this->pdo = new \PDO(PDODatabaseTest::$testDSN);
-		$this->database = new PDODatabase();
 		$this->pdo->exec("DELETE FROM users");
 		$this->pdo->exec("DELETE FROM projects");
 		$this->pdo->exec("INSERT INTO users (username, root) VALUES (\"sharpa\", 1)");
@@ -51,6 +54,8 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 		$result = $this->pdo->query("SELECT * FROM users WHERE username = \"{$newUser}\"");
 		$result = $result->fetch(\PDO::FETCH_ASSOC);
 		$this->assertEquals(array("username" => "asdfasdf", "root" => $expectedRoot), $result);
+
+		system("rmdir ./data/projects/2");
 	}
 
 	/**

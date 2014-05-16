@@ -9,8 +9,8 @@ spl_autoload_register(function($class) {
 });
 
 // Run the application
-$database = new \Database\PDODatabase();
 $operatingSystem = new \Models\MacOperatingSystem();
+$database = new \Database\PDODatabase($operatingSystem);
 $workflow = new \Models\QIIMEWorkflow($database, $operatingSystem);
 if (isset($_GET['shortcut'])) {
 	$indexController = new \Controllers\ShortcutController($database, $workflow);

@@ -48,7 +48,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers DefaultParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
-		$expectedString = $this->name . "=" . $this->value;
+		$expectedString = $this->name . "='" . $this->value . "'";
 		$this->assertEquals($expectedString, $this->parameter->renderForOperatingSystem());
 	}
 

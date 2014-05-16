@@ -10,7 +10,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->operatingSystem = new MacOperatingSystem();
-		$this->database = new \Database\PDODatabase();
+		$this->database = new \Database\PDODatabase($this->operatingSystem);
 		$this->workflow = new QIIMEWorkflow($this->database, $this->operatingSystem);
 	}
 
