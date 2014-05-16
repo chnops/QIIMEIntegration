@@ -13,6 +13,9 @@ class SelectProjectController extends Controller {
 		if ($this->username) {
 			$this->projects = $this->workflow->getAllProjects($this->username);
 		}
+		if (!$this->username) { // could be an else, but this makes more sense conceptually
+			$this->disabled = " disabled";
+		}
 	}
 
 	public function parseInput() {
@@ -87,31 +90,30 @@ class SelectProjectController extends Controller {
 	}
 
 	public function getForm() {
-		$disabled = ($this->username) ? "" : " disabled";
 		$selectForm = "";
 		if (!empty($this->projects)) {
 			$selectForm = "
 				<form method=\"POST\"><p>Select a project<br/>
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\">
-				<input type=\"hidden\" name=\"create\" value=\"0\"{$disabled}>";
+				<input type=\"hidden\" name=\"create\" value=\"0\"{$this->disabled}>";
 
 			foreach ($this->projects as $project) {
 				$checkedName = ($this->project) ? $this->project->getName() : "";
 				$checked = ($checkedName == $project->getName()) ? " checked" : "";
 				$projectName = htmlentities($project->getName());
 				$selectForm .= "<label style=\"display:block;\" for=\"project\">
-					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$disabled}{$checked}>{$projectName}</label>";
+					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$this->disabled}{$checked}>{$projectName}</label>";
 			}
 
-			$selectForm .=	"<button type=\"submit\"{$disabled}>Select</button>
+			$selectForm .=	"<button type=\"submit\"{$this->disabled}>Select</button>
 				</p></form><strong>-OR-</strong><br/>";
 		}
 		$createForm = "
 			<form method=\"POST\"><p>Create a project<br/>
 			<input type=\"hidden\" name=\"step\" value=\"{$this->step}\">
-			<input type=\"hidden\" name=\"create\" value=\"1\"{$disabled}>
-			<label for=\"project\">Project name: <input type=\"text\" name=\"project\"{$disabled}/></label>
-			<button type=\"submit\"{$disabled}>Create</button>
+			<input type=\"hidden\" name=\"create\" value=\"1\"{$this->disabled}>
+			<label for=\"project\">Project name: <input type=\"text\" name=\"project\"{$this->disabled}/></label>
+			<button type=\"submit\"{$this->disabled}>Create</button>
 			</form>";
 		return $selectForm . $createForm;
 	}

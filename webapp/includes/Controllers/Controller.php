@@ -15,6 +15,7 @@ abstract class Controller {
 
 	protected $username = "";
 	protected $project = NULL;
+	protected $disabled = "";
 
 	protected $isResultError = false;
 	protected $hasResult = false;
@@ -39,7 +40,6 @@ abstract class Controller {
 			return;
 		}
 		$this->project = $this->workflow->findProject($this->username, $_SESSION['project_id']);
-		$this->pastResults = $this->retrievePastResults();
 	}
 
 	public function retrievePastResults() {
@@ -70,6 +70,10 @@ abstract class Controller {
 		return $output;
 	}
 	public function hasPastResults() {
+		if (!$this->project) {
+			return false;
+		}
+		$this->pastResults = $this->retrievePastResults();
 		if ($this->pastResults) {
 			return true;
 		}

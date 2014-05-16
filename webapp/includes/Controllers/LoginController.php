@@ -7,6 +7,9 @@ class LoginController extends Controller {
 	protected $subTitle = "Login";
 
 	public function parseInput() {
+		if ($_POST['logout']) {
+			$this->logout();
+		}
 		if (!isset($_POST['username'])) {
 			return;
 		}
@@ -25,7 +28,7 @@ class LoginController extends Controller {
 		}
 		else {
 			if ($userExists) {
-				$this->logIn($username);
+				$this->login($username);
 			}
 			else {
 				$this->isResultError = true;
@@ -34,17 +37,21 @@ class LoginController extends Controller {
 		}
 	}
 
-	private function logIn($username) {
+	private function logout() {
 		$_SESSION = array();
-		$_SESSION['username'] = $username;
+		$this->username = NULL;
 		$this->project = NULL;
+	}
+	private function login($username) {
+		$this->logout();
+		$_SESSION['username'] = $username;
 		$this->username = $username;
 		$this->result = "You have successfully logged in.";
 	}
 	private function createUser($username) {
 		$this->database->createUser($username);
 
-		$this->logIn($username);
+		$this->login($username);
 		$this->result = "You have successfully created a new user.";
 	}
 
@@ -64,11 +71,18 @@ class LoginController extends Controller {
 		$createForm = "
 			<form method=\"POST\">
 			<p>Create new user<br/>
-			<input type=\"hidden\" name=\"step\" value=\"$this->step\">
+			<input type=\"hidden\" name=\"step\" value=\"{$this->step}\">
 			<input type=\"hidden\" name=\"create\" value=\"1\">
 			<label for=\"username\">New user name: <input type=\"text\" name=\"username\"></label>
 			<button type=\"submit\">Create</button></p>
 			</form>";
-		return $loginForm . "<strong>-OR-</strong><br/>" . $createForm;
+		$logoutForm = "
+			<form method=\"POST\">
+			<p>Log out<br/>
+			<input type=\"hidden\" name=\"step\" value=\"{$this->step}\">
+			<input type=\"hidden\" name=\"create\" value=\"0\">
+			<button type=\"submit\" name=\"logout\" value=\"1\">Log out</button>
+			</form>";
+		return $loginForm . "<strong>-OR-</strong><br/>" . $createForm . "<strong>-OR-</strong><br/>" . $logoutForm;
 	}
 }

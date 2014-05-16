@@ -14,7 +14,7 @@ echo "<p><em>Instructions (<a id=\"instruction_controller\" onclick=\"toggleInst
 echo "<hr/>";
 
 if ($this->hasPastResults()) {
-	echo $this->renderPastResults();
+	echo "<div id=\"past_results\">{$this->renderPastResults()}</div>";
 	echo "<hr/>";
 }
 

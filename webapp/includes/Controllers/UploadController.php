@@ -27,6 +27,7 @@ class UploadController extends Controller {
 
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
+			$this->disabled = " disabled";
 			$this->isResultError = true;
 			$this->hasResult = true;
 			$this->result = "In order to upload files, you must be logged in and have a project selected.";
@@ -70,7 +71,8 @@ class UploadController extends Controller {
 			<li>A fasta formatted sequence file</li>
 			<li>A sequence quality file</li>
 			</ol></p>";
-		$fileTypes = $this->project->getFileTypes();
+		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+		$fileTypes = $project->getFileTypes();
 		if (!$this->fileType) {
 			$this->fileType = $fileTypes[0];
 		}
@@ -84,20 +86,20 @@ class UploadController extends Controller {
 			<form method=\"POST\" action=\"index.php\" enctype=\"multipart/form-data\">
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
 				<label for=\"file\">Select a file to upload:
-				<input type=\"file\" name=\"file\"/></label>
+				<input type=\"file\" name=\"file\"/{$this->disabled}></label>
 				<label for=\"type\">File type:
-				<select name=\"type\" onchange=\"displayHelp('script_help_'+this[this.selectedIndex].getAttribute('value'));\"
-				onload=\"alert('script_help_'+this[this.selectedIndex].getAttribute('value'));\">";
+				<select name=\"type\" onchange=\"displayHelp('script_help_'+this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
 
 		$selectedFileType = ($this->fileType) ? $this->fileType->getShortName() : "";
-		foreach ($this->project->getFileTypes() as $fileType) {
+		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+		foreach ($project->getFileTypes() as $fileType) {
 			$selected = ($fileType->getShortName() == $selectedFileType) ? " SELECTED" : "";
 			$output .= "<option value=\"{$fileType->getShortName()}\"{$selected}>{$fileType->getName()}</option>";
 		}
 	
 		$output .= "</select></label>
 			<script type=\"text/javascript\">displayHelp('script_help_{$selectedFileType}');</script>
-			<button type=\"submit\">Upload</button>
+			<button type=\"submit\"{$this->disabled}>Upload</button>
 			</form>";
 		return $output;
 	}
