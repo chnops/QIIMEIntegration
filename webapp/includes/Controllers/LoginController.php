@@ -7,7 +7,7 @@ class LoginController extends Controller {
 	protected $subTitle = "Login";
 
 	public function parseInput() {
-		if ($_POST['logout']) {
+		if (isset($_POST['logout'])) {
 			$this->logout();
 		}
 		if (!isset($_POST['username'])) {
