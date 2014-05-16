@@ -13,4 +13,7 @@ interface DatabaseI {
 	public function getAllProjects($username);
 	public function createProject($username, $projectName);
 	public function getProjectName($username, $projectId);
+
+	public function createUploadedFile($username, $projectId, $fileName, $fileType);
+	public function getAllUploadedFiles($username, $projectId);
 }

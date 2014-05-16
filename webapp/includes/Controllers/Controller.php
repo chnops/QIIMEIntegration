@@ -75,6 +75,9 @@ abstract class Controller {
 		}
 		return false;
 	}
+	public function renderPastResults() {
+		return $this->pastResults;
+	}
 	public function getInstructions() {
 		return "<div class=\"error\">Instructions not yet implemented!</div>";
 	}

@@ -12,12 +12,15 @@ abstract class Project {
 	protected $operatingSystem;
 
 	protected $scripts;
+	protected $fileTypes;
 
 	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
 		$this->workflow = $workflow;
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
 		$this->scripts = $this->getInitialScripts();
+		$this->fileTypes = $this->getInitialFileTypes();
+		$this->fileTypes[] = new ArbitraryTextFileType();
 	}
 
 	public function getOwner() {
@@ -41,6 +44,9 @@ abstract class Project {
 	public function getScripts() {
 		return $this->scripts;
 	}
+	public function getFileTypes() {
+		return $this->fileTypes;
+	}
 	public function renderForm() {
 		$projectName = htmlentities($this->name);
 		$owner = htmlentities($this->owner);
@@ -62,18 +68,6 @@ abstract class Project {
 		return $form;
 	}
 	public function renderHelp() {
-		$javascript = "
-			<script type=\"text/javascript\">
-			var displayedHelp = null;
-			function displayHelp(id) {
-				if (displayedHelp != null) {
-					displayedHelp.style.display=\"none\";
-				}
-				displayedHelp = document.getElementById(id);
-				displayedHelp.style.display=\"block\";
-			}
-			</script>";
-		$css = "<style>div.script_help{display:none;}</style>";
 		$help = "<div class=\"script_help\" id=\"script_help_name\">";
 		$help .= "<p>Name your project</p>
 			<p>Choose something short, yet descriptive.  Any name will do.  For owner, put your own netID, or the netID of whoever will own the project.</p>";
@@ -88,10 +82,36 @@ abstract class Project {
 			$help .= "</div>";
 		}
 
-		return  $javascript . $css . $help;
+		return  $help;
+	}
+
+	public function getFileTypeFromShortName($shortName) {
+		foreach ($this->fileTypes as $fileType) {
+			if ($fileType->getShortName() == $shortName) {
+				return $fileType;
+			}
+		}
+		return NULL;
+	}
+	public function receiveUploadedFile($fileName, FileType $fileType) {
+		$systemFileName = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getShortName());
+		if (!$systemFileName) {
+			return false;
+		}
+		// TODO add system file informaiton (user root/projects) to name
+		return $systemFileName;
+	}
+	public function retrieveAllUploadedFiles() {
+		$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
+		$formattedFiles = array();
+		foreach ($rawFiles as $fileArray) {
+			$formattedFiles[$fileArray['file_type']][] = $fileArray['given_name'];
+		}
+		return $formattedFiles;
 	}
 
 	public abstract function beginProject();
 	public abstract function getInitialScripts();
+	public abstract function getInitialFileTypes();
 	public abstract function processInput(array $allInput);
 }

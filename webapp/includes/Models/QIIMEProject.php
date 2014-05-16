@@ -15,6 +15,13 @@ class QIIMEProject extends Project {
 //			new \Models\Scripts\SplitLibraries($this->database, $this->operatingSystem),
 		);
 	}
+	public function getInitialFileTypes() {
+		return array(
+			new MapFileType(),
+			new SequenceFileType(),
+			new SequenceQualityFileType(),
+		);
+	}
 	public function processInput(array $allInput) {
 		ob_start();
 

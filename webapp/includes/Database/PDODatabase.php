@@ -139,4 +139,53 @@ class PDODatabase implements DatabaseI {
 			return "ERROR";
 		}
 	}
+
+	public function createUploadedFile($username, $projectId, $fileName, $fileType) {
+		try {
+			$pdoStatement = $this->pdo->prepare("SELECT system_name FROM uploaded_files WHERE project_owner = 
+				:owner AND project_id = :id ORDER BY system_name DESC LIMIT 1");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
+			$systemName = $pdoStatement->fetchColumn(0);
+			$systemName += 1;
+
+			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, given_name, system_name, file_type)
+				VALUES (:id, :owner, :givenName, :systemName, :fileType)");
+			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "givenName" => $fileName,
+				"systemName" => $systemName, "fileType" => $fileType));
+			if (!$insertSuccess) {
+				$errorInfo = $pdoStatement->errorInfo();
+				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
+			}
+			return $systemName;
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to create uploaded file: " . $ex->getMessage());
+			// TODO error handling
+			return false;
+		}
+	}
+
+	public function getAllUploadedFiles($username, $projectId) {
+		$files = array();
+		try {
+			$pdoStatement = $this->pdo->prepare("SELECT * FROM uploaded_files WHERE project_id = :id AND project_owner = :owner");
+			$pdoStatement->execute(array("id" => $projectId, "owner" => $username));
+			$files = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to get uploaded files: " . $ex->getMessage());
+			// TODO error handling
+		}
+		return $files;
+	
+	}
+
+	/*Try catch block commong to all functions
+		try {
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to : " . $ex->getMessage());
+			// TODO error handling
+		}
+	 */
 }
