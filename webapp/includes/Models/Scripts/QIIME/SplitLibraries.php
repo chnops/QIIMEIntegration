@@ -16,39 +16,39 @@ class SplitLibraries extends DefaultScript {
 	public function getInitialParameters() {
 		$required = true;
 		return array(
-			"--version" => new VersionParameter("--version", ""),
-			"--help" => new HelpParameter("--help", ""),
-  			"--verbose" => new TrueFalseInvertedParameter("--verbose", "True"),
-			"--qual" => new TextArgumentParameter("--qual", ""),
-			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned", "False"),
-			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200"),
-  			"--max-seq-length" => new TextArgumentParameter("--max-seq-length", "1000"),
-  			"--trim-seq-length" => new TrueFalseParameter("--trim-seq-length", "False"),
-  			"--min-qual-score" => new TextArgumentParameter("--min-qual-score", "25"),
-  			"--keep-primer" =>  new TrueFalseParameter("--keep-primer", "False"),
-			"--keep-barcode" => new TrueFalseParameter("--keep-barcode", "False"),
-			"--max-ambig" => new TextArgumentParameter("--max-ambig", "6"),
-  			"--max-homopolymer" => new TextArgumentParameter("--max-homopolymer", "6"),
-			"--max-primer-mismatch" => new TextArgumentParameter("--max-primer-mismatch", "0"),
-			"--barcode-type" => new ChoiceParameter("--barcode-type", "golay_12"),
+			"--version" => new VersionParameter(),
+			"--help" => new HelpParameter(),
+  			"--verbose" => new TrueFalseInvertedParameter("--verbose"),
+			"--qual" => new OldFileParameter("--qual", $this->project),
+			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
+			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+  			"--max-seq-length" => new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+  			"--trim-seq-length" => new TrueFalseParameter("--trim-seq-length"),
+  			"--min-qual-score" => new TextArgumentParameter("--min-qual-score", "25", "/\\d+/"),
+  			"--keep-primer" =>  new TrueFalseParameter("--keep-primer"),
+			"--keep-barcode" => new TrueFalseParameter("--keep-barcode"),
+			"--max-ambig" => new TextArgumentParameter("--max-ambig", "6", "/\\d+/"),
+  			"--max-homopolymer" => new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
+			"--max-primer-mismatch" => new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
+			"--barcode-type" => new ChoiceParameter("--barcode-type", "golay_12", array("hamming_8", "golay_12", "variable_length")), // TODO create annonymous class that overloads isInputValid
                         /*a number representing the
                         length of the barcode, such as -b 4. */
-  			"--dir-prefix" => new NewFileParameter("--dir-prefix", "."), // possibly a file parameter
-			"--max-barcode-errors=" => new TextArgumentParameter("--max-barcode-error", "1.5"),
-			"--start-numbering-at" => new TextArgumentParameter("--start-numbering-at", "1"),
-			"--retain_unassigned_reads" => new TrueFalseParameter("--retain_unasigned_reads", "False"),
-			"--disable_bc_correction" => new TrueFalseParameter("--disable_bc_correction", "False"), // Can improve performance
-			"--qual_score_window" => new TextArgumentParameter("--qual_score_window", "0"), // depends other args, 0 means no checking
-			"--discard_bad_windows" => new TrueFalseParameter("--discard_bad_windows", "False"), 
-			"--disable_primers" => new TrueFalseParameter("--disable_primers", "False"),
-			"--reverse_primers" => new ChoiceParameter("--reverse_primers", "disable"),
-  			"--reverse_primer_mismatches" => new TextArgumentParameter("--reverse_primer_mismatches", "0"),
-			"--record_qual_scores" => new TrueFalseParameter("--recored_qual_scores", "False"),
-			"--median_length_filtering" => new TextArgumentParameter("--mediate_length_filtering", "none"),
-			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "none"),
-			"--truncate_ambi_bases" => new TrueFalseParameter("--truncate_ambi_bases", "False"),
-			"--map" => new OldFileParameter("--map", "", $required),
-			"--fasta" => new OldFileParameter("--fasta", "", $required),
+  			"--dir-prefix" => new NewFileParameter("--dir-prefix", "."), // TODO possibly a file parameter
+			"--max-barcode-errors=" => new TextArgumentParameter("--max-barcode-error", "1.5", "/.*/"),
+			"--start-numbering-at" => new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
+			"--retain_unassigned_reads" => new TrueFalseParameter("--retain_unasigned_reads"),
+			"--disable_bc_correction" => new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
+			"--qual_score_window" => new TextArgumentParameter("--qual_score_window", "0", "/\\d+/"), // depends other args, 0 means no checking
+			"--discard_bad_windows" => new TrueFalseParameter("--discard_bad_windows"), 
+			"--disable_primers" => new TrueFalseParameter("--disable_primers"),
+			"--reverse_primers" => new ChoiceParameter("--reverse_primers", "disable", array("disable", "truncate_only", "truncate_remove")),
+  			"--reverse_primer_mismatches" => new TextArgumentParameter("--reverse_primer_mismatches", "0", "/\\d+/"),
+			"--record_qual_scores" => new TrueFalseParameter("--recored_qual_scores"),
+			"--median_length_filtering" => new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
+			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
+			"--truncate_ambi_bases" => new TrueFalseParameter("--truncate_ambi_bases"),
+			"--map" => new OldFileParameter("--map", $this->project),
+			"--fasta" => new OldFileParameter("--fasta", $this->project),
 		);
 	}
 	public function getScriptName() {

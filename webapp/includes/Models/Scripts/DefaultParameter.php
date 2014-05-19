@@ -5,14 +5,16 @@ namespace Models\Scripts;
 class DefaultParameter implements ParameterI {
 	protected $name;
 	protected $value;
-	protected $isRequired;
 
-	public function __construct($name, $value, $isRequired = false) {
+	public function __construct($name, $value) {
 		$this->name = $name;
 		$this->value = $value;
-		$this->isRequired = $isRequired;
 	}
+
 	public function renderForOperatingSystem() {
+		if (!$this->isValueValid()) {
+			throw new \ScriptException("An invalid value was provided for the parameter: {$this->name}");
+		}
 		if ($this->value) {
 			$separator = (strlen($this->name) == 2) ? " " : "=";
 			return $this->name . $separator . "'" . $this->value . "'";
@@ -34,10 +36,7 @@ class DefaultParameter implements ParameterI {
 	public function getName() {
 		return $this->name;
 	}
-	public function setIsRequired($isRequired) {
-		$this->isRequired = $isRequired;
-	}
-	public function isRequired() {
-		return $this->isRequired;
+	public function isValueValid() {
+		return true;
 	}
 }

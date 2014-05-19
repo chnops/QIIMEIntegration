@@ -3,6 +3,9 @@
 namespace Models\Scripts;
 
 class HelpParameter extends DefaultParameter {
+	public function __construct() {
+		return;
+	}
 	public function renderForOperatingSystem() {
 		return "";
 	}

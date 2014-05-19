@@ -4,6 +4,10 @@ namespace Models\Scripts;
 
 class VersionParameter extends DefaultParameter {
 
+	public function __construct() {
+		return;
+	}
+
 	public function renderForOperatingSystem() {
 		return "";
 	}

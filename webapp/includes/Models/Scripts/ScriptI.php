@@ -4,7 +4,7 @@ namespace Models\Scripts;
 
 interface ScriptI {
 
-	public function __construct(\Database\DatabaseI $database, \Models\OperatingSystemI $operatingSystem);
+	public function __construct(\Models\Project $project);
 	public function getScriptName();
 	public function getScriptTitle();
 	public function getScriptShortTitle();

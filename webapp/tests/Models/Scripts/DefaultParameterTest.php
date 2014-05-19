@@ -7,10 +7,9 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	private $parameter;
 	private $name = "--file_path";
 	private $value = "./file/path.ext";
-	private $isRequired = False;
 
 	public function setUp() {
-		$this->parameter = new DefaultParameter($this->name, $this->value, $this->isRequired);
+		$this->parameter = new DefaultParameter($this->name, $this->value);
 	}
 
 	/**
@@ -22,7 +21,6 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testGetters() {
 		$this->assertEquals($this->name, $this->parameter->getName());
 		$this->assertEquals($this->value, $this->parameter->getValue());
-		$this->assertEquals($this->isRequired, $this->parameter->isRequired());
 	}
 
 	/**
@@ -36,11 +34,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 		$this->parameter->setName($newName);
 		$newValue = "./new/file/path.ext";
 		$this->parameter->setValue($newValue);
-		$isRequiredNow = true;
-		$this->parameter->setIsRequired($isRequiredNow);
 		$this->assertEquals($newName, $this->parameter->getName());
 		$this->assertEquals($newValue, $this->parameter->getValue());
-		$this->assertEquals($isRequiredNow, $this->parameter->isRequired());
 	}
 
 	/**

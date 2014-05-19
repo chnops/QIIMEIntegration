@@ -47,6 +47,12 @@ abstract class Project {
 	public function getFileTypes() {
 		return $this->fileTypes;
 	}
+	public function getDatabase() {
+		return $this->database;
+	}
+	public function getOperatingSystem() {
+		return $this->operatingSystem;
+	}
 	public function renderForm() {
 		$projectName = htmlentities($this->name);
 		$owner = htmlentities($this->owner);

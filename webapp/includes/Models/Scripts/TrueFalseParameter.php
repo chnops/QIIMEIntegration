@@ -3,10 +3,9 @@
 namespace Models\Scripts;
 
 class TrueFalseParameter extends DefaultParameter {
-	public function __construct($name, $value, $isRequired = false) {
+	public function __construct($name) {
 		$this->name = $name;
 		$this->value = false;
-		$this->isRequired = false;
 	}
 	public function renderForOperatingSystem() {
 		if ($this->value) {
@@ -17,6 +16,7 @@ class TrueFalseParameter extends DefaultParameter {
 		}
 	}
 	public function renderForForm() {
-		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}</label>";
+		$checked = ($this->value) ? " checked" : "";
+		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}/> {$this->name}</label>";
 	}
 }

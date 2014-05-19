@@ -3,10 +3,9 @@
 namespace Models\Scripts;
 
 class TrueFalseInvertedParameter extends DefaultParameter {
-	public function __construct($name, $value, $isRequired = false) {
+	public function __construct($name) {
 		$this->name = $name;
 		$this->value = true;
-		$this->isRequired = false;
 	}
 	public function renderForOperatingSystem() {
 		if (!$this->value) {
@@ -17,14 +16,7 @@ class TrueFalseInvertedParameter extends DefaultParameter {
 		}
 	}
 	public function renderForForm() {
-		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}</label>";
-	}
-	public function setValue($value) {
-		if ($value) {
-			$this->value = false;
-		}
-		else {
-			$this->value = true;
-		}
+		$checked = ($this->value) ? " checked" : "";
+		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}/> {$this->name}</label>";
 	}
 }

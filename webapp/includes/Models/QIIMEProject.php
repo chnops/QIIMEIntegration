@@ -11,8 +11,8 @@ class QIIMEProject extends Project {
 	}
 	public function getInitialScripts() {
 		return array(
-			new \Models\Scripts\QIIME\ValidateMappingFile($this->database, $this->operatingSystem),
-			new \Models\Scripts\QIIME\SplitLibraries($this->database, $this->operatingSystem),
+			new \Models\Scripts\QIIME\ValidateMappingFile($this),
+			new \Models\Scripts\QIIME\SplitLibraries($this),
 		);
 	}
 	public function getInitialFileTypes() {
