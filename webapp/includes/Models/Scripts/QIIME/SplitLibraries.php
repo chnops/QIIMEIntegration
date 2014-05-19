@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\QIIME;
 
 class SplitLibraries extends DefaultScript {
 
