@@ -13,8 +13,8 @@
 		div#navigation table td{border-left:1px solid #999966;padding:0em .5em;}
 		div#navigation table td:first-child {border-left:none}
 		div#content,div#help{background-color:#ffcc66;border:3px solid;margin:.25em .5em;padding:.5em;}
-		div#content{width:67%;float:left}
-		div#help{width:27%;float:right;}
+		div#content{width:65%;float:left;dislpay:incline}
+		div#help{width:25%;float:left;display:inline}
 		div#content div.form{margin-left:2.5em;text-align:left;width:45%;border:2px #999966 ridge;padding:1em;}
 		div#session_data{margin-left:0px;margin-right:auto;border-style:solid;border-color:#999966;border-width:0px 0px 1px 1px;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#result{border:2px #999966 ridge;display:inline-block;margin-left:2.5em;padding:.25em;background-color:#ffffcc}
@@ -70,7 +70,7 @@ foreach ($steps as $key => $step) {
 }
 ?>
 </tr></table></div>
-<div id="help"><p><?php echo $this->help ?></p></div>
 <div id="content"><p><?php echo $this->content ?></p></div>
+<div id="help"><p><?php echo $this->help ?></p></div>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
