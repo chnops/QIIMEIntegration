@@ -52,15 +52,22 @@ class UploadController extends Controller {
 		}
 		// TODO if size/type are valid
 
-		$fileName = $file['name'];	
+		$fileName = $file['name'];
 		$systemFileName = $this->project->receiveUploadedFile($fileName, $fileType);	
 		if (!$systemFileName) {
 			$this->isResultError = true;
 			$this->result = "There was an error adding your file to the project.";
 		}
 		else {
-			// TODO move_uploaded_file($systemFileName)
-			$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
+			$moveResult = move_uploaded_file($file['tmp_name'], $systemFileName);
+			if ($moveResult) {
+				$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
+		
+			}
+			else {
+				$this->isResultError = true;
+				$this->result = "There was an error moving your file on to the system.";
+			}
 		}
 	}
 

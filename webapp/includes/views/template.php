@@ -22,6 +22,7 @@
 		div#past_results{display:inline-block;background-color:#999966;padding:0em .5em}
 		div#past_results,div#result{overflow:auto;max-width:90%}
 		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;white-space:nowrap;}
+		div.script_form input[type="text"],div.script_form input[type="file"],select{display:block}
 		div.script_help{display:none;}
 		a{color:#003366;cursor:pointer;}
 		a:link {color:#003366;text-decoration:none;font-style:italic;}

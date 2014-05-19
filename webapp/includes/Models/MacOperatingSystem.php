@@ -17,8 +17,12 @@ class MacOperatingSystem implements OperatingSystemI {
 		return $this->home;
 	}
 	public function createDir($name) {
-		if (!$this->isValidFileName($name)) {
-			throw new OperatingSystemException("Invalid file name: {$name}");
+		// TODO kindly strip preceding slash
+		$nameParts = explode("/", $name);
+		foreach ($nameParts as $namePart) {
+			if (!$this->isValidFileName($namePart)) {
+				throw new OperatingSystemException("Invalid file name: {$name}");
+			}
 		}
 
 		$returnCode = 0;
