@@ -115,4 +115,5 @@ abstract class Project {
 	public abstract function getInitialScripts();
 	public abstract function getInitialFileTypes();
 	public abstract function processInput(array $allInput);
+	public abstract function renderOverview();
 }

@@ -11,8 +11,7 @@ class QIIMEWorkflow implements WorkflowI {
 		"login" => "Login",	
 		"select" => "Select/create project",
 		"upload" => "Upload files",
-		"make_otu" => "Create OTU table",
-		"make_phylogeny" => "Perform phylogeny analysis [optional]",
+		"run" => "Run scripts",
 		"view" => "View results");
 
 	public function getSteps() {
@@ -77,10 +76,8 @@ class QIIMEWorkflow implements WorkflowI {
 				return "select";
 			case "Controllers\\UploadController":
 				return "upload";
-			case "Controllers\\MakeOtuController":
-				return "make_otu";
-			case "Controllers\\MakePhylogenyController":
-				return "make_phylogeny";
+			case "Controllers\\RunScriptsController":
+				return "run";
 			case "Controllers\\ViewResultsController":
 				return "view";
 		}
@@ -90,28 +87,18 @@ class QIIMEWorkflow implements WorkflowI {
 			switch($step) {
 			case "test":
 				return new \Controllers\TestController($this->database, $this);
-				break;
 			case "login":
 				return new \Controllers\LoginController($this->database, $this);
-				break;
 			case "select":
 				return new \Controllers\SelectProjectController($this->database, $this);
-				break;
 			case "upload":
 				return new \Controllers\UploadController($this->database, $this);
-				break;
-			case "make_otu":
-				return new \Controllers\MakeOtuController($this->database, $this);
-				break;
-			case "make_phylogeny":
-				return new \Controllers\MakePhylogenyController($this->database, $this);
-				break;
+			case "run":
+				return new \Controllers\RunScriptsController($this->database, $this);
 			case "view":
 				return new \Controllers\ViewResultsController($this->database, $this);
-				break;
 			default:
 				return new \Controllers\LoginController($this->database, $this);
-				break;
 			}
 	}
 
