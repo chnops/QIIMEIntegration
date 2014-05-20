@@ -1,0 +1,46 @@
+Usage: pick_rep_set.py [options] {-i/--input_file OTU_FP}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+After picking OTUs, you can then pick a representative set of sequences. For each OTU, you will end up with one sequence that can be used in subsequent analyses. By default, the representative sequence for an OTU is chosen as the most abundant sequence showing up in that OTU. This is computed by collapsing identical sequences, and choosing the one that was read the most times as the representative sequence (note that each of these would have a different sequence identifier in the FASTA provided as input).
+
+Example usage: 
+Print help message and exit
+ pick_rep_set.py -h
+
+Simple example: picking a representative set for de novo-picked OTUs: The script pick_rep_set.py takes as input an 'OTU map' (via the "-i" parameter) which maps OTU identifiers to sequence identifiers. Typically, this will be the output file provided by pick_otus.py. Additionally, a FASTA file is required, via "-f", which contains all of the sequences whose identifiers are listed in the OTU map.  By default, a representative sequence will be chosen as the most abundant sequence in the OTU. This can be changed to, for example, choose the first sequence listed in each OTU by passing -m first.
+ pick_rep_set.py -i seqs_otus.txt -f seqs.fna -o rep_set1.fna
+
+Picking OTUs with "preferred representative" sequences: Under some circumstances you may have a fasta file of "preferred representative" sequences. An example of this is if you were to pick OTUs against a reference collection with uclust_ref. In this case you may want your representative sequences to be the sequences from the reference collection, rather than the sequences from your sequencing run. To achieve this, you can pass the original reference collection via -r. If you additionally allowed for new clusters (i.e., sequences which don't match a reference sequence are used as seeds for new OTUs) you'll also need to pass the original sequence collection to pick a representative sequence from the sequencing run in that case.
+ pick_rep_set.py -i seqs_otus.txt -f seqs.fna -r refseqs.fasta -o rep_set2.fna
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         Print information during execution -- useful for
+                        debugging [default: False]
+  -f FASTA_FP, --fasta_file=FASTA_FP
+                        Path to input fasta file [REQUIRED if not picking
+                        against a reference set; default: None]
+  -m REP_SET_PICKING_METHOD, --rep_set_picking_method=REP_SET_PICKING_METHOD
+                        Method for picking representative sets.  Valid choices
+                        are random, longest, most_abundant, first [default:
+                        first (first chooses cluster seed when picking otus
+                        with uclust)]
+  -o RESULT_FP, --result_fp=RESULT_FP
+                        Path to store result file [default:
+                        <input_sequences_filepath>_rep_set.fasta]
+  -l LOG_FP, --log_fp=LOG_FP
+                        Path to store log file [default: No log file created.]
+  -s SORT_BY, --sort_by=SORT_BY
+                        sort by otu or seq_id [default: otu]
+  -r REFERENCE_SEQS_FP, --reference_seqs_fp=REFERENCE_SEQS_FP
+                        collection of preferred representative sequences
+                        [default: none]
+
+  REQUIRED options:
+    The following options must be provided under all circumstances.
+
+    -i OTU_FP, --input_file=OTU_FP
+                        Path to input otu mapping file [REQUIRED]

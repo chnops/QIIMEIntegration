@@ -20,7 +20,7 @@ class MakePhylogeny extends DefaultScript {
 		);
 	}
 	public function getScriptName() {
-		return "make_phylgeny.py";
+		return "make_phylogeny.py";
 	}
 	public function getScriptTitle() {
 		return "Make phylogenetic tree";

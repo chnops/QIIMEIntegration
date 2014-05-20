@@ -122,6 +122,15 @@ abstract class Project {
 			return false;
 		}
 	}
+	public function getVersion($scriptName) {
+		try {
+			$consoleOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "{$scriptName} --version");
+			return trim($consoleOutput);
+		}
+		catch (\Exception $ex) {
+			return "Unable to obtain version information";
+		}
+	}
 
 	public abstract function beginProject();
 	public abstract function initializeScripts();

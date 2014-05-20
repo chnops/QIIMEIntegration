@@ -1,0 +1,42 @@
+Usage: make_phylogeny.py [options] {-i/--input_fp INPUT_FP}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+Many downstream analyses require that the phylogenetic tree relating the OTUs in a study be present. The script make_phylogeny.py produces this tree from a multiple sequence alignment. Trees are constructed with a set of sequences representative of the OTUs, by default using FastTree (Price, Dehal, & Arkin, 2009).
+
+Example usage: 
+Print help message and exit
+ make_phylogeny.py -h
+
+Examples: A simple example of make_phylogeny.py is shown by the following command, where we use the default tree building method (fasttree) and write the file to the current working directory without a log file
+ make_phylogeny.py -i $PWD/aligned.fasta -o $PWD/rep_phylo.tre
+
+Alternatively, if the user would prefer using another tree building method (i.e. clearcut (Sheneman, Evans, & Foster, 2006)), then they could use the following command
+ make_phylogeny.py -i $PWD/aligned.fasta -t clearcut
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         Print information during execution -- useful for
+                        debugging [default: False]
+  -t TREE_METHOD, --tree_method=TREE_METHOD
+                        Method for tree building. Valid choices are: clearcut,
+                        clustalw, fasttree_v1, fasttree, raxml_v730, muscle
+                        [default: fasttree]
+  -o RESULT_FP, --result_fp=RESULT_FP
+                        Path to store result file [default:
+                        <input_sequences_filename>.tre]
+  -l LOG_FP, --log_fp=LOG_FP
+                        Path to store log file [default: No log file created.]
+  -r ROOT_METHOD, --root_method=ROOT_METHOD
+                        method for choosing root of phylo tree  Valid choices
+                        are: midpoint, tree_method_default [default:
+                        tree_method_default]
+
+  REQUIRED options:
+    The following options must be provided under all circumstances.
+
+    -i INPUT_FP, --input_fp=INPUT_FP
+                        Path to read input fasta alignment, only first word in
+                        defline will be considered [REQUIRED]

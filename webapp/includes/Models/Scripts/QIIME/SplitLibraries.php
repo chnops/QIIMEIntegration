@@ -17,8 +17,6 @@ class SplitLibraries extends DefaultScript {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
 		$this->parameters['special'] = array(
-			"--version" => new VersionParameter(),
-			"--help" => new HelpParameter(),
   			$verboseParameter->getName() => $verboseParameter,
 			"--qual" => new OldFileParameter("--qual", $this->project),
 			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),

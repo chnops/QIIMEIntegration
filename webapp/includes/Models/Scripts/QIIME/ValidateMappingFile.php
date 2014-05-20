@@ -15,13 +15,13 @@ class ValidateMappingFile extends DefaultScript {
 
 	private $scriptName;
 	public function __construct(\Models\Project $project) {
-		parent::__construct($project);
-		if ($this->project->scriptExists("validate_map_file.py")) {
+		if ($project->scriptExists("validate_map_file.py")) {
 			$this->scriptName = "validate_map_file.py";
 		}
 		else {
 			$this->scriptName = "check_id_map.py";
 		}
+		parent::__construct($project);
 	}
 
 	public function initializeParameters() {

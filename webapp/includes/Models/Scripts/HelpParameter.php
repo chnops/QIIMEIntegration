@@ -3,14 +3,16 @@
 namespace Models\Scripts;
 
 class HelpParameter extends DefaultParameter {
-	public function __construct() {
-		return;
+
+	private $script;
+
+	public function __construct(ScriptI $script) {
+		$this->script = $script;
 	}
 	public function renderForOperatingSystem() {
 		return "";
 	}
 	public function renderForForm() {
-		// TODO get actual help doc page
-		return "<a href=\"http://wikipedia.org\" target=\"_blank\" class=\"button\">See man page</a>";
+		return "<a href=\"public/manual/{$this->script->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
 	}
 }

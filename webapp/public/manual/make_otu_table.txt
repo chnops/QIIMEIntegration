@@ -1,0 +1,45 @@
+Usage: make_otu_table.py [options] {-i/--otu_map_fp OTU_MAP_FP -o/--output_biom_fp OUTPUT_BIOM_FP}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+The script make_otu_table.py tabulates the number of times an OTU is found in each sample, and adds the taxonomic predictions for each OTU in the last column if a taxonomy file is supplied.
+
+Example usage: 
+Print help message and exit
+ make_otu_table.py -h
+
+Make OTU table: Make an OTU table from an OTU map (i.e., result from pick_otus.py) and a taxonomy assignment file (i.e., result from assign_taxonomy.py). Write the output file to otu_table.biom.
+ make_otu_table.py -i otu_map.txt -t tax_assignments.txt -o otu_table.biom
+
+Make OTU table, excluding OTU ids listed in a fasta file: Make an OTU table, excluding the sequences listed in pynast_failures.fna. Note that the file pass as -e must end with either '.fasta' or '.fna'.
+ make_otu_table.py -i otu_map.txt -o otu_table_no_pynast_failures.biom -e pynast_failures.fna
+
+Make OTU table, excluding a list of OTU ids: Make an OTU table, excluding the sequences listed in chimeric_seqs.txt
+ make_otu_table.py -i otu_map.txt -o otu_table_non_chimeric.biom -e chimeric_seqs.txt
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         Print information during execution -- useful for
+                        debugging [default: False]
+  -t TAXONOMY_FNAME, --taxonomy=TAXONOMY_FNAME
+                        Path to taxonomy assignment, containing the
+                        assignments of taxons to sequences (i.e., resulting
+                        txt file from assign_taxonomy.py) [default: none]
+  -e EXCLUDE_OTUS_FP, --exclude_otus_fp=EXCLUDE_OTUS_FP
+                        path to a file listing OTU identifiers that should not
+                        be included in the OTU table (e.g., the output of
+                        identify_chimeric_seqs.py) or a fasta file where seq
+                        ids should be excluded (e.g., failures fasta file from
+                        align_seqs.py)
+
+  REQUIRED options:
+    The following options must be provided under all circumstances.
+
+    -i OTU_MAP_FP, --otu_map_fp=OTU_MAP_FP
+                        path to the input OTU map (i.e., the output from
+                        pick_otus.py) [REQUIRED]
+    -o OUTPUT_BIOM_FP, --output_biom_fp=OUTPUT_BIOM_FP
+                        the output otu table in biom format (recommended
+                        extension: .biom) [REQUIRED]

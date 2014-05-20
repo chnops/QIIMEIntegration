@@ -11,8 +11,8 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	public function __construct(\Models\Project $project) {
 		$this->project = $project;
 		$this->parameters['common'] = array (
-			"--version" => new VersionParameter(),
-			"--help" => new HelpParameter(),
+			"--version" => new VersionParameter($this->project, $this->getScriptName()),
+			"--help" => new HelpParameter($this),
 		);
 		$this->initializeParameters();
 	}

@@ -4,8 +4,9 @@ namespace Models\Scripts;
 
 class VersionParameter extends DefaultParameter {
 
-	public function __construct() {
-		return;
+	private $versionString = "";
+	public function __construct(\Models\Project $project, $scriptName) {
+		$this->versionString = $project->getVersion($scriptName);
 	}
 
 	public function renderForOperatingSystem() {
@@ -14,6 +15,6 @@ class VersionParameter extends DefaultParameter {
 
 	public function renderForForm() {
 		// TODO get actual version info
-		return "<a class=\"button\" onclick=\"alert('Version Info');\">Version</a>";
+		return "<a class=\"button\" onclick=\"alert('{$this->versionString}');\">Version</a>";
 	}
 }
