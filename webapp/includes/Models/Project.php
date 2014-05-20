@@ -85,6 +85,34 @@ abstract class Project {
 		return $this->database->getUploadedFileSystemName($this->owner, $this->id, $userFileName);
 	}
 
+	public function getPastScriptRuns() {
+		$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
+		if (empty($pastRuns)) {
+			return "";
+		}
+
+		$pastRunsFormatted = array();
+		foreach ($pastRuns as $run) {
+			$pastRunsFormatted[$run['script_name']][] = $run['script_string'];
+		}
+		
+		$output = "";
+		foreach ($this->scripts as $scriptName => $scriptObject) {
+			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
+			if (isset($pastRunsFormatted[$scriptName])) {
+				foreach ($pastRunsFormatted[$scriptName] as $run) {
+					$output .= "<li>" . htmlentities($run) . "</li>";
+				}
+			}
+			else {
+				$output .= "This script has not been run yet.";
+			}
+			$output .= "</ul></div>\n";
+
+		}
+		return $output;
+	}
+
 	public abstract function beginProject();
 	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();

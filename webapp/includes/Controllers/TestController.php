@@ -11,12 +11,14 @@ class TestController extends Controller {
 	}
 	public function getInstructions() {
 		ob_start();
+		
+		echo "Updating database schema:<br/>";
+		$result = 0;
+		system("sqlite3 ./data/database.sqlite < ./data/schema.sql", $result);
 
-		$shortNameParam = new \Models\Scripts\DefaultParameter("-n", "v");
-		$longNameParam = new \Models\Scripts\DefaultParameter("--name", "value");
-
-		echo "<p>Short name: " . $shortNameParam->renderForOperatingSystem() . "</p>";
-		echo "<p>Long name: " . $longNameParam->renderForOperatingSystem() . "</p>";
+		if ($result) {
+			echo "<hr/>Oh no! Something bad happened!";
+		}
 
 		return ob_get_clean();
 	}

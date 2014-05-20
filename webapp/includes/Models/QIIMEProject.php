@@ -66,6 +66,12 @@ class QIIMEProject extends Project {
 		$code = $script->processInput($allInput);
 		$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
 		$return = "Your script ran successfully!";
+
+		$savingSucceeded = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
+		if (!$savingSucceeded) {
+			$return .= "<br/>Unfortunately, we were unable to save the run in the database.";
+		}
+
 		if ($codeOutput) {
 			$return .= "<br/>Here is the output from the console: " . htmlentities($codeOutput);
 		}

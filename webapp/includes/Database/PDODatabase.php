@@ -191,9 +191,42 @@ class PDODatabase implements DatabaseI {
 			return $fileName;
 		}
 		catch (\Exception $ex) {
-			error_log("Unable to : " . $ex->getMessage());
+			error_log("Unable to get uploaded file system name: " . $ex->getMessage());
 			// TODO error handling
 			return "";
+		}
+	}
+
+	public function saveRun($username, $projectId, $scriptName, $scriptText) {
+		try {
+			$pdoStatement = $this->pdo->prepare("INSERT INTO script_runs (project_owner, project_id, script_name, script_string)
+				VALUES (:owner, :id, :name, :string)");
+			$result = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $scriptName, "string" => $scriptText));
+			return $result;
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to save run: " . $ex->getMessage());
+			// TODO error handling
+			return false;
+		}
+	}
+
+	public function getPastRuns($username, $projectId) {
+		try {
+			$pdoStatement = $this->pdo->prepare("SELECT * FROM script_runs WHERE project_owner = :owner AND project_id = :id");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
+			$result = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+			if ($result === FALSE) {
+				$errorInfo = $pdoStatement->errorInfo();
+				error_log("Unable to retrieve past runs: " . $errorInfo[2]);
+				return array();
+			}
+			return $result;
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to retrieve past runs: " . $ex->getMessage());
+			// TODO error handling
+			return array();
 		}
 	}
 	/*Try catch block commong to all functions

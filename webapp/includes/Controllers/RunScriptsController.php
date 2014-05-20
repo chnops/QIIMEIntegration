@@ -8,11 +8,10 @@ class RunScriptsController extends Controller {
 	private $script = "";
 
 	public function retrievePastResults() {
-		return "You have not run any scripts yet.";
-		//TODO $project->getScripts();
-		// freach (script)
-		// echo <div class=\"hideable\" id=\"past_results_{$script->getHtmlId()}\">$script->renderAsForm()</div>
-		// render past results
+		if (!$this->project) {
+			return "";
+		}
+		return "<h4>Past runs:</h4>\n" . $this->project->getPastScriptRuns();
 	}
 
 	public function parseInput() {

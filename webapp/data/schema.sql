@@ -1,6 +1,8 @@
 --DROP TABLE IF EXISTS users;
 --DROP TABLE IF EXISTS projects;
-DROP table IF EXISTS uploaded_files;
+--DROP TABLE IF EXISTS uploaded_files;
+DROP TABLE IF EXISTS script_runs;
+DROP TABLE IF EXISTS derived_files;
 
 CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY ,
@@ -27,3 +29,20 @@ CREATE TABLE IF NOT EXISTS uploaded_files (
 	);
 --TODO given_name is unique per 'project'
 --TODO system_name is unique per 'project'
+
+CREATE TABLE IF NOT EXISTS script_runs (
+	id INTEGER NOT NULL UNIQUE PRIMARY KEY ,
+	project_id INT(11) NOT NULL ,
+	project_owner VARCHAR(255) NOT NULL ,
+	script_name VARCHAR(255) NOT NULL ,
+	script_string TEXT NOT NULL ,
+	version TEXT ,
+	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
+	);
+
+CREATE TABLE IF NOT EXISTS derived_files (
+	run_id INTEGER NOT NULL ,
+	name VARCHAR(255) NOT NULL ,
+	FOREIGN KEY (run_id) REFERENCES script_runs(id)
+	);
+-- TODO name is unique per run id
