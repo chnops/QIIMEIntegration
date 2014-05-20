@@ -10,12 +10,44 @@ class QIIMEProject extends Project {
 
 		$this->operatingSystem->createDir($this->database->getUserRoot($this->owner) . "/" . $newId);
 	}
-	public function getInitialScripts() {
-		return array(
-			new \Models\Scripts\QIIME\ValidateMappingFile($this),
-			new \Models\Scripts\QIIME\SplitLibraries($this),
-		);
+	public function initializeScripts() {
+		$script = new \Models\Scripts\QIIME\ValidateMappingFile($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Validate input'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['De-multiplex libraries'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\PickOtus($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Organize into OTUs'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\PickRepSet($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Organize into OTUs'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\MakeOtuTable($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\AssignTaxonomy($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\AlignSeqs($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\FilterAlignment($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\MakePhylogeny($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
 	}
+
 	public function getInitialFileTypes() {
 		return array(
 			new MapFileType(),
@@ -26,39 +58,28 @@ class QIIMEProject extends Project {
 	public function processInput(array $allInput) {
 		ob_start();
 
-		$this->setName($allInput['project_name']);
-		unset($allInput['project_name']);
-		$this->setOwner($allInput['project_owner']);
-		unset($allInput['project_owner']);
-		// TODO process file {$_FILES['project_input_file']}
-		unset($_FILES['project_input_file']);
-
-		foreach ($this->scripts as $script) {
-			echo $script->processInput($allInput);
-		}
+		// TODO getScript
+		// TODO pass input to script
+			// TODO update script so that form re-renders with user input
+		// TODO set default script to getScript
 
 		return ob_get_clean();
 	}
 
 	public function renderOverview() {
-		ob_start();
-?>
-<style>
-div#project_overview{border:2px #999966 ridge;padding:.5em}
-div#project_overview td{padding:.5em .25em}
-div#project_overview a.button{min-width:100%}
-</style>
-<div id="project_overview">
-<table>
-<tr><td>Validate input</td><td><a class="button" onclick="displayHideables('validate_mapping_file');">validate_mapping_file.py</a></td><td><a class="button">identify_chimeric_seqs.py</a></td><td><a class="button">exclude_seqs_by_blast.py</a></td></tr>
-<tr><td>De-multiplex libraries</td><td><a class="button" onclick="displayHideables('split_libraries');">split_libraries.py</a></td></tr>
-<tr><td>Organize into OTUs</td><td><a class="button">pick_otus.py</a></td><td><a class="button">pick_rep_sets.py</a></td></tr>
-<tr><td>Count/analyze OTUs</td><td><a class="button">make_otu_table.py</a></td><td><a class="button">assign_taxonomy.py</a></td></tr>
-<tr><td>Perform phylogeny analysis</td><td><a class="button">align_seqs.py</a></td><td><a class="button">filter_alignment.py</a></td><td><a class="button">make_phylogeny.py</a></td></tr>
-</table>			
-</div>
-<?php
-		return ob_get_clean();
+
+		$overview = "<style>div#project_overview{border:2px #999966 ridge;padding:.5em .5em 1.5em .5em;overflow:auto}div#project_overview td{padding:.5em .25em;white-space:nowrap}div#project_overview a.button{min-width:100%}</style>\n";
+		$overview .= "<div id=\"project_overview\">\n<table>\n";
+
+		foreach ($this->scriptsFormatted as $category => $scriptArray) {
+			$overview .= "<tr><td>{$category}</td>";
+			foreach ($scriptArray as $script) {
+				$overview .= "<td><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\">{$script->getScriptTitle()}</a></td>";
+			}
+			$overview .= "</tr>\n";
+		}
+		$overview .= "</table>\n</div>\n";
+		return $overview;
 	}
 
 }

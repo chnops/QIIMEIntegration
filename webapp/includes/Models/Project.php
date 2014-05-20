@@ -12,13 +12,14 @@ abstract class Project {
 	protected $operatingSystem;
 
 	protected $scripts;
+	protected $scriptsFormatted;
 	protected $fileTypes;
 
 	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
 		$this->workflow = $workflow;
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
-		$this->scripts = $this->getInitialScripts();
+		$this->initializeScripts();
 		$this->fileTypes = $this->getInitialFileTypes();
 		$this->fileTypes[] = new ArbitraryTextFileType();
 	}
@@ -81,7 +82,7 @@ abstract class Project {
 	}
 
 	public abstract function beginProject();
-	public abstract function getInitialScripts();
+	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();
 	public abstract function processInput(array $allInput);
 	public abstract function renderOverview();

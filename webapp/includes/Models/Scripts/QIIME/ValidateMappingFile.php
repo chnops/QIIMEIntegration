@@ -33,7 +33,7 @@ class ValidateMappingFile extends DefaultScript {
 		return "validate_mapping_file.py";
 	}
 	public function getScriptTitle() {
-		return "Map validation parameters";
+		return "Validate map file";
 	}
 	public function getHtmlId() {
 		return "validate_mapping_file";
