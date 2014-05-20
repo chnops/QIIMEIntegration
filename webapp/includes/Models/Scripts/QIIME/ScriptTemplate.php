@@ -13,8 +13,8 @@ use Models\Scripts\ChoiceParameter;
 
 class  extends DefaultScript {
 
-	public function getInitialParameters() {
-		return array(
+	public function initializeParameters() {
+		$this->parameters = array(
 			"--version" => new VersionParameter(),
 			"--help" => new HelpParameter(),
 		);

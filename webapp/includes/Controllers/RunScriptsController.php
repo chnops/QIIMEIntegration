@@ -5,6 +5,7 @@ namespace Controllers;
 class RunScriptsController extends Controller {
 
 	protected $subTitle = "Run Scripts";
+	private $script = "";
 
 	public function retrievePastResults() {
 		return "You have not run any scripts yet.";
@@ -21,6 +22,21 @@ class RunScriptsController extends Controller {
 			$this->hasResult = true;
 			$this->result = "In order to run scripts, you must be logged in and have a project selected.";
 			return;
+		}
+		if (!isset($_POST['step'])) {
+			return;
+		}
+		$_GET['step'] = $_POST['step'];
+		unset($_POST['step']);
+		$this->hasResult = true;
+		$this->script = $_POST['script'];
+
+		try {
+			$this->result = $this->project->processScriptInput($_POST);
+		}
+		catch (\Exception $ex) {
+			$this->isResultError = true;
+			$this->result = htmlentities($ex->getMessage());
 		}
 	}
 
@@ -48,12 +64,15 @@ class RunScriptsController extends Controller {
 	public function getForm() {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 		$scripts = $project->getScripts();
-		$defaultScript = $scripts[0];
 		$form = "";
 		foreach ($scripts as $script) {
 			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm()}</div>\n";
 		}
-		$form .= "<script type=\"text/javascript\">window.onload=function(){hideableFields=['form', 'help', 'past_results']};</script>\n";
+		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
+		if ($this->script) {
+			$onLoadJavascript .= "displayHideables('{$this->script}');";
+		}
+		$form .= "<script type=\"text/javascript\">window.onload=function(){{$onLoadJavascript}};</script>\n";
 		return $form;
 	}
 }

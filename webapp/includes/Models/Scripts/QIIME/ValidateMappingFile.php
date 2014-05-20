@@ -13,13 +13,14 @@ use Models\Scripts\ChoiceParameter;
 
 class ValidateMappingFile extends DefaultScript {
 
-	public function getInitialParameters() {
-		$required = true;
-		return array(
+	public function initializeParameters() {
+		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
+		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
+		$this->parameters = array(
 			"--version" => new VersionParameter(),
 			"--help" => new HelpParameter(),
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
-			"--verbose" => new TrueFalseInvertedParameter("--verbose"),
+			$verboseParameter->getName() => $verboseParameter,
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/./"),
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),
 			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes"),

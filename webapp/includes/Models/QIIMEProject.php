@@ -55,15 +55,15 @@ class QIIMEProject extends Project {
 			new SequenceQualityFileType(),
 		);
 	}
-	public function processInput(array $allInput) {
-		ob_start();
+	public function processScriptInput(array $allInput) {
+		$scriptId = $allInput['script'];
+		unset($allInput['script']);
+		if (!isset($this->scripts[$scriptId])) {
+			throw new \Exception("Unable to find script: {$scriptId}");
+		}
 
-		// TODO getScript
-		// TODO pass input to script
-			// TODO update script so that form re-renders with user input
-		// TODO set default script to getScript
-
-		return ob_get_clean();
+		$script = $this->scripts[$scriptId];
+		return $script->processInput($allInput);
 	}
 
 	public function renderOverview() {

@@ -13,12 +13,13 @@ use Models\Scripts\ChoiceParameter;
 
 class SplitLibraries extends DefaultScript {
 
-	public function getInitialParameters() {
-		$required = true;
-		return array(
+	public function initializeParameters() {
+		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
+		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
+		$this->parameters = array(
 			"--version" => new VersionParameter(),
 			"--help" => new HelpParameter(),
-  			"--verbose" => new TrueFalseInvertedParameter("--verbose"),
+  			$verboseParameter->getName() => $verboseParameter,
 			"--qual" => new OldFileParameter("--qual", $this->project),
 			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
 			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
@@ -34,7 +35,7 @@ class SplitLibraries extends DefaultScript {
                         /*a number representing the
                         length of the barcode, such as -b 4. */
   			"--dir-prefix" => new NewFileParameter("--dir-prefix", "."), // TODO possibly a file parameter
-			"--max-barcode-errors=" => new TextArgumentParameter("--max-barcode-error", "1.5", "/.*/"),
+			"--max-barcode-errors" => new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
 			"--start-numbering-at" => new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
 			"--retain_unassigned_reads" => new TrueFalseParameter("--retain_unasigned_reads"),
 			"--disable_bc_correction" => new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
