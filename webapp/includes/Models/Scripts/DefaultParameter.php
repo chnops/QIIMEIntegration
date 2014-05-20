@@ -13,7 +13,7 @@ class DefaultParameter implements ParameterI {
 
 	public function renderForOperatingSystem() {
 		if (!$this->isValueValid()) {
-			throw new \ScriptException("An invalid value was provided for the parameter: {$this->name}");
+			throw new ScriptException("An invalid value was provided for the parameter: {$this->name}");
 		}
 		if ($this->value) {
 			$separator = (strlen($this->name) == 2) ? " " : "=";

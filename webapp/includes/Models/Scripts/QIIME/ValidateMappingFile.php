@@ -16,9 +16,7 @@ class ValidateMappingFile extends DefaultScript {
 	public function initializeParameters() {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
-		$this->parameters = array(
-			"--version" => new VersionParameter(),
-			"--help" => new HelpParameter(),
+		$this->parameters['special'] = array(
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
 			$verboseParameter->getName() => $verboseParameter,
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/./"),
@@ -27,6 +25,8 @@ class ValidateMappingFile extends DefaultScript {
 			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check"),
 			"-j" => new TextArgumentParameter("-j", "", "/.*/"),
 			"--suppress_html" => new TrueFalseParameter("--suppress_html"),
+		);
+		$this->parameters['required'] = array(
 			"--mapping_fp" => new OldFileParameter("--mapping_fp", $this->project)
 		);
 	}

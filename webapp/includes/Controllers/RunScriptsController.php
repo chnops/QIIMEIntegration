@@ -43,7 +43,7 @@ class RunScriptsController extends Controller {
 	public function getInstructions() {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();	
 		
-		$scripts = $this->project->getScripts();
+		$scripts = $project->getScripts();
 		if ($scripts) {
 			$this->help .= "\n";
 			foreach ($scripts as $script) {

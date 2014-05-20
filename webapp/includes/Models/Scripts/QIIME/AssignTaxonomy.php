@@ -14,9 +14,9 @@ use Models\Scripts\ChoiceParameter;
 class AssignTaxonomy extends DefaultScript {
 
 	public function initializeParameters() {
-		$this->parameters = array(
-			"--version" => new VersionParameter(),
-			"--help" => new HelpParameter(),
+		$this->parameters['required'] = array(
+		);
+		$this->parameters['special'] = array(
 		);
 	}
 	public function getScriptName() {

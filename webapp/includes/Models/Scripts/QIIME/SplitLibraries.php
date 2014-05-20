@@ -16,7 +16,7 @@ class SplitLibraries extends DefaultScript {
 	public function initializeParameters() {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
-		$this->parameters = array(
+		$this->parameters['special'] = array(
 			"--version" => new VersionParameter(),
 			"--help" => new HelpParameter(),
   			$verboseParameter->getName() => $verboseParameter,
@@ -48,6 +48,8 @@ class SplitLibraries extends DefaultScript {
 			"--median_length_filtering" => new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
 			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
 			"--truncate_ambi_bases" => new TrueFalseParameter("--truncate_ambi_bases"),
+		);
+		$this->parameters['required'] = array( 
 			"--map" => new OldFileParameter("--map", $this->project),
 			"--fasta" => new OldFileParameter("--fasta", $this->project),
 		);
