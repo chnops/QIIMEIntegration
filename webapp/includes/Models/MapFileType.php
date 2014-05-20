@@ -5,7 +5,7 @@ namespace Models;
 class MapFileType extends FileType {
 	public function __construct() {
 		$this->name = "Map";
-		$this->shortName = "map";
+		$this->htmlId = "map";
 		$this->help = "
 			<p>A map file contains metadata about your samples.  It is tab-delineated text, formatted in a table, with one sample per row, one characteristic of the sample per column.</p>
 			<p>The example below contains the four required fields: a name for each sample, its unique barcode, the linker/primer used to amplify the sample, and a description.

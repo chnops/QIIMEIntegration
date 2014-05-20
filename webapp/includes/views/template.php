@@ -23,7 +23,7 @@
 		div#past_results,div#result{overflow:auto;max-width:90%}
 		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;white-space:nowrap;}
 		div.script_form input[type="text"],div.script_form input[type="file"],select{display:block}
-		div.script_help{display:none;}
+		div.hideable{display:none;}
 		a{color:#003366;cursor:pointer;}
 		a:link {color:#003366;text-decoration:none;font-style:italic;}
 		a:hover {background-color:#ffffcc;text-decoration:underline;}
@@ -48,13 +48,16 @@
 			body.style.display = "inline";
 		}
 	}	
-	var displayedHelp = null;
-	function displayHelp(id) {
-		if (displayedHelp != null) {
-			displayedHelp.style.display="none";
+	var hideableFields = [];
+	var displayedHideableId = "";
+	function displayHideables(hideableToDisplayId) {
+		for (var i = 0; i < hideableFields.length; i++) {
+			var hideableToDisplay = document.getElementById(hideableFields[i] + "_" + hideableToDisplayId);
+			var displayedHideable = document.getElementById(hideableFields[i] + "_" + displayedHideableId);
+			if (displayedHideable) displayedHideable.style.display="none";
+			if (hideableToDisplay) hideableToDisplay.style.display="block";
 		}
-		displayedHelp = document.getElementById(id);
-		displayedHelp.style.display="block";
+		displayedHideableId = hideableToDisplayId;
 	}
 </script>
 </head>
@@ -71,7 +74,8 @@ foreach ($steps as $key => $step) {
 }
 ?>
 </tr></table></div>
-<div id="content"><p><?php echo $this->content ?></p></div>
-<div id="help"><p><?php echo $this->help ?></p></div>
+<div id="content"><?php echo $this->content ?></div>
+<div id="help"><?php echo $this->help ?></div>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
+</html>

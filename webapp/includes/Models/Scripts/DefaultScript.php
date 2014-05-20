@@ -2,7 +2,7 @@
 
 namespace Models\Scripts;
 
-abstract class DefaultScript implements ScriptI {
+abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
 	protected $project;
 	protected $parameters;
@@ -15,8 +15,7 @@ abstract class DefaultScript implements ScriptI {
 		return $this->parameters;
 	}
 	public function renderAsForm() {
-		$form = "<h4>{$this->getScriptTitle()} 
-			(<a onclick=\"displayHelp('script_help_{$this->getScriptShortTitle()}');\">help</a>)</h4>\n";
+		$form = "<h4>{$this->getScriptTitle()}</h4>\n";
 		foreach ($this->parameters as $parameter) {
 			$form .= $parameter->renderForForm() . "\n";
 		}
@@ -40,6 +39,6 @@ abstract class DefaultScript implements ScriptI {
 
 	public abstract function getScriptName();
 	public abstract function getScriptTitle();
-	public abstract function getScriptShortTitle();
+	public abstract function getHtmlId();
 	public abstract function renderHelp();
 }

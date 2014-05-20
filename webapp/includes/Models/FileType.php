@@ -2,9 +2,9 @@
 
 namespace Models;
 
-abstract class FileType {
+abstract class FileType implements HideableI {
 	protected $name;
-	protected $shortName;
+	protected $htmlId;
 	protected $help;
 	protected $example;
 
@@ -13,18 +13,21 @@ abstract class FileType {
 	public function getName() {
 		return $this->name;
 	}
-	public function getShortName() {
-		return $this->shortName;
+	public function getHtmlId() {
+		return $this->htmlId;
 	}
+	/* TODO
+	 * public function getDatabaseName() {
+	 * 	return $this->htmlId;
+	 * }
+	 */
 
 	public function renderHelp() {
-		$output = "<div class=\"script_help\" id=\"script_help_{$this->shortName}\">
-			<h4>{$this->name} Files</h4>
+		$output = "<h4>{$this->name} Files</h4>
 			<p>{$this->help}</p>";
 		if ($this->example) {
 			$output .= "<div class=\"file_example\">{$this->example}</div>";
 		}
-		$output .= "</div>";	
 		return $output;
 	}
 }

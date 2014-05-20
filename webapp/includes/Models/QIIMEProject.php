@@ -44,17 +44,17 @@ class QIIMEProject extends Project {
 		ob_start();
 ?>
 <style>
-div#project_overview{background-color:white}
-div#project_overview td{border-style:outset;}
-div#project_overview tr{border-bottom:2px;margin-bottom:1em;}
+div#project_overview{border:2px #999966 ridge;padding:.5em}
+div#project_overview td{padding:.5em .25em}
+div#project_overview a.button{min-width:100%}
 </style>
 <div id="project_overview">
 <table>
-<tr><td class="category">Validate input</td><td>validate_mapping_file.py</td><td>identify_chimeric_seqs.py</td><td>exclude_seqs_by_blast.py</td></tr>
-<tr><td class="category">De-multiplex libraries</td><td>split_libraries.py</td></tr>
-<tr><td class="category">Organize into OTUs</td><td>pick_otus.py</td><td>pick_rep_sets.py</td></tr>
-<tr><td class="category">Count/analyze OTUs</td><td>make_otu_table.py</td><td>assign_taxonomy.py</td></tr>
-<tr><td class="category">Perform phylogeny analysis</td><td>align_seqs.py</td><td>filter_alignment.py</td><td>make_phylogeny.py</td></tr>
+<tr><td>Validate input</td><td><a class="button" onclick="displayHideables('validate_mapping_file');">validate_mapping_file.py</a></td><td><a class="button">identify_chimeric_seqs.py</a></td><td><a class="button">exclude_seqs_by_blast.py</a></td></tr>
+<tr><td>De-multiplex libraries</td><td><a class="button" onclick="displayHideables('split_libraries');">split_libraries.py</a></td></tr>
+<tr><td>Organize into OTUs</td><td><a class="button">pick_otus.py</a></td><td><a class="button">pick_rep_sets.py</a></td></tr>
+<tr><td>Count/analyze OTUs</td><td><a class="button">make_otu_table.py</a></td><td><a class="button">assign_taxonomy.py</a></td></tr>
+<tr><td>Perform phylogeny analysis</td><td><a class="button">align_seqs.py</a></td><td><a class="button">filter_alignment.py</a></td><td><a class="button">make_phylogeny.py</a></td></tr>
 </table>			
 </div>
 <?php

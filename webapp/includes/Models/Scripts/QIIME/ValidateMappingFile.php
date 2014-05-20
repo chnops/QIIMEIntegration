@@ -35,8 +35,8 @@ class ValidateMappingFile extends DefaultScript {
 	public function getScriptTitle() {
 		return "Map validation parameters";
 	}
-	public function getScriptShortTitle() {
-		return "validate";
+	public function getHtmlId() {
+		return "validate_mapping_file";
 	}
 	public function renderHelp() {
 		return "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to take your map file, and tell you if you did it right.</p>";

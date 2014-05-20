@@ -5,7 +5,7 @@ namespace Models;
 class SequenceQualityFileType extends FileType {
 	public function __construct() {
 		$this->name = "Sequence Quality";
-		$this->shortName = "quality";
+		$this->htmlId = "quality";
 		$this->help = "<p>A sequence quality file is matched to a sequence file, and a pair must be uploaded at the same time.
 			The format is roughly parallel, but instead of unseparated bases designations, the quality file has space-delineated quality scores.</p>";
 		$this->example = "
