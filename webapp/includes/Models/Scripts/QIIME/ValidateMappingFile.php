@@ -13,6 +13,17 @@ use Models\Scripts\ChoiceParameter;
 
 class ValidateMappingFile extends DefaultScript {
 
+	private $scriptName;
+	public function __construct(\Models\Project $project) {
+		parent::__construct($project);
+		if ($this->project->scriptExists("validate_map_file.py")) {
+			$this->scriptName = "validate_map_file.py";
+		}
+		else {
+			$this->scriptName = "check_id_map.py";
+		}
+	}
+
 	public function initializeParameters() {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
@@ -31,7 +42,7 @@ class ValidateMappingFile extends DefaultScript {
 		);
 	}
 	public function getScriptName() {
-		return "validate_mapping_file.py";
+		return $this->scriptName;
 	}
 	public function getScriptTitle() {
 		return "Validate map file";

@@ -113,6 +113,16 @@ abstract class Project {
 		return $output;
 	}
 
+	public function scriptExists($scriptName) {
+		try {
+			$whichOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "which {$scriptName}");
+			return true;
+		}
+		catch (\Exception $ex) {
+			return false;
+		}
+	}
+
 	public abstract function beginProject();
 	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();
