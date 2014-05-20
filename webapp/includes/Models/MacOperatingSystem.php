@@ -33,8 +33,18 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 	}
 
-	public function executeArbitraryScript($script) {
-		system("source '/macqiime/configs/bash_profile.txt'; cd ./projects/1/; {$script}");		
+	public function executeArbitraryScript($environmentSource, $projectDirectory, $script) {
+		$code = "source {$environmentSource}; cd ./projects/{$projectDirectory}; {$script}";
+
+		$returnValue = 0;
+		ob_start();
+		//system($code, $returnValue);
+		echo $code;
+		if ($returnValue) {
+			ob_end_clean();
+			throw new OperatingSystemException("An error occurred while executing script. Check the error log, or contact your system administrator.");
+		}
+		return ob_get_clean();
 	}
 	public function isValidFileName($name) {
 		// the database can only hold ints that are 11 digits long

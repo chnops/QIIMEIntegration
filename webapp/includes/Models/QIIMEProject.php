@@ -63,7 +63,8 @@ class QIIMEProject extends Project {
 		}
 
 		$script = $this->scripts[$scriptId];
-		return $script->processInput($allInput);
+		$code = $script->processInput($allInput);
+		return $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
 	}
 
 	public function renderOverview() {

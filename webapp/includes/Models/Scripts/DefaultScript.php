@@ -38,17 +38,6 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		return $form;
 	}
 
-	public function run() {
-		$arbitraryScript = $this->getScriptName() . " ";
-		foreach ($this->parameters as $category => $parameterArray) {
-			foreach ($parameterArray as $parameter) {
-				$arbitraryScript .= $parameter->renderForOperatingSystem() . " ";
-			}
-		}
-//		$this->project->getOperatingSystem()->executeArbitraryScript($arbitraryScript);
-		return $arbitraryScript;
-	}
-
 	public function processInput(array $input) {
 		foreach ($this->trueFalseParameters as $name => $parameter) {
 			if (!isset($input[$name])) {
@@ -70,7 +59,14 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			$parameter = $this->parameters['special'][$inputName];
 			$parameter->setValue($inputValue);
 		}
-		return "Once this is working, it will run the script:<br/>{$this->run()}<br/>";
+
+		$script = $this->getScriptName() . " ";
+		foreach ($this->parameters as $category => $parameterArray) {
+			foreach ($parameterArray as $parameter) {
+				$script .= $parameter->renderForOperatingSystem() . " ";
+			}
+		}
+		return $script;
 	}
 
 	public abstract function getScriptName();
