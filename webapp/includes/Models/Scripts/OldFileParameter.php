@@ -9,6 +9,18 @@ class OldFileParameter extends DefaultParameter {
 		$this->name = $name;
 		$this->project = $project;
 	}
+	public function renderForOperatingSystem() {
+		if (!$this->value) {
+			return "";
+		}
+		$systemFileName = $this->project->getSystemFileName($this->value);
+		if (!$systemFileName) {
+			throw new ScriptException("Unable to locate the given file: {$this->value}");
+		}
+
+		$separator = (strlen($this->name) == 2) ? " " : "=";
+		return $this->name . $separator . "'" . $systemFileName . "'";
+	}
 	public function renderForForm() {
 		if (empty($this->files)) {
 			$this->files = $this->project->retrieveAllUploadedFiles();

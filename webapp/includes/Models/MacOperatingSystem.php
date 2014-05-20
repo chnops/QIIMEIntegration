@@ -38,8 +38,7 @@ class MacOperatingSystem implements OperatingSystemI {
 
 		$returnValue = 0;
 		ob_start();
-		//system($code, $returnValue);
-		echo $code;
+		system($code, $returnValue);
 		if ($returnValue) {
 			ob_end_clean();
 			throw new OperatingSystemException("An error occurred while executing script. Check the error log, or contact your system administrator.");

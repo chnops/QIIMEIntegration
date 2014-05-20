@@ -183,6 +183,19 @@ class PDODatabase implements DatabaseI {
 	
 	}
 
+	public function getUploadedFileSystemName($username, $projectId, $fileName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("SELECT system_name FROM uploaded_files WHERE project_owner = :owner AND project_id = :id AND given_name = :fileName");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId, "fileName" => $fileName));
+			$fileName = $pdoStatement->fetchColumn(0);
+			return $fileName;
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to : " . $ex->getMessage());
+			// TODO error handling
+			return "";
+		}
+	}
 	/*Try catch block commong to all functions
 		try {
 		}

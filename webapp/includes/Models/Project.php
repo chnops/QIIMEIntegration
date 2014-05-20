@@ -80,6 +80,10 @@ abstract class Project {
 		}
 		return $formattedFiles;
 	}
+	
+	public function getSystemFileName($userFileName) {
+		return $this->database->getUploadedFileSystemName($this->owner, $this->id, $userFileName);
+	}
 
 	public abstract function beginProject();
 	public abstract function initializeScripts();

@@ -64,7 +64,12 @@ class QIIMEProject extends Project {
 
 		$script = $this->scripts[$scriptId];
 		$code = $script->processInput($allInput);
-		return $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
+		$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
+		$return = "Your script ran successfully!";
+		if ($codeOutput) {
+			$return .= "<br/>Here is the output from the console: " . htmlentities($codeOutput);
+		}
+		return $return;
 	}
 
 	public function renderOverview() {

@@ -17,4 +17,5 @@ interface DatabaseI {
 
 	public function createUploadedFile($username, $projectId, $fileName, $fileType);
 	public function getAllUploadedFiles($username, $projectId);
+	public function getUploadedFileSystemName($username, $projectId, $userName);
 }
