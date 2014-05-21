@@ -3,13 +3,9 @@
 namespace Database;
 
 class PDODatabase implements DatabaseI {
+	private static $dsn = "sqlite:data/database.sqlite";
 
 	private $operatingSystem = NULL;
-	private static $dsn = "sqlite:data/database.sqlite";
-	public static function overwriteDSN($newDSN) {
-		PDODatabase::$dsn = $newDSN;
-	}
-
 	private $pdo = NULL;
 
 	public function __construct(\Models\OperatingSystemI $operatingSystem) {

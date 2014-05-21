@@ -7,6 +7,10 @@ class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
 	private $name = "--true_false_inverted";
 	private $parameter;
 
+	public static function setUpBeforeClass() {
+		error_log("TrueFalseInvertedParameterTest");
+	}
+
 	public function setUp() {
 		$this->parameter = new TrueFalseInvertedParameter($this->name);
 	}

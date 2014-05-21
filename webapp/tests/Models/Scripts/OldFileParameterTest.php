@@ -10,12 +10,12 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 	private static $project;
 
 	public static function setUpBeforeClass() {
+		error_log("OldFileParameterTest");
 		OldFileParameterTest::$owner = "sharpa";
 		OldFileParameterTest::$id = 1;
 
 		$pdo = new \PDO("sqlite:./data/database.sqlite");
 		$pdo->exec("DELETE FROM uploaded_files");
-		\Database\PDODatabase::overwriteDSN("sqlite:./data/database.sqlite");
 
 		OldFileParameterTest::$database = new \Database\PDODatabase(new \Models\MacOperatingSystem());
 		OldFileParameterTest::$database->createUploadedFile(
@@ -68,10 +68,11 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testRenderForForm() {
 		$this->parameter->setValue("File2");
 		$expectedForm = "<label for=\"--old_file_param\">--old_file_param<select name=\"--old_file_param\">\n";
-		$expectedForm .= "<optgroup label=\"arbitrary_text\">\n";
+		$expectedForm .= "<option value=\"\">--Selected a file--</option>\n";
+		$expectedForm .= "<optgroup label=\"arbitrary_text files\">\n";
 		$expectedForm .= "<option value=\"File1\">File1</option>\n";
 		$expectedForm .= "</optgroup>\n";
-		$expectedForm .= "<optgroup label=\"map\">\n";
+		$expectedForm .= "<optgroup label=\"map files\">\n";
 		$expectedForm .= "<option value=\"File2\" selected>File2</option>\n";
 		$expectedForm .= "</optgroup>\n";
 		$expectedForm .= "</select></label>\n";

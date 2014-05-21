@@ -3,15 +3,8 @@
 namespace Models;
 
 class MacOperatingSystem implements OperatingSystemI {
-
 	// since all scripts execute in webapp/index.php,	
 	private $home = "./projects/";
-	public function overwriteHome($newHome) {
-		if ($newHome != './data/projects') {
-			error_log("WARNING: This should only be used in testing contexts.  It could be disasrous to use it otherwise.");
-		}
-		$this->home = $newHome;
-	}
 
 	public function getHome() {
 		return $this->home;

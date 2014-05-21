@@ -7,6 +7,10 @@ class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 	private $name = "--true_false";
 	private $parameter;
 
+	public static function setUpBeforeClass() {
+		error_log("TrueFalseParameterTest");
+	}
+
 	public function setUp() {
 		$this->parameter = new TrueFalseParameter($this->name);
 	}

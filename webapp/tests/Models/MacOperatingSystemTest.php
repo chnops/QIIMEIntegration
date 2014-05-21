@@ -4,24 +4,26 @@ namespace Models;
 
 class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
-	private $newHome = "./data/projects";
+	private $projectHome = "./projects/";
 	private $operatingSystem = NULL;
+
+	public static function setUpBeforeClass() {
+		error_log("MacOperatingSystemTest");
+	}
 
 	public function setUp() {
 		$this->operatingSystem = new MacOperatingSystem();
-		$this->operatingSystem->overwriteHome($this->newHome);
 	}
 
 	/**
 	 * @test
 	 * @covers MacOperatingSystem::getHome
-	 * @covers MacOperatingSystem::overwriteHome
 	 */
 	public function testFindsHome() {
 		$returnCode = 0;
 		system("cd {$this->operatingSystem->getHome()}", $returnCode);
 		$this->assertEquals(0, $returnCode);
-		$this->assertEquals($this->newHome, $this->operatingSystem->getHome());
+		$this->assertEquals($this->projectHome, $this->operatingSystem->getHome());
 	}
 
 	/**
@@ -56,7 +58,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			$this->operatingSystem->createDir(1);
 		}
 		catch (OperatingSystemException $ex) {
-			$this->fail("Failed to create directory {$this->newHome}/1: " . $ex->getMessage());
+			$this->fail("Failed to create directory {$this->projectHome}/1: " . $ex->getMessage());
 		}
 
 		try {
@@ -65,25 +67,25 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch (OperatingSystemException $ex) {
 			$this->assertEquals("mkdir failed: 1", $ex->getMessage());
 		}
-		system("rmdir {$this->newHome}/1");
+		system("rmdir {$this->projectHome}/1");
 
 		try {
 			$this->operatingSystem->createDir("1");
 		}
 		catch (OperatingSystemException $ex) {
-			$this->fail("Failed to create directory {$this->newHome}/\"1\": " . $ex->getMessage());
+			$this->fail("Failed to create directory {$this->projectHome}/\"1\": " . $ex->getMessage());
 		}
-		system("rmdir {$this->newHome}/1");
+		system("rmdir {$this->projectHome}/1");
 
-		system("mkdir {$this->newHome}/2");
+		system("mkdir {$this->projectHome}/2");
 		try {
 			$this->operatingSystem->createDir("2/1");
 		}
 		catch (OperatingSystemException $ex) {
-			$this->fail("Failed to create directory {$this->newHome}/2/1: " . $ex->getMessage());
+			$this->fail("Failed to create directory {$this->projectHome}/2/1: " . $ex->getMessage());
 		}
-		system("rmdir {$this->newHome}/2/1;
-			rmdir {$this->newHome}/2");
+		system("rmdir {$this->projectHome}/2/1;
+			rmdir {$this->projectHome}/2");
 
 		try {
 			$this->operatingSystem->createDir("2/notAValidFileName");
@@ -98,6 +100,6 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @covers MacOperatingSystem::executeArbitraryScript
 	 */
 	public function testExecuteArbitraryScript() {
-		$this->markTestIncomplete();
+		$this->markTestIncomplete();	
 	}
 }

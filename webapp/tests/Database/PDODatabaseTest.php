@@ -10,12 +10,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	private $database;
 
 	public static function setUpBeforeClass() {
-		PDODatabase::overwriteDSN(PDODatabaseTest::$testDSN);
+		error_log("PDODatabaseTest");
 		system("rm -r ./data/projects/*");
 	}
 	public function setUp() {
 		$operatingSystem = new \Models\MacOperatingSystem();
-		$operatingSystem->overwriteHome("./data/projects");
 		$this->database = new PDODatabase($operatingSystem);
 
 		$this->pdo = new \PDO(PDODatabaseTest::$testDSN);

@@ -10,6 +10,10 @@ class ChoiceParameterTest extends \PHPUnit_Framework_TestCase {
 
 	private $parameter;
 
+	public static function setUpBeforeClass() {
+		error_log("ChoiceParameterTest");
+	}
+
 	public function setUp() {
 		$this->parameter = new ChoiceParameter($this->name, $this->defaultValue, $this->options);
 	}

@@ -7,6 +7,10 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 	private $name = "--test_text";
 	private $parameter;
 
+	public static function setUpBeforeClass() {
+		error_log("TextArgumentParameterTest");
+	}
+
 	/**
 	 * @test
 	 * @covers TextArgumentParameter::__construct

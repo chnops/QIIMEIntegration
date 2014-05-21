@@ -114,6 +114,10 @@ abstract class Project {
 	}
 
 	public function scriptExists($scriptName) {
+		if (!$this->owner || !$this->id) {
+			return false;
+		}
+
 		try {
 			$whichOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "which {$scriptName}");
 			return true;
@@ -123,6 +127,9 @@ abstract class Project {
 		}
 	}
 	public function getVersion($scriptName) {
+		if (!$this->owner || !$this->id) {
+			return "Unable to obtain version information.";
+		}
 		try {
 			$consoleOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "{$scriptName} --version");
 			return trim($consoleOutput);

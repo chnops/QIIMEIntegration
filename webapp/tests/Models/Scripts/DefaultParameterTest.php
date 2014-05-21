@@ -8,6 +8,10 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	private $name = "--file_path";
 	private $value = "./file/path.ext";
 
+	public static function setUpBeforeClass() {
+		error_log("DefaultParameterTest");
+	}
+
 	public function setUp() {
 		$this->parameter = new DefaultParameter($this->name, $this->value);
 	}

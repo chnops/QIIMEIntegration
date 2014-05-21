@@ -8,6 +8,10 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	private $database;
 	private $workflow;
 
+	public static function setUpBeforeClass() {
+		error_log("QIIMEWorkflowTest");
+	}
+
 	public function setUp() {
 		$this->operatingSystem = new MacOperatingSystem();
 		$this->database = new \Database\PDODatabase($this->operatingSystem);
@@ -23,8 +27,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 			"login" => "Login",	
 			"select" => "Select/create project",
 			"upload" => "Upload files",
-			"make_otu" => "Create OTU table",
-			"make_phylogeny" => "Perform phylogeny analysis [optional]",
+			"run" => "Run scripts",
 			"view" => "View results");
 		$this->assertEquals($expectedSteps, $this->workflow->getSteps());
 	}
@@ -34,7 +37,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 * @covers QIIMEWorkflow::getNextStep
 	 */
 	public function testGetNextStep() {
-		$stepsInOrder = array ("login", "select", "upload", "make_otu", "make_phylogeny", "view");
+		$stepsInOrder = array ("login", "select", "upload", "run", "view");
 		$stepsCount = count($stepsInOrder);
 		for ($i = 0; $i < $stepsCount - 1; $i++) {
 			$expected = $stepsInOrder[$i + 1];
@@ -49,7 +52,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 * @covers QIIMEWorkflow::getPreviousStep
 	 */
 	public function testGetPreviousStep() {
-		$stepsInReverseOrder = array ("view", "make_phylogeny", "make_otu", "upload", "select", "login");
+		$stepsInReverseOrder = array ("view", "run", "upload", "select", "login");
 		$stepsCount = count($stepsInReverseOrder);
 		for ($i = 0; $i < $stepsCount - 1; $i++) {
 			$expected = $stepsInReverseOrder[$i + 1];
@@ -70,12 +73,11 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 				new \Controllers\LoginController($this->database, $this->workflow), 
 				new \Controllers\SelectProjectController($this->database, $this->workflow), 
 				new \Controllers\UploadController($this->database, $this->workflow), 
-				new \Controllers\MakeOtuController($this->database, $this->workflow), 
-				new \Controllers\MakePhylogenyController($this->database, $this->workflow), 
+				new \Controllers\RunScriptsController($this->database, $this->workflow),
 				new \Controllers\ViewResultsController($this->database, $this->workflow), 
 			);
 		$stepsInOrder = array ("test","login","login","select",
-			"upload","make_otu","make_phylogeny","view",);
+			"upload","run","view",);
 		$stepsCount = count($stepsInOrder);
 		for ($i = 0; $i < $stepsCount; $i++) {
 			$this->assertEquals($stepsInOrder[$i],
@@ -88,15 +90,14 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetController() {
 		$stepsInOrder = array ("test","index","login","select",
-			"upload","make_otu","make_phylogeny","view",);
+			"upload","run","view",);
 		$controllerNamesInOrder = array (
 				"Controllers\\TestController", 
 				"Controllers\\LoginController", 
 				"Controllers\\LoginController", 
 				"Controllers\\SelectProjectController", 
 				"Controllers\\UploadController", 
-				"Controllers\\MakeOtuController", 
-				"Controllers\\MakePhylogenyController", 
+				"Controllers\\RunScriptsController",
 				"Controllers\\ViewResultsController", 
 			);
 		$stepsCount = count($stepsInOrder);

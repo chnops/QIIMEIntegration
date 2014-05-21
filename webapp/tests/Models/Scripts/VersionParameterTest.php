@@ -6,8 +6,14 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 
 	private $parameter;
 
+	public static function setUpBeforeClass() {
+		error_log("VersionParameterTest");
+	}
+
 	public function setUp() {
-		$this->parameter = new VersionParameter();
+		$mockProject = $this->getMock("\Models\Project", array(), array(), "", $callConstructor = false);
+		$mockProject->expects($this->any())->method("getVersion")->will($this->returnValue("mock version 1.7"));
+		$this->parameter = new VersionParameter($mockProject, "");
 	}
 
 	public function testRenderForOperatingSystem() {
@@ -15,6 +21,6 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testRenderForForm() {
-		$this->assertEquals("<a class=\"button\" onclick=\"alert('Version Info');\">Version</a>", $this->parameter->renderForForm());
+		$this->assertEquals("<a class=\"button\" onclick=\"alert('mock version 1.7');\">Version</a>", $this->parameter->renderForForm());
 	}
 }
