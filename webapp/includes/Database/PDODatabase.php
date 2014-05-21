@@ -3,7 +3,7 @@
 namespace Database;
 
 class PDODatabase implements DatabaseI {
-	private static $dsn = "sqlite:data/database.sqlite";
+	private static $dsn = "sqlite:./data/database.sqlite";
 
 	private $operatingSystem = NULL;
 	private $pdo = NULL;
@@ -198,10 +198,27 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO script_runs (project_owner, project_id, script_name, script_string)
 				VALUES (:owner, :id, :name, :string)");
 			$result = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $scriptName, "string" => $scriptText));
-			return $result;
+			if ($result) {
+				return $this->pdo->lastInsertId();
+			}
+			else {
+				return false;
+			}
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to save run: " . $ex->getMessage());
+			// TODO error handling
+			return false;
+		}
+	}
+
+	public function addRunResults($runId, $consoleOutput, $version) {
+		try {
+			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET output = :output, version = :version WHERE id = :id");
+			return $pdoStatement->execute(array("id" => $runId, "output" => $consoleOutput, "version" => $version));
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to add results from run: " . $ex->getMessage());
 			// TODO error handling
 			return false;
 		}

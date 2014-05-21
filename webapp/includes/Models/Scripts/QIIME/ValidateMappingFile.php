@@ -15,8 +15,8 @@ class ValidateMappingFile extends DefaultScript {
 
 	private $scriptName;
 	public function __construct(\Models\Project $project) {
-		if ($project->scriptExists("validate_map_file.py")) {
-			$this->scriptName = "validate_map_file.py";
+		if ($project->scriptExists("validate_mapping_file.py")) {
+			$this->scriptName = "validate_mapping_file.py";
 		}
 		else {
 			$this->scriptName = "check_id_map.py";
@@ -30,7 +30,7 @@ class ValidateMappingFile extends DefaultScript {
 		$this->parameters['special'] = array(
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
 			$verboseParameter->getName() => $verboseParameter,
-			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/./"),
+			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/^.$/"),
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),
 			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes"),
 			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check"),

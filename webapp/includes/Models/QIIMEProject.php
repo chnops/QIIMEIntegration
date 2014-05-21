@@ -8,7 +8,9 @@ class QIIMEProject extends Project {
 		$newId = $this->database->createProject($this->owner, $this->name);
 		$this->setId($newId);
 
-		$this->operatingSystem->createDir($this->database->getUserRoot($this->owner) . "/" . $newId);
+		$projectDir = $this->database->getUserRoot($this->owner) . "/" . $newId;
+		$this->operatingSystem->createDir($projectDir);
+		$this->operatingSystem->createDir($projectDir . "/uploads/");
 	}
 	public function initializeScripts() {
 		$script = new \Models\Scripts\QIIME\ValidateMappingFile($this);
@@ -61,26 +63,56 @@ class QIIMEProject extends Project {
 		if (!isset($this->scripts[$scriptId])) {
 			throw new \Exception("Unable to find script: " . htmlentities($scriptId));
 		}
-
 		$script = $this->scripts[$scriptId];
+
 		$code = $script->convertInputToCode($allInput);
-		$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
-		$return = "Your script ran successfully!";
-		if ($codeOutput) {
-			$return .= "<br/>Here is the output from the console: " . htmlentities($codeOutput);
+		$result = "Script input is valid";
+
+		$runId = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
+		if (!$runId) {
+			$result .= "<br/>However, we were unable to save the run in the database.";
+			throw new \Exception($result);
 		}
 
-		$savingSucceeded = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
-		if (!$savingSucceeded) {
-			$return .= "<br/>Unfortunately, we were unable to save the run in the database.";
-			throw new \Exception($return);
+		$version = "";
+		$consoleError = false;
+
+		$projectDir = $this->database->getUserRoot($this->owner) . "/" . $this->getId();
+		$runDir = $projectDir . "/" . $runId;
+		try {
+			$this->operatingSystem->createDir($runDir);
+
+			$version = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
+			$version = trim($version);
+
+			$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $runDir, $code);
+
+			$result .= "<br/>Script run successful!";
+			$codeOutput = trim($codeOutput);
+			if ($codeOutput) {
+				$result .= "<br/>Here is the output from the console:<br/>" . htmlentities($codeOutput);
+			}
+
+		}
+		catch (OperatingSystemException $ex) {
+			$consoleError = true;
+			$codeOutput = $ex->getConsoleOutput();
+			$result .= "<br/>There was a problem with the operating system: " . htmlentities(trim($ex->getMessage()));
 		}
 
-		return $return;
+		$outputSaveResult = $this->database->addRunResults($runId, $codeOutput, $version);
+		if (!$outputSaveResult) {
+			$conjunction = ($consoleError) ? "Also" : "However";
+			$result .= "<br/><br/>{$conjunction}, we were unable to save the results to the database.";
+		}
+
+		if ($consoleError) {
+			throw new \Exception($result);
+		}
+		return $result;
 	}
 
 	public function renderOverview() {
-
 		$overview = "<style>div#project_overview{border:2px #999966 ridge;padding:.5em .5em 1.5em .5em;overflow:auto}div#project_overview td{padding:.5em .25em;white-space:nowrap}div#project_overview a.button{min-width:100%}</style>\n";
 		$overview .= "<div id=\"project_overview\">\n<table>\n";
 

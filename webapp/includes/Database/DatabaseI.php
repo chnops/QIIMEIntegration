@@ -20,5 +20,6 @@ interface DatabaseI {
 	public function getUploadedFileSystemName($username, $projectId, $userName);
 
 	public function saveRun($username, $projectId, $sriptName, $scriptText);
+	public function addRunResults($runId, $consoleOutput, $version);
 	public function getPastRuns($username, $projectId);
 }

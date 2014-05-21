@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS script_runs (
 	project_owner VARCHAR(255) NOT NULL ,
 	script_name VARCHAR(255) NOT NULL ,
 	script_string TEXT NOT NULL ,
+	output TEXT ,
 	version TEXT ,
 	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
 	);

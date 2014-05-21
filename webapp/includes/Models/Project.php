@@ -69,7 +69,7 @@ abstract class Project {
 			return false;
 		}
 		$fullFileName = $this->operatingSystem->getHome() .
-			$this->database->getUserRoot($this->owner) . "/" . $this->id . "/" . $systemFileName;
+			$this->database->getUserRoot($this->owner) . "/" . $this->id . "/uploads/" . $systemFileName;
 		return $fullFileName;
 	}
 	public function retrieveAllUploadedFiles() {
@@ -114,12 +114,8 @@ abstract class Project {
 	}
 
 	public function scriptExists($scriptName) {
-		if (!$this->owner || !$this->id) {
-			return false;
-		}
-
 		try {
-			$whichOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "which {$scriptName}");
+			$whichOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), "", "which {$scriptName}");
 			return true;
 		}
 		catch (\Exception $ex) {
@@ -127,11 +123,8 @@ abstract class Project {
 		}
 	}
 	public function getVersion($scriptName) {
-		if (!$this->owner || !$this->id) {
-			return "Unable to obtain version information.";
-		}
 		try {
-			$consoleOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), "{$scriptName} --version");
+			$consoleOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), "", "{$scriptName} --version");
 			return trim($consoleOutput);
 		}
 		catch (\Exception $ex) {

@@ -19,7 +19,7 @@ class OldFileParameter extends DefaultParameter {
 		}
 
 		$separator = (strlen($this->name) == 2) ? " " : "=";
-		return $this->name . $separator . "'" . $systemFileName . "'";
+		return $this->name . $separator . "'../uploads/" . $systemFileName . "'";
 	}
 	public function renderForForm() {
 		if (empty($this->files)) {

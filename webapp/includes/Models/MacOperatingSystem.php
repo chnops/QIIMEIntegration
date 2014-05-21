@@ -14,7 +14,7 @@ class MacOperatingSystem implements OperatingSystemI {
 		$nameParts = explode("/", $name);
 		foreach ($nameParts as $namePart) {
 			if (!$this->isValidFileName($namePart)) {
-				throw new OperatingSystemException("Invalid file name: {$name}");
+				throw new OperatingSystemException("Invalid file name: " . htmlentities($name));
 			}
 		}
 
@@ -27,14 +27,19 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 
 	public function executeArbitraryScript($environmentSource, $runDirectory, $script) {
-		$code = "source {$environmentSource}; cd {$this->home}/{$runDirectory}; {$script}";
+		$code = "source {$environmentSource}; 
+			if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;
+			cd {$this->home}/{$runDirectory};
+			if [ $? -ne 0 ]; then echo 'Requested directory cannot be found: {$this->home}{$runDirectory}'; exit 1; fi;
+		   	{$script};";
 
 		$returnValue = 0;
 		ob_start();
 		system($code, $returnValue);
 		if ($returnValue) {
-			ob_end_clean();
-			throw new OperatingSystemException("An error occurred while executing script. Check the error log, or contact your system administrator.");
+			$exception = new OperatingSystemException("An error occurred while executing script. Check the error log, or contact your system administrator.");
+			$exception->setConsoleOutput(ob_get_clean());
+			throw $exception;
 		}
 		return ob_get_clean();
 	}
