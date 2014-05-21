@@ -15,6 +15,16 @@ class PDODatabase implements DatabaseI {
 		$this->operatingSystem = $operatingSystem;
 	}
 
+	public function startTakingRequests() {
+		$this->pdo->beginTransaction();
+	}
+	public function executeAllRequests() {
+		$this->pdo->commit();
+	}
+	public function forgetAllRequests() {
+		$this->pdo->rollBack();
+	}
+
 	public function userExists($username) {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
@@ -25,12 +35,14 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Error checking user ({$username}) existance: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return -1;
 		}
 	}
 
 	public function createUser($username) {
 		try {
+			$this->pdo->beginTransaction();
 			$result = $this->pdo->query("SELECT root FROM users ORDER BY root DESC LIMIT 1");
 			$root = $result->fetchColumn(0);
 			$root += 1;
@@ -41,18 +53,21 @@ class PDODatabase implements DatabaseI {
 				// TODO this functionality should be stored elsewhere, for example, the Roster object.
 				// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
 				$this->operatingSystem->createDir($root);
-
+				$this->pdo->commit();
 				return $root;
 			}
 			else {
 				$errorInfo = $pdoStatement->errorInfo();
-					error_log("Unable to create user: " . $errorInfo[2]);
+				error_log("Unable to create user: " . $errorInfo[2]);
+				$this->pdo->rollBack();
 				return false;
 			}
 		}
 		catch (\Exception $ex) {
+			$this->pdo->rollBack();
 			error_log("Unable to create user ({$username}): " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return false;
 		}
 	}
@@ -65,6 +80,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to get user root ({$username}): " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return "";
 		}
 	}
@@ -78,6 +94,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to get all projects: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return array();
 		}
 	}
@@ -116,6 +133,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to create project: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return false;
 		}
 	}
@@ -160,6 +178,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to create uploaded file: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return false;
 		}
 	}
@@ -174,6 +193,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to get uploaded files: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 		}
 		return $files;
 	
@@ -189,6 +209,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to get uploaded file system name: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return "";
 		}
 	}
@@ -208,6 +229,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to save run: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return false;
 		}
 	}
@@ -220,6 +242,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to add results from run: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return false;
 		}
 	}
@@ -239,6 +262,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to retrieve past runs: " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 			return array();
 		}
 	}
@@ -248,6 +272,7 @@ class PDODatabase implements DatabaseI {
 		catch (\Exception $ex) {
 			error_log("Unable to : " . $ex->getMessage());
 			// TODO error handling
+			// TODO transactions
 		}
 	 */
 }

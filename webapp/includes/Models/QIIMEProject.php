@@ -5,12 +5,24 @@ namespace Models;
 class QIIMEProject extends Project {
 
 	public function beginProject() {
+		$this->database->startTakingRequests();
 		$newId = $this->database->createProject($this->owner, $this->name);
+		if (!$newId) {
+			$this->database->forgetAllRequests();
+			throw new \Exception("There was a problem with the database.");
+		}
 		$this->setId($newId);
 
 		$projectDir = $this->database->getUserRoot($this->owner) . "/" . $newId;
-		$this->operatingSystem->createDir($projectDir);
-		$this->operatingSystem->createDir($projectDir . "/uploads/");
+		try {
+			$this->operatingSystem->createDir($projectDir);
+			$this->operatingSystem->createDir($projectDir . "/uploads/");
+			$this->database->executeAllRequests();
+		}
+		catch (OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
 	}
 	public function initializeScripts() {
 		$script = new \Models\Scripts\QIIME\ValidateMappingFile($this);

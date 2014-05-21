@@ -44,8 +44,9 @@ class MacOperatingSystem implements OperatingSystemI {
 		return ob_get_clean();
 	}
 	public function isValidFileName($name) {
+		// TODO implement this
+		return true;
 		// the database can only hold ints that are 11 digits long
-		// TODO is that true?
 		if (strlen($name) > 11) {
 			return false;
 		}

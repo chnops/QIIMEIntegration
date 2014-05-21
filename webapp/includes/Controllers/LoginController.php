@@ -49,10 +49,15 @@ class LoginController extends Controller {
 		$this->result = "You have successfully logged in.";
 	}
 	private function createUser($username) {
-		$this->database->createUser($username);
-
-		$this->login($username);
-		$this->result = "You have successfully created a new user.";
+		$createSuccess = $this->database->createUser($username);
+		if ($createSuccess) {
+			$this->login($username);
+			$this->result = "You have successfully created a new user.";
+		}
+		else {
+			$this->isResultError = true;
+			$this->result = "We were unable to create a new user.  Please see the error log or contact your system administrator";
+		}
 	}
 
 	public function getInstructions() {

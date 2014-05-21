@@ -62,11 +62,12 @@ class UploadController extends Controller {
 			$moveResult = move_uploaded_file($file['tmp_name'], $systemFileName);
 			if ($moveResult) {
 				$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
-		
+				$this->project->confirmUploadedFile();	
 			}
 			else {
 				$this->isResultError = true;
 				$this->result = "There was an error moving your file on to the system.";
+				$this->project->forgetUploadedFile();
 			}
 		}
 	}

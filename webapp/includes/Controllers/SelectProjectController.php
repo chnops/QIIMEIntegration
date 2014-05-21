@@ -42,11 +42,18 @@ class SelectProjectController extends Controller {
 				$project = $this->workflow->getNewProject();
 				$project->setName($projectName);
 				$project->setOwner($this->username);
-				$project->beginProject();
-				$this->projects[] = $project;
-				$this->result = "Successfully created project: " . htmlentities($projectName);
-				$_SESSION['project_id'] = $project->getId();
-				$this->project = $project;
+				try {
+					$project->beginProject();
+					$this->projects[] = $project;
+					$this->result = "Successfully created project: " . htmlentities($projectName);
+					$_SESSION['project_id'] = $project->getId();
+					$this->project = $project;
+				}
+				catch (\Exception $ex) {
+					$this->isResultError = true;
+					error_log($ex->getMessage());
+					$this->result = "We were unable to create a new project. Please see the error log or contact your system administrator";
+				}
 			}
 		}
 		else {

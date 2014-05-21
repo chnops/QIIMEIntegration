@@ -64,13 +64,21 @@ abstract class Project {
 		return NULL;
 	}
 	public function receiveUploadedFile($fileName, FileType $fileType) {
+		$this->database->startTakingRequests();
 		$systemFileName = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
 		if (!$systemFileName) {
+			$this->database->forgetAllRequests();
 			return false;
 		}
 		$fullFileName = $this->operatingSystem->getHome() .
 			$this->database->getUserRoot($this->owner) . "/" . $this->id . "/uploads/" . $systemFileName;
 		return $fullFileName;
+	}
+	public function confirmUploadedFile() {
+		$this->database->executeAllRequests();
+	}
+	public function forgetUploadedFile() {
+		$this->database->forgetAllRequests();
 	}
 	public function retrieveAllUploadedFiles() {
 		$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
