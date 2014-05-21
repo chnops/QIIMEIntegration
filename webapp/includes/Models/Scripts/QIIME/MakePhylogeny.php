@@ -15,8 +15,16 @@ class MakePhylogeny extends DefaultScript {
 
 	public function initializeParameters() {
 		$this->parameters['required'] = array(
+			"--input_fp" => new OldFileParameter("--input_fp", $this->project),
 		);
 		$this->parameters['special'] = array(
+			"--verbose" => new TrueFalseParameter("--verbose"),
+			"--tree_method" => new ChoiceParameter("--tree_method", "fasttree", 
+				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),
+			"--result_fp" => new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
+			"--log_fp" => new NewFileParameter("--log_fp", ""),
+			"--root_method" => new ChoiceParameter("--root_method", "tree_method_default",
+				array("midpoint", "tree_method_default")),
 		);
 	}
 	public function getScriptName() {

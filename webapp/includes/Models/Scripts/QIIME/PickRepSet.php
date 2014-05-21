@@ -15,8 +15,17 @@ class PickRepSet extends DefaultScript {
 
 	public function initializeParameters() {
 		$this->parameters['required'] = array(
+			"--input_file" => new OldFileParameter("--input_file", $this->project),
 		);
 		$this->parameters['special'] = array(
+			"--verbose" => new TrueFalseParameter("--verbose"),
+			"--fasta_file" => new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
+			"--rep_set_picking_method" => new ChoiceParameter("--rep_set_picking_method", "first", 
+				array("random", "longest", "most_abundant", "first")),
+			"--result_fp" => new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
+			"--log_fp" => new NewFileParameter("--log_fp", ""), 
+			"--sort_by" => new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id")),
+			"--reference_seqs_fp" => new OldFileParameter("--reference_seqs_fp", $this->project),
 		);
 	}
 	public function getScriptName() {

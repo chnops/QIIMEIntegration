@@ -15,8 +15,13 @@ class MakeOtuTable extends DefaultScript {
 
 	public function initializeParameters() {
 		$this->parameters['required'] = array(
+			"--otu_map_fp" => new OldFileParameter("--otu_map_fp", $this->project),
+			"--output_biom_fp" => new NewFileParameter("--output_biom_fp", ""),
 		);
 		$this->parameters['special'] = array(
+			"--verbose" => new TrueFalseParameter("--verbose"),
+			"--taxonomy" => new OldFileParameter("--taxonomy", $this->project),
+			"--exclude_otus_fp" => new OldFileParameter("--exclude_otus_fp", $this->project),
 		);
 	}
 	public function getScriptName() {

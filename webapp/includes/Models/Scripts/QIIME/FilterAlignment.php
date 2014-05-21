@@ -15,8 +15,21 @@ class FilterAlignment extends DefaultScript {
 
 	public function initializeParameters() {
 		$this->parameters['required'] = array(
+			"--input_fasta_file" => new OldFileParameter("--input_fasta_file", $this->project),
 		);
 		$this->parameters['special'] = array(
+			"--verbose" => new TrueFalseParameter("--verbose"),
+			"--output_dir" => new NewFileParameter("--output_dir", "."),
+			"--lane_mask_fp" => new OldFileParameter("--lane_mask_fp", $this->project),
+				// TODO [default:/macqiime/greengenes/lanemask_in_1s_and_0s]
+			"--suppress_lane_mask_filter" => new TrueFalseParameter("--suppress_lane_mask_filter"),
+				// TODO supresses lane_mask_fp
+			"--allowed_gap_frac" => new TextArgumentParameter("--allowed_gap_frac", "0.999999", "/.*/"), // TODO 0 < fraction < 1
+			"--remove_outliers" => new TrueFalseParameter("--remove_outliers"),
+			"--threshold" => new TextArgumentParameter("--threshold", "3.0", "/.*/"), // TODO arbitrary float
+				//TODO only used with remove_outliers
+			"--entropy_threshold" => new TextArgumentParameter("--entropy_threshold", "", "/.*/"), // TODO 0 < fraction < 1
+				// TODO If this value is used, any lane mask supplied will be ignored.
 		);
 	}
 	public function getScriptName() {
