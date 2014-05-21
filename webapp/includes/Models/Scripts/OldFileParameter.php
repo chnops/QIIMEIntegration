@@ -15,7 +15,7 @@ class OldFileParameter extends DefaultParameter {
 		}
 		$systemFileName = $this->project->getSystemFileName($this->value);
 		if (!$systemFileName) {
-			throw new ScriptException("Unable to locate the given file: {$this->value}");
+			throw new ScriptException("Unable to locate the given file: " . htmlentities($this->value));
 		}
 
 		$separator = (strlen($this->name) == 2) ? " " : "=";
@@ -31,7 +31,7 @@ class OldFileParameter extends DefaultParameter {
 			$output .= "<optgroup label=\"{$category} files\">\n";
 			foreach ($fileNames as $fileName) {
 				$selected = ($this->value == $fileName) ? " selected" : "";
-				$output .= "<option value=\"{$fileName}\"{$selected}>{$fileName}</option>\n";
+				$output .= "<option value=\"{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
 			}
 			$output .= "</optgroup>\n";
 		}

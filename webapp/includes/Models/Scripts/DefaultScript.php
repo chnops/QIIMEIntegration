@@ -38,18 +38,16 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		return $form;
 	}
 
-	public function processInput(array $input) {
+	public function convertInputToCode(array $input) {
+		$inputErrors = array();
 		foreach ($this->trueFalseParameters as $name => $parameter) {
 			if (!isset($input[$name])) {
 				$input[$name] = false;
 			}
 		}
 		foreach ($this->parameters['required'] as $name => $requiredParam) {
-			if (!isset($input[$name])) {
-				throw new \Exception("A required parameter was not found: {$name}");
-			}
-			else if (empty($input[$name])) {
-				throw new \Exception("A required parameter was not found: {$name}");
+			if (!isset($input[$name]) || empty($input[$name])) {
+				$inputErrors[] = "A required parameter was not found: " . htmlentities($name);
 			}
 
 			$requiredParam->setValue($input[$name]);
@@ -63,8 +61,22 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		$script = $this->getScriptName() . " ";
 		foreach ($this->parameters as $category => $parameterArray) {
 			foreach ($parameterArray as $parameter) {
-				$script .= $parameter->renderForOperatingSystem() . " ";
+				try {
+					$script .= $parameter->renderForOperatingSystem() . " ";
+				}
+				catch (ScriptException $ex) {
+					$inputErrors[] = $ex->getMessage();
+				}
 			}
+		}
+
+		if (!empty($inputErrors)) {
+			$errorOutput = "There some were problems with the parameters you submitted:<ul>";
+			foreach ($inputErrors as $error) {
+				$errorOutput .= "<li>{$error}</li>";
+			}
+			$errorOutput .= "</ul>\n";
+			throw new ScriptException($errorOutput);
 		}
 		return $script;
 	}

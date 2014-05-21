@@ -31,11 +31,11 @@ class RunScriptsController extends Controller {
 		$this->script = $_POST['script'];
 
 		try {
-			$this->result = $this->project->processScriptInput($_POST);
+			$this->result = $this->project->runScript($_POST);
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
-			$this->result = htmlentities($ex->getMessage());
+			$this->result = $ex->getMessage();
 		}
 	}
 

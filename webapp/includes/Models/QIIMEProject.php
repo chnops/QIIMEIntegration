@@ -55,26 +55,27 @@ class QIIMEProject extends Project {
 			new SequenceQualityFileType(),
 		);
 	}
-	public function processScriptInput(array $allInput) {
+	public function runScript(array $allInput) {
 		$scriptId = $allInput['script'];
 		unset($allInput['script']);
 		if (!isset($this->scripts[$scriptId])) {
-			throw new \Exception("Unable to find script: {$scriptId}");
+			throw new \Exception("Unable to find script: " . htmlentities($scriptId));
 		}
 
 		$script = $this->scripts[$scriptId];
-		$code = $script->processInput($allInput);
+		$code = $script->convertInputToCode($allInput);
 		$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $this->database->getUserRoot($this->owner) . "/" . $this->getId(), $code);
 		$return = "Your script ran successfully!";
+		if ($codeOutput) {
+			$return .= "<br/>Here is the output from the console: " . htmlentities($codeOutput);
+		}
 
 		$savingSucceeded = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
 		if (!$savingSucceeded) {
 			$return .= "<br/>Unfortunately, we were unable to save the run in the database.";
+			throw new \Exception($return);
 		}
 
-		if ($codeOutput) {
-			$return .= "<br/>Here is the output from the console: " . htmlentities($codeOutput);
-		}
 		return $return;
 	}
 

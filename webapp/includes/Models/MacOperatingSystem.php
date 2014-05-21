@@ -33,8 +33,8 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 	}
 
-	public function executeArbitraryScript($environmentSource, $projectDirectory, $script) {
-		$code = "source {$environmentSource}; cd ./projects/{$projectDirectory}; {$script}";
+	public function executeArbitraryScript($environmentSource, $runDirectory, $script) {
+		$code = "source {$environmentSource}; cd {$this->home}/{$runDirectory}; {$script}";
 
 		$returnValue = 0;
 		ob_start();

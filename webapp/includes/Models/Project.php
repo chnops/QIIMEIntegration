@@ -135,6 +135,6 @@ abstract class Project {
 	public abstract function beginProject();
 	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();
-	public abstract function processScriptInput(array $allInput);
+	public abstract function runScript(array $allInput);
 	public abstract function renderOverview();
 }
