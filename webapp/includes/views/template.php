@@ -19,7 +19,7 @@
 		div#session_data{margin-left:0px;margin-right:auto;border-style:solid;border-color:#999966;border-width:0px 0px 1px 1px;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#result{border:2px #999966 ridge;display:inline-block;margin-left:2.5em;padding:.25em;background-color:#ffffcc}
 		div#result.error{background-color:#cc6600}
-		div#past_results{display:inline-block;background-color:#999966;padding:0em .5em}
+		div#past_results{display:inline-block;background-color:#ffffcc;padding:0em .5em;border:1px #999966 solid}
 		div#past_results,div#result{overflow:auto;max-width:90%}
 		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;white-space:nowrap;}
 		div.script_form input[type="text"],div.script_form input[type="file"],select{display:block}
@@ -34,6 +34,8 @@
 		input,select{background-color:#ffffcc;}
 		input[disabled]{background-color:#999966;}
 		hr.small{width:25%;margin-left:0px;}
+		select[size]{padding:.5em .5em 1.5em .5em}
+		optgroup.big{font-size:1.25em;font-style:bold}
 	</style>
 <script type="text/javascript">
 	function toggleInstruction() {

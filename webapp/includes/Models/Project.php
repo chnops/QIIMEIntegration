@@ -101,7 +101,19 @@ abstract class Project {
 
 		$pastRunsFormatted = array();
 		foreach ($pastRuns as $run) {
-			$pastRunsFormatted[$run['script_name']][] = $run['script_string'];
+			if (!isset($pastRunsFormatted[$run['script_name']])) {
+				$pastRunsFormatted[$run['script_name']] = array();
+			}
+
+			$projectDirectory = $this->database->getUserRoot($this->owner) . "/" . $this->id;
+			$generatedFiles = $this->operatingSystem->getDirContents($projectDirectory . "/" . $run['id']);
+
+			$pastRunsFormatted[$run['script_name']][] = array(
+				"script_string" => $run['script_string'],
+				"files" => $generatedFiles,
+				"output" => $run['output'],
+				"version" => $run['version'],
+			);
 		}
 		
 		$output = "";
@@ -109,7 +121,13 @@ abstract class Project {
 			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
 			if (isset($pastRunsFormatted[$scriptName])) {
 				foreach ($pastRunsFormatted[$scriptName] as $run) {
-					$output .= "<li>" . htmlentities($run) . "</li>";
+					$output .= "<li title=\"{$run['script_string']}\">";
+					$output .= "Result:<br/>{$run['version']}<br/>{$run['output']}";
+					$output .= "<ul>";
+					foreach ($run['files'] as $file) {
+						$output .= "<li>{$file}</li>";
+					}
+					$output .= "</ul></li>\n";
 				}
 			}
 			else {
@@ -138,6 +156,17 @@ abstract class Project {
 		catch (\Exception $ex) {
 			return "Unable to obtain version information";
 		}
+	}
+
+	public function getAllGeneratedFiles() {
+		$generatedFiles = array();
+		$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
+		foreach ($pastRuns as $runArray) {
+			$projectDirectory = $this->database->getUserRoot($this->owner) . "/" . $this->id;
+			$runFiles = $this->operatingSystem->getDirContents($projectDirectory . "/" . $runArray['id']);
+			$generatedFiles[$runArray['id']] = $runFiles;
+		}
+		return $generatedFiles;
 	}
 
 	public abstract function beginProject();

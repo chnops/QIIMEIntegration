@@ -78,7 +78,7 @@ class QIIMEProject extends Project {
 		$script = $this->scripts[$scriptId];
 
 		$code = $script->convertInputToCode($allInput);
-		$result = "Script input is valid";
+		$result = "Script input is valid-";
 
 		$runId = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
 		if (!$runId) {

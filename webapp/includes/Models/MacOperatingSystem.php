@@ -26,6 +26,31 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 	}
 
+	public function getDirContents($name) {
+		if (!$this->isValidFileName($name)) {
+			throw new OperatingSystemException("tried to list contents of invalid file");
+		}
+
+		$result = 0;
+		ob_start();
+		$code = "ls {$this->home}/{$name}";
+		system($code, $result);
+
+		if ($result) {
+			ob_end_clean();
+			throw new OperatingSystemException("ls failed.  See error log");
+		}
+		$output = ob_get_clean();
+		$output = trim($output);
+		if ($output) {
+			$output = explode("\n", $output);
+		}
+		else {
+			$output = array();
+		}
+		return $output;
+	}
+
 	public function executeArbitraryScript($environmentSource, $runDirectory, $script) {
 		$code = "source {$environmentSource}; 
 			if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;

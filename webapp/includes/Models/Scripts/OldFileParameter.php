@@ -25,8 +25,8 @@ class OldFileParameter extends DefaultParameter {
 		if (empty($this->files)) {
 			$this->files = $this->project->retrieveAllUploadedFiles();
 		}
-		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\">\n";
-		$output .= "<option value=\"\">--Selected a file--</option>\n";
+		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\" size=\"5\">\n";
+		$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
 		foreach ($this->files as $category => $fileNames) {
 			$output .= "<optgroup label=\"{$category} files\">\n";
 			foreach ($fileNames as $fileName) {
@@ -35,6 +35,20 @@ class OldFileParameter extends DefaultParameter {
 			}
 			$output .= "</optgroup>\n";
 		}
+
+		$generatedFiles = $this->project->getAllGeneratedFiles();
+		if (!empty($generatedFiles)) {
+			$output .= "<optgroup label=\"generated files\" class=\"big\">\n";
+			foreach ($generatedFiles as $run => $fileNames) {
+				$output .= "<optgroup label=\"from run {$run}\">\n";
+				foreach ($fileNames as $fileName) {
+					$selected = ($this->value == $fileName) ? " selected" : "";
+					$output .= "<option value=\"{$run}/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+				}
+				$output .= "</optgroup>\n";
+			}
+		}
+
 		$output .= "</select></label>\n";
 		return $output;
 	}

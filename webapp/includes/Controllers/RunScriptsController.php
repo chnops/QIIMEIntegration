@@ -11,7 +11,11 @@ class RunScriptsController extends Controller {
 		if (!$this->project) {
 			return "";
 		}
-		return "<h4>Past runs:</h4>\n" . $this->project->getPastScriptRuns();
+		$pastScriptRuns = $this->project->getPastScriptRuns();
+		if ($pastScriptRuns) {
+			return "<h4>Past runs:</h4>\n" . $pastScriptRuns;
+		}
+		return "";
 	}
 
 	public function parseInput() {
