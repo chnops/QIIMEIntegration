@@ -13,15 +13,12 @@ abstract class Project {
 
 	protected $scripts;
 	protected $scriptsFormatted;
-	protected $fileTypes;
+	protected $fileTypes = array();
 
 	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
 		$this->workflow = $workflow;
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
-		$this->initializeScripts();
-		$this->fileTypes = $this->getInitialFileTypes();
-		$this->fileTypes[] = new ArbitraryTextFileType();
 	}
 
 	public function getOwner() {
@@ -43,9 +40,16 @@ abstract class Project {
 		$this->name = $name;
 	}
 	public function getScripts() {
+		if (empty($this->scripts)) {
+			$this->initializeScripts();
+		}
 		return $this->scripts;
 	}
 	public function getFileTypes() {
+		if (empty($this->fileTypes)) {
+			$this->fileTypes = $this->getInitialFileTypes();
+			$this->fileTypes[] = new ArbitraryTextFileType();
+		}
 		return $this->fileTypes;
 	}
 	public function getDatabase() {
@@ -56,7 +60,7 @@ abstract class Project {
 	}
 
 	public function getFileTypeFromHtmlId($htmlId) {
-		foreach ($this->fileTypes as $fileType) {
+		foreach ($this->getFileTypes() as $fileType) {
 			if ($fileType->getHtmlId() == $htmlId) {
 				return $fileType;
 			}
@@ -117,7 +121,7 @@ abstract class Project {
 		}
 		
 		$output = "";
-		foreach ($this->scripts as $scriptName => $scriptObject) {
+		foreach ($this->getScripts() as $scriptName => $scriptObject) {
 			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
 			if (isset($pastRunsFormatted[$scriptName])) {
 				foreach ($pastRunsFormatted[$scriptName] as $run) {
