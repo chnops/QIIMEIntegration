@@ -13,7 +13,7 @@
 		div#navigation table td{border-left:1px solid #999966;padding:0em .5em;}
 		div#navigation table td:first-child {border-left:none}
 		div#content,div#help{background-color:#ffcc66;border:3px solid;margin:.25em .5em;padding:.5em;}
-		div#content{width:65%;float:left;dislpay:incline}
+		div#content{width:65%;float:left;display:inline}
 		div#help{width:25%;float:left;display:inline}
 		div#content div.form{margin-left:2.5em;text-align:left;width:45%;border:2px #999966 ridge;padding:1em;}
 		div#session_data{margin-left:0px;margin-right:auto;border-style:solid;border-color:#999966;border-width:0px 0px 1px 1px;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
@@ -35,8 +35,9 @@
 		input[disabled]{background-color:#999966;}
 		hr.small{width:25%;margin-left:0px;}
 		select[size]{padding:.5em .5em 1.5em .5em}
-		optgroup.big{font-size:1.25em;font-style:bold}
+		optgroup.big{font-size:1.25em;font-weight:bold}
 	</style>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">
 	function toggleInstruction() {
 		var control = document.getElementById('instruction_controller');
@@ -60,6 +61,14 @@
 			if (hideableToDisplay) hideableToDisplay.style.display="block";
 		}
 		displayedHideableId = hideableToDisplayId;
+	}
+	function disable(Object) {
+		console.log("disabling: " + Object.attr('name'));
+		Object.prop('disabled', true).parent('label').css('display', 'none');
+	}
+	function enable(Object) {
+		console.log("enabling: " + Object.attr('name'));
+		Object.prop('disabled', false).parent('label').css('display', 'block');
 	}
 </script>
 </head>

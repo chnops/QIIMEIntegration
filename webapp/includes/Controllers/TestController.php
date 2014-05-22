@@ -12,14 +12,14 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 		
-		echo "Updating database schema:<br/>";
-		$result = 0;
-		system("sqlite3 ./data/database.sqlite < ./data/schema.sql", $result);
-
-		if ($result) {
-			echo "<hr/>Oh no! Something bad happened!";
-		}
-
+		echo "Attempting to use jquery:<br/>";
+		$script = "<script type=\"text/javascript\">
+			function myFunction() { $('div#help').css('display', 'none');}
+			$(myFunction);
+</script>";
+		echo "Here's the script:<br/><pre>";
+		echo htmlentities($script);
+		echo $script . "</pre>";
 		return ob_get_clean();
 	}
 }
