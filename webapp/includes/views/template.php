@@ -36,6 +36,7 @@
 		hr.small{width:25%;margin-left:0px;}
 		select[size]{padding:.5em .5em 1.5em .5em}
 		optgroup.big{font-size:1.25em;font-weight:bold}
+		p.conditional_requirement{text-decoration:underline;display:none}
 	</style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">
@@ -63,11 +64,9 @@
 		displayedHideableId = hideableToDisplayId;
 	}
 	function disable(Object) {
-		console.log("disabling: " + Object.attr('name'));
 		Object.prop('disabled', true).parent('label').css('display', 'none');
 	}
 	function enable(Object) {
-		console.log("enabling: " + Object.attr('name'));
 		Object.prop('disabled', false).parent('label').css('display', 'block');
 	}
 </script>

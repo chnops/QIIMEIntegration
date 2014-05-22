@@ -10,13 +10,11 @@ use Models\Scripts\TrueFalseInvertedParameter;
 use Models\Scripts\NewFileParameter;
 use Models\Scripts\OldFileParameter;
 use Models\Scripts\ChoiceParameter;
+use Models\Scripts\ConditionallyRequiredParameter;
 
 class AssignTaxonomy extends DefaultScript {
 
 	public function initializeParameters() {
-		$this->parameters['required'] = array(
-			"--input_fasta_fp" => new OldFileParameter("--input_fasta_fp", $this->project),
-		);
 		$assignmentMethod = new ChoiceParameter("--assignment_method", "uclust", 
 			array("rdp", "blast", "rtax", "mothur", "tax2tree", "uclust"));
 		$read1SeqsFp = new OldFileParameter("--read_1_seqs_fp", $this->project);
@@ -31,22 +29,31 @@ class AssignTaxonomy extends DefaultScript {
 		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", "/.*/"); // TODO decimal between 0 and 1
 		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", "/.*/");  // TODO decimal between 0 and 1
 		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", "/\\d+/"); 
+
 		$this->parameterDependencyRelationships[$assignmentMethod->getName()] = array(
 			"rtax" => array($read1SeqsFp->getName(),$read2SeqsFp->getName(),$singleOk->getName(),$noSingleOkGeneric->getName(),$readIdRegex->getName(),$ampliconIdRegex->getName(),$headerIdRegex->getName()),
 			"rdp" => array($confidence->getName(),$rdpMaxMemory->getName()),
 			"mothur" => array($confidence->getName()),
 			"uclust" => array($uclustMinConsensusFraction->getName(),$uclustSimilarity->getName(),$uclustMaxAccepts->getName())
 		);
+
+		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project);
+		$treeFp = new OldFileParameter("--tree_fp", $this->project);
+		$this->parameterRequirementRelationships[$assignmentMethod->getName()] = array(
+			"blast" => array($idToTaxonomyFp->getName()),
+			"tax2tree" => array($treeFp->getName())
+		);
+
+		$this->parameters['required'] = array(
+			"--input_fasta_fp" => new OldFileParameter("--input_fasta_fp", $this->project),
+			new ConditionallyRequiredParameter($idToTaxonomyFp, $this->getHtmlId()),
+			new ConditionallyRequiredParameter($treeFp, $this->getHtmlId()),
+		);
+
 		$this->parameters['special'] = array(
 			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--id_to_taxonomy_fp" => new OldFileParameter("--id_to_taxonomy_fp", $this->project),
-				// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 
-				// TODO REQUIRED when method is blast
-			"--reference_seqs_fp" => new OldFileParameter("--reference_seqs_fp", $this->project),
-				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
-				// TODO REQUIRED if -b is not provided when method is blast]
-			"--training_data_properties_fp" => new OldFileParameter("--training_data_properties_fp", $this->project),
-				// TODO This option is overridden by the -t and -r options.
+			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
+			$assignmentMethod->getName() => $assignmentMethod,
 			$read1SeqsFp->getName() => $read1SeqsFp,
 			$read2SeqsFp->getName() => $read2SeqsFp,
 			$singleOk->getName() => $singleOk,
@@ -54,19 +61,24 @@ class AssignTaxonomy extends DefaultScript {
 			$readIdRegex->getName() => $readIdRegex,
 			$ampliconIdRegex->getName() => $ampliconIdRegex,
 			$headerIdRegex->getName() => $headerIdRegex,
-			$assignmentMethod->getName() => $assignmentMethod,
-			"--blast_db" => new OldFileParameter("--blast_db", $this->project),
-				// TODO build in files
-				// TODO Must provide either --blast_db or --reference_seqs_db for assignment with blast [default: none]
 			$confidence->getName() => $confidence,
+			$rdpMaxMemory->getName() => $rdpMaxMemory,
 			$uclustMinConsensusFraction->getName() => $uclustMinConsensusFraction,
 			$uclustSimilarity->getName() => $uclustSimilarity,
 			$uclustMaxAccepts->getName() => $uclustMaxAccepts,
-			$rdpMaxMemory->getName() => $rdpMaxMemory,
+			$idToTaxonomyFp->getName() => $idToTaxonomyFp,
+				// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 
+				// TODO REQUIRED when method is blast
+			"--reference_seqs_fp" => new OldFileParameter("--reference_seqs_fp", $this->project),
+				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
+				// TODO REQUIRED if -b is not provided when method is blast]
+			"--training_data_properties_fp" => new OldFileParameter("--training_data_properties_fp", $this->project),
+				// TODO This option is overridden by the -t and -r options.
+			"--blast_db" => new OldFileParameter("--blast_db", $this->project),
+				// TODO build in files
+				// TODO Must provide either --blast_db or --reference_seqs_db for assignment with blast [default: none]
 			"--e_value" => new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
-			"--tree_fp" => new OldFileParameter("--tree_fp", $this->project),
-				// TODO Required for Tax2Tree assignment.
-			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
+			$treeFp->getName() => $treeFp,
 		);
 	}
 	public function getScriptName() {

@@ -8,6 +8,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	protected $parameters;
 	protected $trueFalseParameters = array();
 	protected $parameterDependencyRelationships = array();
+	protected $parameterRequirementRelationships = array();
 
 	public function __construct(\Models\Project $project) {
 		$this->project = $project;
@@ -37,6 +38,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"/>
 			<button type=\"submit\">Run</button></form>\n";
 		$form .= $this->getScriptForDependentParameters();
+		$form .= $this->getScriptForConditionallyRequiredParameters();
 		return $form;
 	}
 
@@ -103,11 +105,36 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			$disablePart .= "];jQuery.each(allInputs, function(index, Element) { disable(Element); } );\n";
 			$enablePart .= "}";
 
-
 			$function .= $disablePart . $enablePart . "});\n";
 			$script .= $function . "trigger.trigger('change');";
 		}
 		$script .= "</script>\n";
+		return $script;
+	}
+	public function getScriptForConditionallyRequiredParameters() {
+		$script = "<script type=\"text/javascript\">\nvar thisForm = $('div#form_{$this->getHtmlId()} form');\n";
+		foreach ($this->parameterRequirementRelationships as $requirementTrigger => $requiredParameters) {
+			$script .= "var trigger = thisForm.find('select[name=\"{$requirementTrigger}\"]');\n";
+			$function = "trigger.change(function(Event) {var thisForm = $('div#form_{$this->getHtmlId()} form');\n";
+
+			$disablePart = "var allInputs = [";
+			$enablePart = "var trigger = Event.target;var selectedOptObj = trigger[trigger.selectedIndex];var value = selectedOptObj.textContent;\n";
+			$enablePart .= "switch(value) {\n";
+			foreach ($requiredParameters as $triggerValue => $parameterNames) {
+				$enablePart .= "case \"{$triggerValue}\":\n";
+				foreach ($parameterNames as $name) {
+					$disablePart .= "thisForm.find(\"#{$this->getHtmlId()}_{$name}\"),";
+					$enablePart .= "console.log(thisForm.find(\"#{$this->getHtmlId()}_{$name}\").css('display', 'inline').attr('name'));\n";
+				}
+				$enablePart .= "break;\n";
+			}
+			$disablePart .= "];jQuery.each(allInputs, function(index, Element) { Element.css('display', 'none') } );\n";
+			$enablePart .= "}";
+
+			$function .= $disablePart . $enablePart . "});\n";
+			$script .= $function . "trigger.trigger('change');";
+		}	
+		$script .= "</script>";
 		return $script;
 	}
 	public abstract function getScriptName();
