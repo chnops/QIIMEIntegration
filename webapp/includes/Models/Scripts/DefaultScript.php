@@ -36,7 +36,8 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	}
 
 	public function acceptInput(array $input) {
-		$inputErrors = array();
+		$input = $this->parameterRelationships->incorporateDefaults($input);
+		$inputErrors = $this->parameterRelationships->getViolations($input);
 		$parameters = $this->getParameters();
 		
 		foreach ($input as $inputName => $inputValue) {
@@ -48,8 +49,6 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 				$inputErrors[] = $ex->getMessage();
 			}
 		}
-
-		$inputErrors = array_merge($inputErrors, $this->parameterRelationships->getViolations());
 
 		if (!empty($inputErrors)) {
 			$errorOutput = "There some were problems with the parameters you submitted:<ul>";
@@ -64,10 +63,8 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
 	public function renderCommand() {
 		$script = $this->getScriptName() . " ";
-		foreach ($this->getParameters() as $category => $parameterArray) {
-			foreach ($parameterArray as $parameter) {
-				$script .= $parameter->renderForOperatingSystem() . " ";
-			}
+		foreach ($this->getParameters() as $parameter) {
+			$script .= $parameter->renderForOperatingSystem() . " ";
 		}
 		return $script;
 	}

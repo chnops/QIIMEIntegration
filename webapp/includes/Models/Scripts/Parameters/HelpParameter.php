@@ -7,6 +7,7 @@ class HelpParameter extends DefaultParameter {
 	private $script;
 
 	public function __construct(\Models\Scripts\ScriptI $script) {
+		$this->name = "--help";
 		$this->script = $script;
 	}
 	public function renderForOperatingSystem() {

@@ -19,5 +19,5 @@ interface ParameterRelationshipsI {
 	public function makeOptional(array $additionalParams);
 	public function getSortedParameters();
 	// input
-	public function getViolations();
+	public function getViolations($input);
 }
