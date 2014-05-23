@@ -12,9 +12,6 @@ class DefaultParameter implements ParameterI {
 	}
 
 	public function renderForOperatingSystem() {
-		if (!$this->isValueValid()) {
-			throw new ScriptException("An invalid value was provided for the parameter: {$this->name}");
-		}
 		if ($this->value) {
 			$separator = (strlen($this->name) == 2) ? " " : "=";
 			return $this->name . $separator . "'" . $this->value . "'";
@@ -25,6 +22,9 @@ class DefaultParameter implements ParameterI {
 		return "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";
 	}
 	public function setValue($value) {
+		if (!$this->isValueValid($value)) {
+			throw new ScriptException("An invalid value was provided for the parameter: {$this->name}");
+		}
 		$this->value = $value;
 	}
 	public function getValue() {
@@ -36,7 +36,7 @@ class DefaultParameter implements ParameterI {
 	public function getName() {
 		return $this->name;
 	}
-	public function isValueValid() {
+	public function isValueValid($value) {
 		return true;
 	}
 }

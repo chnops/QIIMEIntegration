@@ -4,8 +4,8 @@ namespace Models\Scripts;
 
 abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
-	protected $project;
-	protected $parameters;
+	protected $project = null;
+	protected $parameters = array();
 	protected $trueFalseParameters = array();
 	protected $parameterDependencyRelationships = array();
 	protected $parameterRequirementRelationships = array();
@@ -42,35 +42,33 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		return $form;
 	}
 
-	public function convertInputToCode(array $input) {
+	public function acceptInput(array $input) {
 		$inputErrors = array();
+		// prep parameters TODO improve design
 		foreach ($this->trueFalseParameters as $name => $parameter) {
 			if (!isset($input[$name])) {
 				$input[$name] = false;
 			}
 		}
+
+		// check required parameters
 		foreach ($this->parameters['required'] as $name => $requiredParam) {
 			if (!isset($input[$name]) || empty($input[$name])) {
 				$inputErrors[] = "A required parameter was not found: " . htmlentities($name);
 			}
-
-			$requiredParam->setValue($input[$name]);
-			unset($input[$name]);
+			else {
+				$requiredParam->setValue($input[$name]);
+			}
 		}
+
+		// setValue (may throw exception)
 		foreach ($input as $inputName => $inputValue) {
 			$parameter = $this->parameters['special'][$inputName];
-			$parameter->setValue($inputValue);
-		}
-
-		$script = $this->getScriptName() . " ";
-		foreach ($this->parameters as $category => $parameterArray) {
-			foreach ($parameterArray as $parameter) {
-				try {
-					$script .= $parameter->renderForOperatingSystem() . " ";
-				}
-				catch (ScriptException $ex) {
-					$inputErrors[] = $ex->getMessage();
-				}
+			try {
+				$parameter->setValue($inputValue);
+			}
+			catch (ScriptException $ex) {
+				$inputErrors[] = $ex->getMessage();
 			}
 		}
 
@@ -81,6 +79,16 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			}
 			$errorOutput .= "</ul>\n";
 			throw new ScriptException($errorOutput);
+		}
+
+	}
+
+	public function renderCommand() {
+		$script = $this->getScriptName() . " ";
+		foreach ($this->parameters as $category => $parameterArray) {
+			foreach ($parameterArray as $parameter) {
+				$script .= $parameter->renderForOperatingSystem() . " ";
+			}
 		}
 		return $script;
 	}
@@ -141,4 +149,5 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	public abstract function getScriptTitle();
 	public abstract function getHtmlId();
 	public abstract function renderHelp();
+	public abstract function initializeParameters();
 }

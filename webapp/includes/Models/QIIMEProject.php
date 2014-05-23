@@ -82,8 +82,9 @@ class QIIMEProject extends Project {
 		}
 		$script = $scripts[$scriptId];
 
-		$code = $script->convertInputToCode($allInput);
+		$script->acceptInput($allInput); // will throw an error if bad input
 		$result = "Script input is valid-";
+		$code = $script->renderCommand();
 
 		$runId = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
 		if (!$runId) {

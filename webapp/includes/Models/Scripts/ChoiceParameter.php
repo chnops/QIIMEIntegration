@@ -21,10 +21,10 @@ class ChoiceParameter extends DefaultParameter {
 		return $output;
 	}
 	
-	public function isValueValid() {
-		if (!$this->value) {
+	public function isValueValid($value) {
+		if (!$value) {
 			return true;
 		}
-		return in_array($this->value, $this->options);
+		return in_array($value, $this->options);
 	}
 }
