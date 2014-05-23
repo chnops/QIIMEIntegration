@@ -16,14 +16,8 @@ class RunScriptsController extends Controller {
 			return "";
 		}
 
-		$pastScriptRunsFormatted = array();
-		foreach($pastScriptRuns as $run) {
-			$scriptName = $run['name'];
-			if (!isset($pastScriptRunsFormatted[$scriptName])) {
-				$pastScriptRunsFormatted[$scriptName] = array();
-			}
-			$pastScriptRunsFormatted[$scriptName][] = $run;
-		}
+		$helper = \Utils\Helper::getHelper();
+		$pastScriptRunsFormatted = $helper->categorizeArray($pastScriptRuns, 'name');
 
 		$output = "";
 		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {

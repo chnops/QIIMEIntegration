@@ -16,14 +16,8 @@ class UploadController extends Controller {
 		}
 
 		$output .= "<h3>Previously Uploaded files:</h3>\n";
-		$previousFilesFormatted = array(); 
-		foreach ($previousFiles as $file) {
-			$fileType = $file['type'];
-			if (!isset($previousFilesFormatted[$fileType])) {
-				$previousFilesFormatted[$fileType] = array();
-			}
-			$previousFilesFormatted[$fileType][] = $file['name'];
-		}
+		$helper = \Utils\Helper::getHelper();
+		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type', 'name');
 
 		foreach ($previousFilesFormatted as $fileType => $fileNames) {
 			$output .= "<h4>{$fileType} files</h4><ul>\n";

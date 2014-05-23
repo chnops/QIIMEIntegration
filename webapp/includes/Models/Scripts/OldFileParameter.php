@@ -30,21 +30,14 @@ class OldFileParameter extends DefaultParameter {
 		return $this->name . $separator . "'" . $systemFileName . "'";
 	}
 	public function renderForForm() {
+		$helper = \Utils\Helper::getHelper();
 		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\" size=\"5\">\n";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		if (!empty($uploadedFiles)) {
 			$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
 
-			$uploadedFilesFormatted = array();
-			foreach ($uploadedFiles as $fileArray) {
-				$fileType = $fileArray['type'];
-				if (!isset($uploadedFilesFormatted[$fileType])) {
-					$uploadedFilesFormatted[$fileType] = array();
-				}
-				$uploadedFilesFormatted[$fileType][] = $fileArray['name'];
-			}
-
+			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name');
 			foreach ($uploadedFilesFormatted as $type=> $fileNames) {
 				if (empty($fileNames)) {
 					continue;
@@ -62,14 +55,7 @@ class OldFileParameter extends DefaultParameter {
 		if (!empty($generatedFiles)) {
 			$output .= "<optgroup label=\"generated files\" class=\"big\">\n";
 			
-			$generatedFilesFormatted = array();
-			foreach ($generatedFiles as $fileArray) {
-				$runId = $fileArray['run_id'];
-				if (!isset($generatedFilesFormatted[$runId])) {
-					$generatedFilesFormatted[$runId] = array();
-				}
-				$generatedFilesFormatted[$runId][] = $fileArray['name'];
-			}
+			$generatedFilesFormatted = $helper->categorizeArray($generatedFiles, 'run_id', 'name');
 
 			foreach ($generatedFilesFormatted as $runId => $fileNames) {
 				if (empty($fileNames)) {
