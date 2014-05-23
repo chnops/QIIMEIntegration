@@ -4,7 +4,6 @@ namespace Models\Scripts;
 
 class OldFileParameter extends DefaultParameter {
 	private $project = NULL;
-	private $files = array();
 	public function __construct($name, \Models\Project $project) {
 		$this->name = $name;
 		$this->project = $project;
@@ -13,37 +12,73 @@ class OldFileParameter extends DefaultParameter {
 		if (!$this->value) {
 			return "";
 		}
-		$systemFileName = $this->project->getSystemFileName($this->value);
-		if (!$systemFileName) {
-			throw new ScriptException("Unable to locate the given file: " . htmlentities($this->value));
+
+		$fileParts = explode("/", $this->value);
+		$isUploadedFile = ($fileParts[0] == "uploaded");
+		if ($isUploadedFile) {
+			$systemFileName = $this->project->getSystemNameForUploadedFile($fileParts[1]);
+			if (!$systemFileName) {
+				throw new ScriptException("Unable to locate the given file: " . htmlentities($this->value));
+			}
+			$systemFileName = "../uploads/" . $systemFileName;
+		}
+		else {
+			$systemFileName = "../" . $this->value;
 		}
 
 		$separator = (strlen($this->name) == 2) ? " " : "=";
-		return $this->name . $separator . "'../uploads/" . $systemFileName . "'";
+		return $this->name . $separator . "'" . $systemFileName . "'";
 	}
 	public function renderForForm() {
-		if (empty($this->files)) {
-			$this->files = $this->project->retrieveAllUploadedFiles();
-		}
 		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\" size=\"5\">\n";
-		$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
-		foreach ($this->files as $category => $fileNames) {
-			$output .= "<optgroup label=\"{$category} files\">\n";
-			foreach ($fileNames as $fileName) {
-				$selected = ($this->value == $fileName) ? " selected" : "";
-				$output .= "<option value=\"{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+
+		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
+		if (!empty($uploadedFiles)) {
+			$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
+
+			$uploadedFilesFormatted = array();
+			foreach ($uploadedFiles as $fileArray) {
+				$fileType = $fileArray['type'];
+				if (!isset($uploadedFilesFormatted[$fileType])) {
+					$uploadedFilesFormatted[$fileType] = array();
+				}
+				$uploadedFilesFormatted[$fileType][] = $fileArray['name'];
 			}
-			$output .= "</optgroup>\n";
+
+			foreach ($uploadedFilesFormatted as $type=> $fileNames) {
+				if (empty($fileNames)) {
+					continue;
+				}
+				$output .= "<optgroup label=\"{$type} files\">\n";
+				foreach ($fileNames as $fileName) {
+					$selected = ($this->value == "uploaded/{$fileName}") ? " selected" : "";
+					$output .= "<option value=\"uploaded/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+				}
+				$output .= "</optgroup>\n";
+			}
 		}
 
-		$generatedFiles = $this->project->getAllGeneratedFiles();
+		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
 			$output .= "<optgroup label=\"generated files\" class=\"big\">\n";
-			foreach ($generatedFiles as $run => $fileNames) {
-				$output .= "<optgroup label=\"from run {$run}\">\n";
+			
+			$generatedFilesFormatted = array();
+			foreach ($generatedFiles as $fileArray) {
+				$runId = $fileArray['run_id'];
+				if (!isset($generatedFilesFormatted[$runId])) {
+					$generatedFilesFormatted[$runId] = array();
+				}
+				$generatedFilesFormatted[$runId][] = $fileArray['name'];
+			}
+
+			foreach ($generatedFilesFormatted as $runId => $fileNames) {
+				if (empty($fileNames)) {
+					continue;
+				}
+				$output .= "<optgroup label=\"from run {$runId}\">\n";
 				foreach ($fileNames as $fileName) {
-					$selected = ($this->value == $fileName) ? " selected" : "";
-					$output .= "<option value=\"{$run}/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+					$selected = ($this->value == "r{$runId}/{$fileName}") ? " selected" : "";
+					$output .= "<option value=\"r{$runId}/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -51,21 +86,5 @@ class OldFileParameter extends DefaultParameter {
 
 		$output .= "</select></label>\n";
 		return $output;
-	}
-	public function isValueValid() {
-		if (!$this->value) {
-			return true;
-		}
-		if (empty($this->files)) {
-			$this->files = $this->project->retrieveAllUploadedFiles();
-		}
-		foreach ($this->files as $category => $nameArray) {
-			foreach ($nameArray as $fileName) {
-				if ($this->value == $fileName) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }

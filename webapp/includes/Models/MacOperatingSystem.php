@@ -13,8 +13,13 @@ class MacOperatingSystem implements OperatingSystemI {
 		// TODO kindly strip preceding slash
 		$nameParts = explode("/", $name);
 		foreach ($nameParts as $namePart) {
+			if (!$namePart) {
+				continue;
+			}
 			if (!$this->isValidFileName($namePart)) {
-				throw new OperatingSystemException("Invalid file name: " . htmlentities($name));
+				$exception = new OperatingSystemException("Unable to create directory");
+				$exception->setConsoleOutput("Invalid file name: " . htmlentities($name));
+				throw $exception;
 			}
 		}
 
@@ -25,10 +30,38 @@ class MacOperatingSystem implements OperatingSystemI {
 			throw new OperatingSystemException("mkdir failed: {$returnCode}");
 		}
 	}
+	public function removeDirIfExists($name) {
+		$nameParts = explode("/", $name);
+		foreach ($nameParts as $namePart) {
+			if (!$namePart) {
+				continue;
+			}
+			if (!$this->isValidFileName($namePart)) {
+				return false;
+			}
+		}
+
+		$returnCode = 0;
+		ob_start();
+		system("rmdir " . $this->home . $name, $returnCode);
+		ob_end_clean();
+		if ($returnCode != 0) {
+			return false;
+		}
+		return true;
+	}
 
 	public function getDirContents($name) {
-		if (!$this->isValidFileName($name)) {
-			throw new OperatingSystemException("tried to list contents of invalid file");
+		$nameParts = explode("/", $name);
+		foreach ($nameParts as $namePart) {
+			if (!$namePart) {
+				continue;
+			}
+			if (!$this->isValidFileName($namePart)) {
+				$exception = new OperatingSystemException("Unable to get directory contents");
+				$exception->setConsoleOutput("Invalid file name: " . htmlentities($name));
+				throw $exception;
+			}
 		}
 
 		$result = 0;
@@ -69,22 +102,14 @@ class MacOperatingSystem implements OperatingSystemI {
 		return ob_get_clean();
 	}
 	public function isValidFileName($name) {
-		// TODO implement this
-		return true;
-		// the database can only hold ints that are 11 digits long
-		if (strlen($name) > 11) {
-			return false;
+		$whitelist = array("uploads");
+		if (in_array($name, $whitelist)) {
+			return true;
 		}
-		// for now anyway, all file names will be integers greater than 0; that's safe
-		$nameCopy = $name;
-		$nameCopy++;
-		$nameCopy--;
-		if ($nameCopy != $name) {
-			return false;
+		$matchesRegex = preg_match("/^[A-z]\\d+$/", $name);
+		if ($matchesRegex === false) {
+			throw new \Exception("unable to check file name");
 		}
-		if ($name <= 0) {
-			return false;
-		}
-		return true;
+		return $matchesRegex;
 	}
 }

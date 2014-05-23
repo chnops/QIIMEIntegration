@@ -52,7 +52,7 @@ class PDODatabase implements DatabaseI {
 
 				// TODO this functionality should be stored elsewhere, for example, the Roster object.
 				// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
-				$this->operatingSystem->createDir($root);
+				$this->operatingSystem->createDir('u' . $root);
 				$this->pdo->commit();
 				return $root;
 			}

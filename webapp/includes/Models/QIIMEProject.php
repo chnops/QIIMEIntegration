@@ -13,13 +13,14 @@ class QIIMEProject extends Project {
 		}
 		$this->setId($newId);
 
-		$projectDir = $this->database->getUserRoot($this->owner) . "/" . $newId;
+		$projectDir = $this->getProjectDir();
 		try {
 			$this->operatingSystem->createDir($projectDir);
 			$this->operatingSystem->createDir($projectDir . "/uploads/");
 			$this->database->executeAllRequests();
 		}
 		catch (OperatingSystemException $ex) {
+			$this->operatingSystem->removeDirIfExists($projectDir);
 			$this->database->forgetAllRequests();
 			throw $ex;
 		}
@@ -70,12 +71,16 @@ class QIIMEProject extends Project {
 		);
 	}
 	public function runScript(array $allInput) {
+		$this->generatedFiles = array();
+		$this->pastScriptRuns = array();
+
+		$scripts = $this->getScripts();
 		$scriptId = $allInput['script'];
 		unset($allInput['script']);
-		if (!isset($this->scripts[$scriptId])) {
+		if (!isset($scripts[$scriptId])) {
 			throw new \Exception("Unable to find script: " . htmlentities($scriptId));
 		}
-		$script = $this->scripts[$scriptId];
+		$script = $scripts[$scriptId];
 
 		$code = $script->convertInputToCode($allInput);
 		$result = "Script input is valid-";
@@ -89,8 +94,8 @@ class QIIMEProject extends Project {
 		$version = "";
 		$consoleError = false;
 
-		$projectDir = $this->database->getUserRoot($this->owner) . "/" . $this->getId();
-		$runDir = $projectDir . "/" . $runId;
+		$projectDir = $this->getProjectDir();
+		$runDir = $projectDir . "/r" . $runId;
 		try {
 			$this->operatingSystem->createDir($runDir);
 

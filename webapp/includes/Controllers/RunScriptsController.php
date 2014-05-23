@@ -12,8 +12,47 @@ class RunScriptsController extends Controller {
 			return "";
 		}
 		$pastScriptRuns = $this->project->getPastScriptRuns();
-		if ($pastScriptRuns) {
-			return "<h4>Past runs:</h4>\n" . $pastScriptRuns;
+		if(empty($pastScriptRuns)) {
+			return "";
+		}
+
+		$pastScriptRunsFormatted = array();
+		foreach($pastScriptRuns as $run) {
+			$scriptName = $run['name'];
+			if (!isset($pastScriptRunsFormatted[$scriptName])) {
+				$pastScriptRunsFormatted[$scriptName] = array();
+			}
+			$pastScriptRunsFormatted[$scriptName][] = $run;
+		}
+
+		$output = "";
+		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {
+			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
+			if (!isset($pastScriptRunsFormatted[$scriptName])) {
+				$output .= "This script has not been run yet.";
+				$output .= "</ul></div>\n";
+				continue;
+			}
+			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
+				$output .= "<li><strong>Run {$run['id']}</strong><br/>";
+				$output .= "<strong>Script name:</strong> {$run['name']}<br/>";
+				$output .= "<strong>User input:</strong> {$run['input']}<br/>";
+
+				$output .= "<strong>Generated files:</strong><ul>";
+				foreach ($run['file_names'] as $fileName) {
+					$output .= "<li>{$fileName}</li>";
+				}
+				$output .= "</ul>";
+
+				$output .= "<strong>Console output:</strong> {$run['output']}<br/>";
+				$output .= "<strong>Script version:</strong> {$run['version']}<br/>";
+				$output .= "</li>\n";
+			}
+			$output .= "</ul></div>\n";
+		}
+
+		if ($output) {
+			return "<h4>Past runs:</h4>\n" . $output;
 		}
 		return "";
 	}

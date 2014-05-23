@@ -11,9 +11,15 @@ abstract class Project {
 	protected $database;
 	protected $operatingSystem;
 
-	protected $scripts;
-	protected $scriptsFormatted;
+	protected $scripts = array();
+	protected $scriptsFormatted = array();
 	protected $fileTypes = array();
+
+	// complex fields (may change during script execution)
+	protected $projectDir = "";
+	protected $uploadedFiles = array();
+	protected $pastScriptRuns = array();
+	protected $generatedFiles = array();
 
 	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
 		$this->workflow = $workflow;
@@ -25,12 +31,14 @@ abstract class Project {
 		return $this->owner;
 	}
 	public function setOwner($owner) {
+		$this->projectDir = "";
 		$this->owner = $owner;
 	}
 	public function getId() {
 		return $this->id;
 	}
 	public function setId($id) {
+		$this->projectDir = "";
 		$this->id = $id;
 	}
 	public function getName() {
@@ -58,6 +66,12 @@ abstract class Project {
 	public function getOperatingSystem() {
 		return $this->operatingSystem;
 	}
+	public function getProjectDir() {
+		if (!$this->projectDir) {
+			$this->projectDir = "u" . $this->database->getUserRoot($this->owner) . "/p" . $this->id;
+		}
+		return $this->projectDir;
+	}
 
 	public function getFileTypeFromHtmlId($htmlId) {
 		foreach ($this->getFileTypes() as $fileType) {
@@ -74,73 +88,48 @@ abstract class Project {
 			$this->database->forgetAllRequests();
 			return false;
 		}
-		$fullFileName = $this->operatingSystem->getHome() .
-			$this->database->getUserRoot($this->owner) . "/" . $this->id . "/uploads/" . $systemFileName;
+		$fullFileName = $this->operatingSystem->getHome() . $this->getProjectDir() . "/uploads/" . $systemFileName;
 		return $fullFileName;
 	}
 	public function confirmUploadedFile() {
+		$this->uploadedFiles = array();
 		$this->database->executeAllRequests();
 	}
 	public function forgetUploadedFile() {
 		$this->database->forgetAllRequests();
 	}
 	public function retrieveAllUploadedFiles() {
-		$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
-		$formattedFiles = array();
-		foreach ($rawFiles as $fileArray) {
-			$formattedFiles[$fileArray['file_type']][] = $fileArray['given_name'];
+		if (empty($this->uploadedFiles)) {
+			$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
+			foreach ($rawFiles as $fileArray) {
+				$this->uploadedFiles[] = array("name" => $fileArray['given_name'], 
+					"type" => $fileArray['file_type'], "uploaded" => "true");
+			}
 		}
-		return $formattedFiles;
+		return $this->uploadedFiles;
 	}
 	
-	public function getSystemFileName($userFileName) {
+	public function getSystemNameForUploadedFile($userFileName) {
 		return $this->database->getUploadedFileSystemName($this->owner, $this->id, $userFileName);
 	}
 
 	public function getPastScriptRuns() {
-		$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
-		if (empty($pastRuns)) {
-			return "";
-		}
-
-		$pastRunsFormatted = array();
-		foreach ($pastRuns as $run) {
-			if (!isset($pastRunsFormatted[$run['script_name']])) {
-				$pastRunsFormatted[$run['script_name']] = array();
+		if (empty($this->pastScriptRuns)) {
+			$pastRunsRaw = $this->database->getPastRuns($this->owner, $this->id);
+			foreach ($pastRunsRaw as $run) {
+				$runFileNames = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $run['id']);
+	
+				$this->pastScriptRuns[] = array(
+					"id" => $run['id'],
+					"name" => $run['script_name'],
+					"input" => $run['script_string'],
+					"file_names" => $runFileNames,
+					"output" => $run['output'],
+					"version" => $run['version'],
+				);
 			}
-
-			$projectDirectory = $this->database->getUserRoot($this->owner) . "/" . $this->id;
-			$generatedFiles = $this->operatingSystem->getDirContents($projectDirectory . "/" . $run['id']);
-
-			$pastRunsFormatted[$run['script_name']][] = array(
-				"script_string" => $run['script_string'],
-				"files" => $generatedFiles,
-				"output" => $run['output'],
-				"version" => $run['version'],
-			);
 		}
-		
-		$output = "";
-		foreach ($this->getScripts() as $scriptName => $scriptObject) {
-			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
-			if (isset($pastRunsFormatted[$scriptName])) {
-				foreach ($pastRunsFormatted[$scriptName] as $run) {
-					$output .= "<li title=\"{$run['script_string']}\">";
-					$output .= "Result:<br/>{$run['version']}<br/>{$run['output']}";
-					$output .= "<ul>";
-					foreach ($run['files'] as $file) {
-						$output .= "<li>{$file}</li>";
-					}
-					$output .= "</ul></li>\n";
-				}
-			}
-			else {
-				$output .= "This script has not been run yet.";
-			}
-			$output .= "</ul></div>\n";
-
-		}
-		return $output;
+		return $this->pastScriptRuns;
 	}
 
 	public function scriptExists($scriptName) {
@@ -162,15 +151,29 @@ abstract class Project {
 		}
 	}
 
-	public function getAllGeneratedFiles() {
-		$generatedFiles = array();
-		$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
-		foreach ($pastRuns as $runArray) {
-			$projectDirectory = $this->database->getUserRoot($this->owner) . "/" . $this->id;
-			$runFiles = $this->operatingSystem->getDirContents($projectDirectory . "/" . $runArray['id']);
-			$generatedFiles[$runArray['id']] = $runFiles;
+	public function retrieveAllGeneratedFiles() {
+		if (empty($this->generatedFiles)) {
+			$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
+			foreach ($pastRuns as $run) {
+				$runId = $run['id'];
+				$runFiles = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $runId);
+
+				foreach ($runFiles as $fileName) {
+					$this->generatedFiles[] = array("name" => $fileName, "run_id" => $runId);
+				}
+			}
 		}
-		return $generatedFiles;
+		return $this->generatedFiles;
+	}
+	public function attemptGetDirContents($dirName) {
+			try {
+				$dirContents = $this->operatingSystem->getDirContents($dirName);
+			}
+			catch (OperatingSystemException $ex) {
+				error_log("unable to list contents of directory: {$dirName}");
+				$dirContents = array();
+			}
+			return $dirContents;
 	}
 
 	public abstract function beginProject();

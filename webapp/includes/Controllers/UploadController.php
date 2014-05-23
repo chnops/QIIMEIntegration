@@ -11,16 +11,26 @@ class UploadController extends Controller {
 	public function retrievePastResults() {
 		$output = "";
 		$previousFiles = $this->project->retrieveAllUploadedFiles();
-		if ($previousFiles) {
-			$output .= "<h3>Previously Uploaded files:</h3>\n";
-			foreach ($previousFiles as $fileType => $arrayOfFiles) {
-				$fileTypeTitle = $this->project->getFileTypeFromHtmlId($fileType)->getName();
-				$output .= "<h4>{$fileTypeTitle} Files</h4><ul>\n";
-				foreach ($arrayOfFiles as $file) {
-					$output .= "<li>" . htmlentities($file) . "</li>\n";
-				}
-				$output .= "</ul><hr class=\"small\"/>\n";
+		if (empty($previousFiles)) {
+			return $output;
+		}
+
+		$output .= "<h3>Previously Uploaded files:</h3>\n";
+		$previousFilesFormatted = array(); 
+		foreach ($previousFiles as $file) {
+			$fileType = $file['type'];
+			if (!isset($previousFilesFormatted[$fileType])) {
+				$previousFilesFormatted[$fileType] = array();
 			}
+			$previousFilesFormatted[$fileType][] = $file['name'];
+		}
+
+		foreach ($previousFilesFormatted as $fileType => $fileNames) {
+			$output .= "<h4>{$fileType} files</h4><ul>\n";
+			foreach ($fileNames as $fileName) {
+				$output .= "<li>" . htmlentities($fileName) . "</li>\n";
+			}
+			$output .= "</ul><hr class=\"small\"/>\n";
 		}
 		return $output;
 	}

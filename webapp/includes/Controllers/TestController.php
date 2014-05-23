@@ -11,15 +11,23 @@ class TestController extends Controller {
 	}
 	public function getInstructions() {
 		ob_start();
-		
-		echo "Attempting to use jquery:<br/>";
-		$script = "<script type=\"text/javascript\">
-			function myFunction() { $('div#help').css('display', 'none');}
-			$(myFunction);
-</script>";
-		echo "Here's the script:<br/><pre>";
-		echo htmlentities($script);
-		echo $script . "</pre>";
+
+		echo "<p>Testing OperatingSystem's file-validation regex</p>";
+		$os = new \Models\MacOperatingSystem();
+
+		$input = 'uploads';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$input = 'u1';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$input = 'p2';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$input = 'u111111111111';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$input = 'u';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$input = '1';
+		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+
 		return ob_get_clean();
 	}
 }
