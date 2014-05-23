@@ -2,14 +2,14 @@
 
 namespace Models\Scripts\QIIME;
 use Models\Scripts\DefaultScript;
-use Models\Scripts\VersionParameter;
-use Models\Scripts\HelpParameter;
-use Models\Scripts\TextArgumentParameter;
-use Models\Scripts\TrueFalseParameter;
-use Models\Scripts\TrueFalseInvertedParameter;
-use Models\Scripts\NewFileParameter;
-use Models\Scripts\OldFileParameter;
-use Models\Scripts\ChoiceParameter;
+use Models\Scripts\Parameters\VersionParameter;
+use Models\Scripts\Parameters\HelpParameter;
+use Models\Scripts\Parameters\TextArgumentParameter;
+use Models\Scripts\Parameters\TrueFalseParameter;
+use Models\Scripts\Parameters\TrueFalseInvertedParameter;
+use Models\Scripts\Parameters\NewFileParameter;
+use Models\Scripts\Parameters\OldFileParameter;
+use Models\Scripts\Parameters\ChoiceParameter;
 
 class ValidateMappingFile extends DefaultScript {
 
@@ -25,21 +25,21 @@ class ValidateMappingFile extends DefaultScript {
 	}
 
 	public function initializeParameters() {
+		$mappingFp = new OldFileParameter("--mapping_fp", $this->project);
+		$this->parameterRelationships->requireParam($mappingFp);
+
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
-		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
-		$this->parameters['special'] = array(
+		$this->parameterRelationships->addDefaultForParam($verboseParameter, false);
+
+		$this->parameterRelationships->makeOptional(array(
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
-			$verboseParameter->getName() => $verboseParameter,
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/^.$/"),
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),
 			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes"),
 			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check"),
 			"-j" => new TextArgumentParameter("-j", "", "/.*/"),
 			"--suppress_html" => new TrueFalseParameter("--suppress_html"),
-		);
-		$this->parameters['required'] = array(
-			"--mapping_fp" => new OldFileParameter("--mapping_fp", $this->project)
-		);
+		));
 	}
 	public function getScriptName() {
 		return $this->scriptName;

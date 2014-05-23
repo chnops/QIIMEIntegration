@@ -2,22 +2,27 @@
 
 namespace Models\Scripts\QIIME;
 use Models\Scripts\DefaultScript;
-use Models\Scripts\VersionParameter;
-use Models\Scripts\HelpParameter;
-use Models\Scripts\TextArgumentParameter;
-use Models\Scripts\TrueFalseParameter;
-use Models\Scripts\TrueFalseInvertedParameter;
-use Models\Scripts\NewFileParameter;
-use Models\Scripts\OldFileParameter;
-use Models\Scripts\ChoiceParameter;
+use Models\Scripts\Parameters\VersionParameter;
+use Models\Scripts\Parameters\HelpParameter;
+use Models\Scripts\Parameters\TextArgumentParameter;
+use Models\Scripts\Parameters\TrueFalseParameter;
+use Models\Scripts\Parameters\TrueFalseInvertedParameter;
+use Models\Scripts\Parameters\NewFileParameter;
+use Models\Scripts\Parameters\OldFileParameter;
+use Models\Scripts\Parameters\ChoiceParameter;
 
 class SplitLibraries extends DefaultScript {
 
 	public function initializeParameters() {
+		$map = new OldFileParameter("--map", $this->project);
+		$this->parameterRelationships->requireParam($map);
+		$fasta= new OldFileParameter("--fasta", $this->project);
+		$this->parameterRelationships->requireParam($fasta);
+
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
-		$this->trueFalseParameters[$verboseParameter->getName()] = $verboseParameter;
-		$this->parameters['special'] = array(
-  			$verboseParameter->getName() => $verboseParameter,
+		$this->parameterRelationships->addDefaultForParam($verboseParameter, false);
+
+		$this->parameterRelationships->makeOptional(array(
 			"--qual" => new OldFileParameter("--qual", $this->project),
 			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
 			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
@@ -46,11 +51,7 @@ class SplitLibraries extends DefaultScript {
 			"--median_length_filtering" => new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
 			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
 			"--truncate_ambi_bases" => new TrueFalseParameter("--truncate_ambi_bases"),
-		);
-		$this->parameters['required'] = array( 
-			"--map" => new OldFileParameter("--map", $this->project),
-			"--fasta" => new OldFileParameter("--fasta", $this->project),
-		);
+		));
 	}
 	public function getScriptName() {
 		return "split_libraries.py";

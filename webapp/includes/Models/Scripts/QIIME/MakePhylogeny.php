@@ -2,22 +2,22 @@
 
 namespace Models\Scripts\QIIME;
 use Models\Scripts\DefaultScript;
-use Models\Scripts\VersionParameter;
-use Models\Scripts\HelpParameter;
-use Models\Scripts\TextArgumentParameter;
-use Models\Scripts\TrueFalseParameter;
-use Models\Scripts\TrueFalseInvertedParameter;
-use Models\Scripts\NewFileParameter;
-use Models\Scripts\OldFileParameter;
-use Models\Scripts\ChoiceParameter;
+use Models\Scripts\Parameters\VersionParameter;
+use Models\Scripts\Parameters\HelpParameter;
+use Models\Scripts\Parameters\TextArgumentParameter;
+use Models\Scripts\Parameters\TrueFalseParameter;
+use Models\Scripts\Parameters\TrueFalseInvertedParameter;
+use Models\Scripts\Parameters\NewFileParameter;
+use Models\Scripts\Parameters\OldFileParameter;
+use Models\Scripts\Parameters\ChoiceParameter;
 
 class MakePhylogeny extends DefaultScript {
 
 	public function initializeParameters() {
-		$this->parameters['required'] = array(
-			"--input_fp" => new OldFileParameter("--input_fp", $this->project),
-		);
-		$this->parameters['special'] = array(
+		$inputFp = new OldFileParameter("--input_fp", $this->project);
+		$this->parameterRelationships->requireParam($inputFp);
+
+		$this->parameterRelationships->makeOptional(array(
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--tree_method" => new ChoiceParameter("--tree_method", "fasttree", 
 				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),
@@ -25,7 +25,7 @@ class MakePhylogeny extends DefaultScript {
 			"--log_fp" => new NewFileParameter("--log_fp", ""),
 			"--root_method" => new ChoiceParameter("--root_method", "tree_method_default",
 				array("midpoint", "tree_method_default")),
-		);
+		));
 	}
 	public function getScriptName() {
 		return "make_phylogeny.py";

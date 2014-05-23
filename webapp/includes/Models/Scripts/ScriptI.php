@@ -16,10 +16,8 @@ interface ScriptI {
 	public function initializeParameters();
 
 	// output
-	public function renderAsForm(); // protected parameters
-	public function getScriptForDependentParameters(); // protected parameterDependencyRelationships
-	public function getScriptForConditionallyRequiredParameters(); // protected ParameterRequirementRelationships
-	public function renderCommand(); // protected parameters
+	public function renderAsForm();
+	public function renderCommand();
 
 	// input
 	public function acceptInput(array $input);

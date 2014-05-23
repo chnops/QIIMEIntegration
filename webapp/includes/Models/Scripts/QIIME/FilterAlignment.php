@@ -2,22 +2,22 @@
 
 namespace Models\Scripts\QIIME;
 use Models\Scripts\DefaultScript;
-use Models\Scripts\VersionParameter;
-use Models\Scripts\HelpParameter;
-use Models\Scripts\TextArgumentParameter;
-use Models\Scripts\TrueFalseParameter;
-use Models\Scripts\TrueFalseInvertedParameter;
-use Models\Scripts\NewFileParameter;
-use Models\Scripts\OldFileParameter;
-use Models\Scripts\ChoiceParameter;
+use Models\Scripts\Parameters\VersionParameter;
+use Models\Scripts\Parameters\HelpParameter;
+use Models\Scripts\Parameters\TextArgumentParameter;
+use Models\Scripts\Parameters\TrueFalseParameter;
+use Models\Scripts\Parameters\TrueFalseInvertedParameter;
+use Models\Scripts\Parameters\NewFileParameter;
+use Models\Scripts\Parameters\OldFileParameter;
+use Models\Scripts\Parameters\ChoiceParameter;
 
 class FilterAlignment extends DefaultScript {
 
 	public function initializeParameters() {
-		$this->parameters['required'] = array(
-			"--input_fasta_file" => new OldFileParameter("--input_fasta_file", $this->project),
-		);
-		$this->parameters['special'] = array(
+		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
+		$this->parameterRelationships->requireParam($inputFastaFile);
+
+		$this->parameterRelationships->makeOptional(array(
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--output_dir" => new NewFileParameter("--output_dir", "."),
 			"--lane_mask_fp" => new OldFileParameter("--lane_mask_fp", $this->project),
@@ -30,7 +30,7 @@ class FilterAlignment extends DefaultScript {
 				//TODO only used with remove_outliers
 			"--entropy_threshold" => new TextArgumentParameter("--entropy_threshold", "", "/.*/"), // TODO 0 < fraction < 1
 				// TODO If this value is used, any lane mask supplied will be ignored.
-		);
+		));
 	}
 	public function getScriptName() {
 		return "filter_alignment.py";

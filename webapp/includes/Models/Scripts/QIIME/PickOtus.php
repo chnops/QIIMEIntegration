@@ -2,23 +2,22 @@
 
 namespace Models\Scripts\QIIME;
 use Models\Scripts\DefaultScript;
-use Models\Scripts\VersionParameter;
-use Models\Scripts\HelpParameter;
-use Models\Scripts\TextArgumentParameter;
-use Models\Scripts\TrueFalseParameter;
-use Models\Scripts\TrueFalseInvertedParameter;
-use Models\Scripts\NewFileParameter;
-use Models\Scripts\OldFileParameter;
-use Models\Scripts\ChoiceParameter;
+use Models\Scripts\Parameters\VersionParameter;
+use Models\Scripts\Parameters\HelpParameter;
+use Models\Scripts\Parameters\TextArgumentParameter;
+use Models\Scripts\Parameters\TrueFalseParameter;
+use Models\Scripts\Parameters\TrueFalseInvertedParameter;
+use Models\Scripts\Parameters\NewFileParameter;
+use Models\Scripts\Parameters\OldFileParameter;
+use Models\Scripts\Parameters\ChoiceParameter;
 
 class PickOtus extends DefaultScript {
 
 	public function initializeParameters() {
-		$this->parameters['required'] = array(
-			"--input_seqs_filepath" => new OldFileParameter("--input_seqs_filepath", $this->project),
-		);
+		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
+		$this->parameterRelationships->requireParam($inputSeqsFilePath);
 
-		$this->parameters['special'] = array(
+		$this->parameterRelationships->makeOptional(array(
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--otu_picking_method" => new ChoiceParameter("--otu_picking_method", "uclust", 
 				array("mothur", "trie", "uclust_ref", "usearch", "usearch_ref", "blast", "usearch61",
@@ -77,7 +76,7 @@ class PickOtus extends DefaultScript {
 				//TODO Requires that --usearch61_sort_method be abundance. [default: False]
 			"--threads" => new TextArgumentParameter("--threads", "1.0", "/.*/"), 
 				// TODO this one is tough...
-		);
+		));
 	}
 	public function getScriptName() {
 		return "pick_otus.py";
