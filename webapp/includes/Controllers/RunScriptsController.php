@@ -5,7 +5,7 @@ namespace Controllers;
 class RunScriptsController extends Controller {
 
 	protected $subTitle = "Run Scripts";
-	private $script = "";
+	private $scriptId = "";
 
 	public function retrievePastResults() {
 		if (!$this->project) {
@@ -65,7 +65,7 @@ class RunScriptsController extends Controller {
 		$_GET['step'] = $_POST['step'];
 		unset($_POST['step']);
 		$this->hasResult = true;
-		$this->script = $_POST['script'];
+		$this->scriptId = $_POST['script'];
 
 		try {
 			$this->result = $this->project->runScript($_POST);
@@ -105,8 +105,8 @@ class RunScriptsController extends Controller {
 			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm()}</div>\n";
 		}
 		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
-		if ($this->script) {
-			$onLoadJavascript .= "displayHideables('{$this->script}');";
+		if ($this->scriptId) {
+			$onLoadJavascript .= "displayHideables('{$this->scriptId}');";
 		}
 		$form .= "<script type=\"text/javascript\">window.onload=function(){{$onLoadJavascript}};</script>\n";
 		return $form;

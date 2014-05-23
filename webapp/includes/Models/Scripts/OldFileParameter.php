@@ -45,7 +45,7 @@ class OldFileParameter extends DefaultParameter {
 				$output .= "<optgroup label=\"{$type} files\">\n";
 				foreach ($fileNames as $fileName) {
 					$selected = ($this->value == "uploaded/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"uploaded/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+					$output .= "<option value=\"uploaded/{$fileName}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -64,7 +64,7 @@ class OldFileParameter extends DefaultParameter {
 				$output .= "<optgroup label=\"from run {$runId}\">\n";
 				foreach ($fileNames as $fileName) {
 					$selected = ($this->value == "r{$runId}/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"r{$runId}/{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+					$output .= "<option value=\"r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}

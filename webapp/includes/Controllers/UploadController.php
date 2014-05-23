@@ -41,9 +41,25 @@ class UploadController extends Controller {
 			return;
 		}
 		$this->hasResult = true;
+
+		$this->fileType = $this->project->getFileTypeFromHtmlId($_POST['type']);
+		if (!$this->fileType) {
+			$this->isResultError = true;
+			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
+		}
+		else {
+			$this->result = "";
+		}
 		
 		// TODO if is valid form
-		$this->fileType = $this->project->getFileTypeFromHtmlId($_POST['type']);
+		$pastUploads = $this->project->retrieveAllUploadedFiles();
+		foreach ($pastUploads as $extantFile) {
+			if ($extantFile['name'] == $_FILES['file']['name']) {
+				$this->isResultError = true;
+				$this->result .= "You have already uploaded a file with that file name. File names must be unique";
+				return;
+			}
+		}
 		$this->uploadFile($_FILES['file'], $this->fileType);
 	}
 
