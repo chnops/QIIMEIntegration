@@ -1,6 +1,7 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
+use \Models\Scripts\ScriptException;
 
 class TextArgumentParameter extends DefaultParameter {
 	private $expectedPattern;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
 
 class TrueFalseParameter extends DefaultParameter {
 	public function __construct($name) {

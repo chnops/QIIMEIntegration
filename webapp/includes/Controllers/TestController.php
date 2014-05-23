@@ -12,21 +12,17 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing OperatingSystem's file-validation regex</p>";
-		$os = new \Models\MacOperatingSystem();
+		echo "<p>Testing for appropriate namespace loading</p";
 
-		$input = 'uploads';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
-		$input = 'u1';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
-		$input = 'p2';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
-		$input = 'u111111111111';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
-		$input = 'u';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
-		$input = '1';
-		echo "<ul><li>Input({$input}): Output({$os->isValidFileName($input)})</li></ul>";
+		$parameter = new \Models\Scripts\Parameters\ChoiceParameter("--name", "default", array("default", "non-default"));
+		var_dump($parameter);
+
+		try {
+			$parameter->setValue("notInArray");
+		}
+		catch (\Exception $ex) {
+			var_dump($ex);
+		}
 
 		return ob_get_clean();
 	}

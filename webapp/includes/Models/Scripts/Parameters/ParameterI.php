@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
 
 interface ParameterI {
 	public function renderForOperatingSystem();

@@ -1,6 +1,7 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
+use \Models\Scripts\ScriptException;
 
 class OldFileParameter extends DefaultParameter {
 	private $project = NULL;
