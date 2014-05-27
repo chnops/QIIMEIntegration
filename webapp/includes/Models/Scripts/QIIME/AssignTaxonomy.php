@@ -56,6 +56,7 @@ class AssignTaxonomy extends DefaultScript {
 		$this->parameterRelationships->requireParamIf($idToTaxonomyFp, $assignmentMethod, "blast");
 		$this->parameterRelationships->requireParamIf($blastDatabase, $assignmentMethod, "blast");
 		$this->parameterRelationships->requireParamIf($treeFp, $assignmentMethod, "tax2tree");
+		$this->parameterRelationships->allowParamIf($treeFp, $assignmentMethod, "tax2tree");
 
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$this->parameterRelationships->requireParam($inputFastaFp);

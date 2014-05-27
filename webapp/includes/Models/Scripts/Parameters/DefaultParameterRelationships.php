@@ -244,12 +244,12 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 				}
 				$formCode .= "{$triggerVariable}.change(function() {
 					jQuery.each({$triggerVariable}['usually_excluded'], function(index, value) {
-						{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', true).parent('label').css('display', 'none');
+						{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', true).parents('label').css('display', 'none');
 					});
 					var allowedParameters = {$triggerVariable}[{$triggerVariable}.val() + '_allows'];
 					if (allowedParameters) {
 						jQuery.each(allowedParameters, function(index, value) {
-							{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', false).parent('label').css('display', 'block')
+							{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', false).parents('label').css('display', 'block')
 						});
 					}
 					});";
