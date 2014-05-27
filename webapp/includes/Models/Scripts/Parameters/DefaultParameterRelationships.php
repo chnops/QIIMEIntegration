@@ -32,9 +32,16 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		return $values;
 	}
 
+	private $triggers = array();
+	private $usuallyExcluded = array();
+	private $conditionalAllowers = array();
 	public function allowParamIf(ParameterI $allowed, ParameterI $allower, $value) {
 		$this->allParameters[$allowed->getName()] = $allowed;
 		$this->allParameters[$allower->getName()] = $allower;
+
+		$this->triggers[] = $allower->getName();
+		$this->usuallyExcluded[] = $allowed->getName();
+		$this->conditionalAllowers[$allower->getName()][$value][] = $allowed->getName();
 	}
 
 	private $usuallyOptional = array();
@@ -43,6 +50,7 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		$this->allParameters[$required->getName()] = $required;
 		$this->allParameters[$requirer->getName()] = $requirer;
 
+		$this->triggers[] = $requirer->getName();
 		$this->usuallyOptional[] = $required->getName();
 		$this->conditionalRequirers[$requirer->getname()][$value][] = $required->getName();
 	}
@@ -77,16 +85,35 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		}
 
 		$sortedParameters[] = new Label("<p><strong>Optional Parameters</strong></p>");
-		foreach ($this->conditionalRequirers as $trigger => $values) {
+		$triggers = array_unique($this->triggers);
+		asort($triggers);
+		foreach ($triggers as $trigger) {
 			$sortedParameters[$trigger] = $this->allParameters[$trigger];
 			unset($this->allParameters[$trigger]);
-			foreach ($values as $value => $associatedParameterNames) {
-				foreach ($associatedParameterNames as $parameterName) {
-					$sortedParameters[$parameterName] = $this->allParameters[$parameterName];
-					unset($this->allParameters[$parameterName]);
+
+			if (isset($this->conditionalRequirers[$trigger])) {
+				$values = $this->conditionalRequirers[$trigger];
+				foreach ($values as $value => $associatedParameterNames) {
+					foreach ($associatedParameterNames as $parameterName) {
+						$sortedParameters[$parameterName] = $this->allParameters[$parameterName];
+						unset($this->allParameters[$parameterName]);
+					}
+				}
+			}
+
+			if (isset($this->conditionalAllowers[$trigger])) {
+				$values = $this->conditionalAllowers[$trigger];
+				foreach ($values as $value => $associatedParameterNames) {
+					foreach ($associatedParameterNames as $parameterName) {
+						if (isset($this->allParameters[$parameterName])) {
+							$sortedParameters[$parameterName] = $this->allParameters[$parameterName];
+							unset($this->allParameters[$parameterName]);
+						}
+					}
 				}
 			}
 		}
+		$this->triggers = $triggers;
 
 		// follow up with the rest of the optional ones
 		foreach ($this->allParameters as $name => $parameter) {
@@ -120,16 +147,24 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 				}
 			}
 		}
-		/* TODO this is actually more appropriate for conditionally allowed parameters
-		foreach ($this->usuallyOptional as $optionalParam) {
-			if (isset($input[$optionalParam])) {
-				$triggerAndValue = $this->getOptionallyRequiredParamTriggerAndValue($optionalParam);
-				if ($input[$triggerAndValue['trigger']] != $triggerAndValue['value']) {
-					$violations[] = "The parameter {$optionalParam} can only be used if the parameter {$triggerAndValue['trigger']}
-				 		is set equal to {$triggerAndValue['value']}";
+
+		$usuallyExcluded = array_unique($this->usuallyExcluded);	
+		foreach ($usuallyExcluded as $excludedParam) {
+			if (isset($input[$excludedParam])) {
+				$triggersAndValues = $this->getOptionallyAllowedParamTriggersAndValues($excludedParam);
+				$allowed = false;
+				$errorMessage = "The parameter {$excludedParam} can only be used under certain circumstances, when:<br/>";
+				foreach ($triggersAndValues as $triggerValuePair) {
+					$errorMessage .= "&nbsp;parameter {$triggerValuePair['trigger']} is set to {$triggerValuePair['value']}<br/>";
+					if ($input[$triggerValuePair['trigger']] == $triggerValuePair['value']) {
+						$allowed = true;
+					}
+				}
+				if (!$allowed) {
+					$violations[] = $errorMessage;
 				}
 			}
-		}*/
+		}
 
 		return $violations;
 	}
@@ -148,25 +183,55 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		}
 		$formCode .= "\n";
 
-		foreach ($this->conditionalRequirers as $trigger => $conditionalParams) {
+		foreach ($this->triggers as $trigger) {
 			$triggerVariable = preg_replace("/--/", "", $trigger);
 			$formCode .= "var {$triggerVariable} = {$formVariable}.find(\"[name='{$trigger}']\");";
 
-			foreach ($conditionalParams as $value => $paramNames) {
-				$quotedArray = array();
-				foreach ($paramNames as $name) {
-					$quotedArray[] = "{$formVariable}.find(\"div[for='{$name}']\")";
+			if (isset($this->conditionalRequirers[$trigger])) {
+				$conditionalParams = $this->conditionalRequirers[$trigger];
+				foreach ($conditionalParams as $value => $paramNames) {
+					$quotedArray = array();
+					foreach ($paramNames as $name) {
+						$quotedArray[] = "{$formVariable}.find(\"div[for='{$name}']\")";
+					}
+					$formCode .= "{$triggerVariable}['{$value}_requires'] = [" . implode(",", $quotedArray) . "];";
 				}
-				$formCode .= "{$triggerVariable}['{$value}_requires'] = [" . implode(",", $quotedArray) . "];";
+				$formCode .= "{$triggerVariable}.change(function() {
+					{$formVariable}.find('div[for]').css('display', 'none');
+					var requiredLabels = {$triggerVariable}[{$triggerVariable}.val() + '_requires'];
+					if (requiredLabels) {
+						jQuery.each(requiredLabels, function(index, value) {value.css('display', 'block')});
+					}
+					});";
 			}
-			$formCode .= "{$triggerVariable}.change(function() {
-				{$formVariable}.find('div[for]').css('display', 'none');
-				var requiredLabels = {$triggerVariable}[{$triggerVariable}.val() + '_requires'];
-				if (requiredLabels) {
-					jQuery.each(requiredLabels, function(index, value) {value.css('display', 'block')});
+			if (isset($this->conditionalAllowers[$trigger])) {
+				$allConditionalParams = array();
+				foreach ($this->usuallyExcluded as $excludedParam) {
+					$allConditionalParams[] = "'{$excludedParam}'";
 				}
-			});
-			{$triggerVariable}.change();";
+				$formCode .= "{$triggerVariable}['usually_excluded'] = [" . implode(",", $allConditionalParams) . "];";
+
+				$conditionalParamsByValue = $this->conditionalAllowers[$trigger];
+				foreach ($conditionalParamsByValue as $value => $paramNames) {
+					$quotedArray = array();
+					foreach ($paramNames as $name) {
+						$quotedArray[] = "'{$name}'";
+					}
+					$formCode .= "{$triggerVariable}['{$value}_allows'] = [" . implode(",", $quotedArray) . "];";
+				}
+				$formCode .= "{$triggerVariable}.change(function() {
+					jQuery.each({$triggerVariable}['usually_excluded'], function(index, value) {
+						{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', true).parent('label').css('display', 'none');
+					});
+					var allowedParameters = {$triggerVariable}[{$triggerVariable}.val() + '_allows'];
+					if (allowedParameters) {
+						jQuery.each(allowedParameters, function(index, value) {
+							{$formVariable}.find('[name=\"' + value + '\"]').prop('disabled', false).parent('label').css('display', 'block')
+						});
+					}
+					});";
+			}
+			$formCode .= "{$triggerVariable}.change();";
 		}
 		$formCode .= "\n";
 
@@ -174,17 +239,17 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		return $formCode;
 	}
 
-	/* TODO this is actually more appropriate for condtionally allowed parameters
-	private function getOptionallyRequiredParamTriggerAndValue($param) {
-		foreach ($this->conditionalRequirers as $trigger => $conditionalParams) {
+	private function getOptionallyAllowedParamTriggersAndValues($param) {
+		$triggersAndValues = array();
+		foreach ($this->conditionalAllowers as $trigger => $conditionalParams) {
 			foreach ($conditionalParams as $value => $paramNames) {
 				foreach ($paramNames as $paramName) {
 					if ($paramName == $param) {
-						return array("value" => $value, "trigger" => $trigger);
+						$triggersAndValues[] = array("trigger" => $trigger, "value" => $value);
 					}
 				}
 			}
 		}
-		return array();
-	}*/
+		return $triggersAndValues;
+	}
 }
