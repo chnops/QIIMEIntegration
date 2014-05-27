@@ -45,10 +45,16 @@ class AssignTaxonomy extends DefaultScript {
 
 		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project);
 			// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 
-			// TODO REQUIRED when method is blast
 		$treeFp = new OldFileParameter("--tree_fp", $this->project);
 
+		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project);
+				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
+		$blastDb = new OldFileParameter("--blast_db", $this->project);
+				// TODO build in files
+		$blastDatabase = $this->parameterRelationships->linkParams($referenceSeqsFp, $blastDb);
+
 		$this->parameterRelationships->requireParamIf($idToTaxonomyFp, $assignmentMethod, "blast");
+		$this->parameterRelationships->requireParamIf($blastDatabase, $assignmentMethod, "blast");
 		$this->parameterRelationships->requireParamIf($treeFp, $assignmentMethod, "tax2tree");
 
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
@@ -57,15 +63,9 @@ class AssignTaxonomy extends DefaultScript {
 		$this->parameterRelationships->makeOptional(array(
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
-			"--reference_seqs_fp" => new OldFileParameter("--reference_seqs_fp", $this->project),
-				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
-				// TODO REQUIRED if -b is not provided when method is blast]
+			"--e_value" => new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
 			"--training_data_properties_fp" => new OldFileParameter("--training_data_properties_fp", $this->project),
 				// TODO This option is overridden by the -t and -r options.
-			"--blast_db" => new OldFileParameter("--blast_db", $this->project),
-				// TODO build in files
-				// TODO Must provide either --blast_db or --reference_seqs_db for assignment with blast [default: none]
-			"--e_value" => new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
 			));
 	}
 	public function getScriptName() {

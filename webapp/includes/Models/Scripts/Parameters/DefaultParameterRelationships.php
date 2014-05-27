@@ -29,6 +29,26 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 				$values[$argName] = $default;
 			}
 		}
+		foreach ($this->links as $link) {
+			$eitherOr = $link[0];
+			$defaultName = $link[1];
+			$alternativeName = $link[2];
+			if (isset($values[$defaultName])) {
+			   	if (isset($values[$alternativeName])) {
+					$this->linkViolations[] = "You can choose either {$defaultName} or {$alternativeName}; you cannot have both.";
+				}
+				else {
+					$eitherOr->setValue($defaultName);
+					$eitherOr->getDefault()->setValue($values[$defaultName]);
+				}
+			}
+			else if (isset($values[$alternativeName])) {
+				$eitherOr->setValue($alternativeName);
+				$eitherOr->getAlternative()->setValue($values[$alternativeName]);
+			}
+			unset($values[$defaultName]);
+			unset($values[$alternativeName]);
+		}
 		return $values;
 	}
 
@@ -55,10 +75,13 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		$this->conditionalRequirers[$requirer->getname()][$value][] = $required->getName();
 	}
 
+	private $links = array();
+	private $linkViolations = array();
 	public function linkParams(ParameterI $default, ParameterI $alternative) {
-		$this->allParameters[$default->getName()] = $default;
-		$this->allParameters[$alternative->getName()] = $alternative;
-		// TODO return the linked parameter object, in case the person wants to require it
+		$eitherOr = new EitherOrParameter($default, $alternative);
+		$this->allParameters[$eitherOr->getName()] = $eitherOr;
+		$this->links[] = array($eitherOr, $default->getName(), $alternative->getName());
+		return $eitherOr;
 	}
 
 	public function makeOptional(array $parameters) {
@@ -166,7 +189,7 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 			}
 		}
 
-		return $violations;
+		return array_merge($violations, $this->linkViolations);
 	}
 
 	public function renderFormCode(\Models\Scripts\ScriptI $script) {
@@ -234,6 +257,19 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 			$formCode .= "{$triggerVariable}.change();";
 		}
 		$formCode .= "\n";
+
+		foreach ($this->links as $link) {
+			$linkVariable = preg_replace("/\-/", "", $link[0]->getName());
+			$defaultValue = ($link[0]->getValue()) ? $link[0]->getValue() : $link[1];
+			$formCode .= "var {$linkVariable} = {$formVariable}.find(\"input[name='{$link[0]->getName()}']\");\n";
+			$formCode .= "{$linkVariable}.each(function(index, value) {
+				$(this).eq(index-1).change(function() {
+				$(this).parents(\"table\").find(\"td:nth-child(2) [name]\").prop('disabled', true);
+				$(this).parents(\"tr\").find(\"td:nth-child(2) [name]\").prop('disabled', false);
+			});});
+				{$formVariable}.find(\"input[value='{$defaultValue}']\").click();
+				";
+		}
 
 		$formCode .= "</script>";
 		return $formCode;
