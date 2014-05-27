@@ -31,7 +31,11 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 		$form .= "<input type=\"hidden\" name=\"step\" value=\"run\"/>
 			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"/>
-			<button type=\"submit\">Run</button></form>\n";
+			<button type=\"submit\">Run</button>\n";
+
+		$form .= $this->parameterRelationships->renderFormCode($this);
+
+		$form .= "</form>\n";
 		return $form;
 	}
 

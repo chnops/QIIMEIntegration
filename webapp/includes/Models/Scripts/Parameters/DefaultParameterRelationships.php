@@ -38,13 +38,13 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 	}
 
 	private $usuallyOptional = array();
-	private $conditionallyRequired = array();
+	private $conditionalRequirers = array();
 	public function requireParamIf(ParameterI $required, ParameterI $requirer, $value) {
 		$this->allParameters[$required->getName()] = $required;
 		$this->allParameters[$requirer->getName()] = $requirer;
 
 		$this->usuallyOptional[] = $required->getName();
-		$this->conditionallyRequired[$requirer->getname()][$value][] = $required->getName();
+		$this->conditionalRequirers[$requirer->getname()][$value][] = $required->getName();
 	}
 
 	public function linkParams(ParameterI $default, ParameterI $alternative) {
@@ -66,14 +66,18 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 			$sortedParameters[$name] = $this->allParameters[$name];
 			unset($this->allParameters[$name]);
 		}
-		// required parameters next
+
+		$sortedParameters[] = new Label("<p><strong>Required Parameters</strong></p>");
 		foreach ($this->alwaysRequired as $name) {
 			$sortedParameters[$name] = $this->allParameters[$name];
 			unset($this->allParameters[$name]);
 		}
+		foreach ($this->usuallyOptional as $paramName) {
+			$sortedParameters[] = new Label("<div for=\"{$paramName}\">{$paramName} is now required</div>");
+		}
 
-		// parameters that trigger a conditionally required parameter
-		foreach ($this->conditionallyRequired as $trigger => $values) {
+		$sortedParameters[] = new Label("<p><strong>Optional Parameters</strong></p>");
+		foreach ($this->conditionalRequirers as $trigger => $values) {
 			$sortedParameters[$trigger] = $this->allParameters[$trigger];
 			unset($this->allParameters[$trigger]);
 			foreach ($values as $value => $associatedParameterNames) {
@@ -105,7 +109,7 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 			}
 		}
 
-		foreach ($this->conditionallyRequired as $trigger => $requiredParams) {
+		foreach ($this->conditionalRequirers as $trigger => $requiredParams) {
 			foreach ($requiredParams as $value => $paramNames) {
 				if ($input[$trigger] == $value) {
 					foreach ($paramNames as $paramName) {
@@ -130,9 +134,49 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		return $violations;
 	}
 
+	public function renderFormCode(\Models\Scripts\ScriptI $script) {
+		$htmlId = $script->getHtmlId();
+		$formVariable = $htmlId . "_form";
+		$formCode = "<script type=\"text/javascript\">\nvar {$formVariable} = $('div#form_{$htmlId} form');\n";
+
+		foreach ($this->alwaysRequired as $requiredParamName) {
+			$formCode .= "{$formVariable}.find(\"label[for='{$requiredParamName}']\").css('color', '#cc0000').css('font-weight', 'bold');";
+		}
+		$formCode .= "\n";
+		foreach ($this->usuallyOptional as $requiredParamName) {
+			$formCode .= "{$formVariable}.find(\"div[for='{$requiredParamName}']\").css('color', '#cc0000').css('font-weight', 'bold').css('display', 'none');";
+		}
+		$formCode .= "\n";
+
+		foreach ($this->conditionalRequirers as $trigger => $conditionalParams) {
+			$triggerVariable = preg_replace("/--/", "", $trigger);
+			$formCode .= "var {$triggerVariable} = {$formVariable}.find(\"[name='{$trigger}']\");";
+
+			foreach ($conditionalParams as $value => $paramNames) {
+				$quotedArray = array();
+				foreach ($paramNames as $name) {
+					$quotedArray[] = "{$formVariable}.find(\"div[for='{$name}']\")";
+				}
+				$formCode .= "{$triggerVariable}['{$value}_requires'] = [" . implode(",", $quotedArray) . "];";
+			}
+			$formCode .= "{$triggerVariable}.change(function() {
+				{$formVariable}.find('div[for]').css('display', 'none');
+				var requiredLabels = {$triggerVariable}[{$triggerVariable}.val() + '_requires'];
+				if (requiredLabels) {
+					jQuery.each(requiredLabels, function(index, value) {value.css('display', 'block')});
+				}
+			});
+			{$triggerVariable}.change();";
+		}
+		$formCode .= "\n";
+
+		$formCode .= "</script>";
+		return $formCode;
+	}
+
 	/* TODO this is actually more appropriate for condtionally allowed parameters
 	private function getOptionallyRequiredParamTriggerAndValue($param) {
-		foreach ($this->conditionallyRequired as $trigger => $conditionalParams) {
+		foreach ($this->conditionalRequirers as $trigger => $conditionalParams) {
 			foreach ($conditionalParams as $value => $paramNames) {
 				foreach ($paramNames as $paramName) {
 					if ($paramName == $param) {
