@@ -55,15 +55,21 @@ class AssignTaxonomy extends DefaultScript {
 				// TODO build in files
 		$blastDatabase = $this->parameterRelationships->linkParams($referenceSeqsFp, $blastDb);
 
-		$this->parameterRelationships->requireParamIf($idToTaxonomyFp, $assignmentMethod, "blast");
-		$this->parameterRelationships->requireParamIf($blastDatabase, $assignmentMethod, "blast");
-		$this->parameterRelationships->requireParamIf($treeFp, $assignmentMethod, "tax2tree");
+		$idToTaxonomyFp->requireIf($assignmentMethod, "blast");
+		$blastDatabase->requireIf($assignmentMethod, "blast");
+		$treeFp->requireIf($assignmentMethod, "tax2tree");
 		$this->parameterRelationships->allowParamIf($treeFp, $assignmentMethod, "tax2tree");
 
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
-		$this->parameterRelationships->requireParam($inputFastaFp);
+		$inputFastaFp->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFastaFp->getName() => $inputFastaFp,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
+			$idToTaxonomyFp->getName() => $idToTaxonomyFp,
+			$blastDatabase->getName() => $blastDatabase,
+			$treeFp->getName() => $treeFp,
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
 			"--e_value" => new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation

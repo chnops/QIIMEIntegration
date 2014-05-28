@@ -22,6 +22,7 @@ class TrueFalseParameter extends DefaultParameter {
 	}
 
 	public function acceptInput(array $input) {
+		parent::acceptInput($input);
 		if (!isset($input[$this->name])) {
 			$this->setValue(false);
 		}

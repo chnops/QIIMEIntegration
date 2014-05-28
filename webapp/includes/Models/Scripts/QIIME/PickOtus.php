@@ -10,14 +10,18 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class PickOtus extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
-		$this->parameterRelationships->requireParam($inputSeqsFilePath);
+		$inputSeqsFilePath->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputSeqsFilePath->getName() => $inputSeqsFilePath,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--otu_picking_method" => new ChoiceParameter("--otu_picking_method", "uclust", 
 				array("mothur", "trie", "uclust_ref", "usearch", "usearch_ref", "blast", "usearch61",

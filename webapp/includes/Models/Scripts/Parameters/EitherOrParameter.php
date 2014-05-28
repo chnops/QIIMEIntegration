@@ -4,28 +4,51 @@ namespace Models\Scripts\Parameters;
 use \Models\Scripts\ScriptException;
 
 class EitherOrParameter extends DefaultParameter {
-	protected $selected;
-	protected $notSelected;
+	protected $default;
+	protected $alternative;
 
 	public function __construct($default, $alternative) {
-		$this->selected = $default;
-		$this->notSelected = $alternative;
+		$this->default = $default;
+		$this->alternative = $alternative;
 		$this->name = "__{$default->getName()}__{$alternative->getName()}__";
-		$this->value = $default->getName();
 	}
 
 	public function renderForOperatingSystem() {
-		if ($this->value) {
-			return $this->selected->renderForOperatingSystem();
+		if (!$this->value) {
+			return "";
 		}
-		return "";
+		if ($this->value == $this->default->getName()) {
+			return $this->default->renderForOperatingSystem();
+		}
+		if ($this->value == $this->alternative->getName()) {
+			return $this->alternative->renderForOperatingSystem();
+		}
 	}
+
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
-		$output = "<label for=\"{$this->name}\">{$this->name}<table>
-			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->selected->getName()}\" selected{$disabledString}/></td><td>{$this->selected->renderForForm($disabled)}</td></tr>
-			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->notSelected->getName()}\"{$disabledString}/></td><td>{$this->notSelected->renderForForm($disabled)}</td></tr>
-			</table></label>";
+		$output = "<label for=\"{$this->name}\">{$this->name}<table style=\"border-left:1px solid\">";
+		$tableRows = array(
+			array("value" => "", "checked" => false, "body" => "None"),
+			array("value" => $this->default->getName(), "checked" => false, "body" => $this->default->renderForForm($disabled)),
+			array("value" => $this->alternative->getName(), "checked" => false, "body" => $this->alternative->renderForForm($disabled)),
+
+		);
+		if (!$this->value) {
+			$tableRows[0]['checked'] = true;
+		}
+		else if ($this->value == $this->default->getName()) {
+			$tableRows[1]['checked'] = true;
+		}
+		else if ($this->value == $this->alternative->getName()) {
+			$tableRows[2]['checked'] = true;
+		}
+		foreach ($tableRows as $row) {
+			$output .= "<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$row['value']}\"{$disabledString}";
+			$output .= ($row['checked']) ? " checked" : "";
+			$output .= "/></td><td>{$row['body']}</td></tr>";
+		}
+		$output .= "</table></label>";
 		return $output;
 	}
 	public function isValueValid($value) {
@@ -41,19 +64,30 @@ class EitherOrParameter extends DefaultParameter {
 		return false;
 	}
 
+	public function getAlternativeValue() {
+		if (!$this->value) {
+			return "";
+		}
+		if ($this->value == $this->default->getName()) {
+			return $this->alternative->getName();
+		}
+		return $this->default->getName();
+	}
+
 	public function acceptInput(array $input) {
-		if (!isset[$input[$this->name]) {
+		parent::acceptInput($input);
+		if (!isset($input[$this->name]) || !$input[$this->name]) {
 			$this->setValue("");
 			return;
 		}
 
 		$this->setValue($input[$this->name]);
-		if (!isset($input[$this->selected->getName()])) {
+		if (!isset($input[$this->value])) {
 			throw new ScriptException("Since {$this->name} is set to {$this->value}, that parameter must be specified.");
 		}
-		if (isset($input[$this->nonSelected->getName()])) {
-			throw new ScriptException("Since {$this->name} is set to {$this->value}, {$this->notSelected->getName()} is not allowed.");
+		if (isset($input[$this->getAlternativeValue()])) {
+			throw new ScriptException("Since {$this->name} is set to {$this->value}, {$this->getAlternativeValue()} is not allowed.");
 		}
-		$this->selected->setValue($input[$this->getValue()]);
+		$this->default->setValue($input[$this->getValue()]);
 	}
 }

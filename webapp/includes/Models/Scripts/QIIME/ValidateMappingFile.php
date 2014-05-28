@@ -10,6 +10,7 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class ValidateMappingFile extends DefaultScript {
 
@@ -26,11 +27,14 @@ class ValidateMappingFile extends DefaultScript {
 
 	public function initializeParameters() {
 		$mappingFp = new OldFileParameter("--mapping_fp", $this->project);
-		$this->parameterRelationships->requireParam($mappingFp);
+		$mappingFp->requireIf();
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$mappingFp->getName() => $mappingFp,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			$verboseParameter->getName() => $verboseParameter,
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/^.$/"),

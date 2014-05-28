@@ -10,12 +10,13 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class AlignSeqs extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
-		$this->parameterRelationships->requireParam($inputFp);
+		$inputFp->requireIf();
 
 		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
 			array("muscle", "pair_hm", "clustal", "blast", "uclust", "mafft"));
@@ -28,6 +29,9 @@ class AlignSeqs extends DefaultScript {
 		$this->parameterRelationships->allowParamIf($blastDb, $alignmentMethod, "pynast");
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFp->getName() => $inputFp,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--template_fp" => new OldFileParameter("--template_fp", $this->project),
 				// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]

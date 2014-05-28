@@ -10,14 +10,18 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class MakePhylogeny extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputFp = new OldFileParameter("--input_fp", $this->project);
-		$this->parameterRelationships->requireParam($inputFp);
+		$inputFp->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFp->getName() => $inputFp,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--tree_method" => new ChoiceParameter("--tree_method", "fasttree", 
 				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),

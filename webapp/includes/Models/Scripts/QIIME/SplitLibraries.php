@@ -10,18 +10,23 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class SplitLibraries extends DefaultScript {
 
 	public function initializeParameters() {
 		$map = new OldFileParameter("--map", $this->project);
-		$this->parameterRelationships->requireParam($map);
-		$fasta= new OldFileParameter("--fasta", $this->project);
-		$this->parameterRelationships->requireParam($fasta);
+		$map->requireIf();
+		$fasta = new OldFileParameter("--fasta", $this->project);
+		$fasta->requireIf();
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$map->getName() => $map, 
+			$fasta->getName() => $fasta, 
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			$verboseParameter->getName() => $verboseParameter,
 			"--qual" => new OldFileParameter("--qual", $this->project),
 			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),

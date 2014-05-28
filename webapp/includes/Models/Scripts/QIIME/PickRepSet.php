@@ -10,14 +10,18 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class PickRepSet extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputFile = new OldFileParameter("--input_file", $this->project);
-		$this->parameterRelationships->requireParam($inputFile);
+		$inputFile->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFile->getName() => $inputFile,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--fasta_file" => new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
 			"--rep_set_picking_method" => new ChoiceParameter("--rep_set_picking_method", "first", 

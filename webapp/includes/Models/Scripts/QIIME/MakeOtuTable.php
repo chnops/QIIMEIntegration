@@ -10,17 +10,22 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class MakeOtuTable extends DefaultScript {
 
 	public function initializeParameters() {
 		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
-		$this->parameterRelationships->requireParam($otuMapFile);
+		$otuMapFile->requireIf();
 		// TODO dynamic default / no default
 		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom");
-		$this->parameterRelationships->requireParam($outputBiomFp);
+		$outputBiomFp->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$otuMapFile->getName() => $otuMapFile,
+			$outputBiomFp->getName() => $outputBiomFp, 
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--taxonomy" => new OldFileParameter("--taxonomy", $this->project),
 			"--exclude_otus_fp" => new OldFileParameter("--exclude_otus_fp", $this->project),
