@@ -10,12 +10,13 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class AssignTaxonomy extends DefaultScript {
 
 	public function initializeParameters() {
-		$assignmentMethod = new ChoiceParameter("--assignment_method", "uclust", 
-			array("rdp", "blast", "rtax", "mothur", "tax2tree", "uclust"));
+		$assignmentMethod = new ChoiceParameter("--assignment_method", "rdp", 
+			array("rdp", "blast", "rtax", "mothur", "tax2tree"));
 		$read1SeqsFp = new OldFileParameter("--read_1_seqs_fp", $this->project);
 		$read2SeqsFp = new OldFileParameter("--read_2_seqs_fp", $this->project);
 		$singleOk = new TrueFalseParameter("--single_ok");
@@ -25,9 +26,10 @@ class AssignTaxonomy extends DefaultScript {
 		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", "/.*/"); // TODO really complex regex
 		$confidence = new TextArgumentParameter("--confidence", "0.8", "/.*/"); // TODO decimal between 0 and 1
 		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", "/\\d+/"); // TODO units = MB
-		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", "/.*/"); // TODO decimal between 0 and 1
-		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", "/.*/");  // TODO decimal between 0 and 1
-		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", "/\\d+/"); 
+//		TODO not supported in all macqiime version
+//		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", "/.*/"); // TODO decimal between 0 and 1
+//		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", "/.*/");  // TODO decimal between 0 and 1
+//		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", "/\\d+/"); 
 
 		$this->parameterRelationships->allowParamIf($read1SeqsFp, $assignmentMethod, "rtax");
 		$this->parameterRelationships->allowParamIf($read2SeqsFp, $assignmentMethod, "rtax");
@@ -39,9 +41,9 @@ class AssignTaxonomy extends DefaultScript {
 		$this->parameterRelationships->allowParamIf($confidence, $assignmentMethod, "rdp");
 		$this->parameterRelationships->allowParamIf($rdpMaxMemory, $assignmentMethod, "rdp");
 		$this->parameterRelationships->allowParamIf($confidence, $assignmentMethod, "mothur");
-		$this->parameterRelationships->allowParamIf($uclustMinConsensusFraction, $assignmentMethod, "uclust");
-		$this->parameterRelationships->allowParamIf($uclustSimilarity, $assignmentMethod, "uclust");
-		$this->parameterRelationships->allowParamIf($uclustMaxAccepts, $assignmentMethod, "uclust");
+//		$this->parameterRelationships->allowParamIf($uclustMinConsensusFraction, $assignmentMethod, "uclust");
+//		$this->parameterRelationships->allowParamIf($uclustSimilarity, $assignmentMethod, "uclust");
+//		$this->parameterRelationships->allowParamIf($uclustMaxAccepts, $assignmentMethod, "uclust");
 
 		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project);
 			// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 

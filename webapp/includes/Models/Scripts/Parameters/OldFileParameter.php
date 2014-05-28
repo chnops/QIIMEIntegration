@@ -33,10 +33,11 @@ class OldFileParameter extends DefaultParameter {
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
-		$output = "<select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
+		$output = "{$this->name}<select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		if (!empty($uploadedFiles)) {
+			$output .= "<option value=\"\">None</option>";
 			$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
 
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name');

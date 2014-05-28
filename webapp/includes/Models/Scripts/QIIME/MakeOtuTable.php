@@ -16,7 +16,8 @@ class MakeOtuTable extends DefaultScript {
 	public function initializeParameters() {
 		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
 		$this->parameterRelationships->requireParam($otuMapFile);
-		$outputBiomFp = new OldFileParameter("--output_biom_fp", $this->project);
+		// TODO dynamic default / no default
+		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom");
 		$this->parameterRelationships->requireParam($outputBiomFp);
 
 		$this->parameterRelationships->makeOptional(array(

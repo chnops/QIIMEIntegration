@@ -74,7 +74,7 @@ class PickOtus extends DefaultScript {
 				array("abundance", "length", "None")),
 			"--sizeorder" => new TrueFalseParameter("--sizeorder"),
 				//TODO Requires that --usearch61_sort_method be abundance. [default: False]
-			"--threads" => new TextArgumentParameter("--threads", "1.0", "/.*/"), 
+//			"--threads" => new TextArgumentParameter("--threads", "1.0", "/.*/"),  TODO not supported in all MacQIIME versions 
 				// TODO this one is tough...
 		));
 	}
