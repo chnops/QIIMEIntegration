@@ -20,4 +20,13 @@ class TrueFalseParameter extends DefaultParameter {
 		$checked = ($this->value) ? " checked" : "";
 		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name}</label>";
 	}
+
+	public function acceptInput(array $input) {
+		if (!isset($input[$this->name])) {
+			$this->setValue(false);
+		}
+		else {
+			$this->setValue(true);
+		}
+	}
 }

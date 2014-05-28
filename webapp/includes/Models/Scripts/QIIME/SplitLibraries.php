@@ -20,9 +20,9 @@ class SplitLibraries extends DefaultScript {
 		$this->parameterRelationships->requireParam($fasta);
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
-		$this->parameterRelationships->addDefaultForParam($verboseParameter, false);
 
 		$this->parameterRelationships->makeOptional(array(
+			$verboseParameter->getName() => $verboseParameter,
 			"--qual" => new OldFileParameter("--qual", $this->project),
 			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
 			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),

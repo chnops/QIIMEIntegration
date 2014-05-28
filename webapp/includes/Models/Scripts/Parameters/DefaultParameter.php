@@ -41,4 +41,10 @@ class DefaultParameter implements ParameterI {
 	public function isValueValid($value) {
 		return true;
 	}
+
+	public function acceptInput(array $input) {
+		if (isset($input[$this->name])) {
+			$this->setValue($input[$this->name]);
+		}
+	}
 }

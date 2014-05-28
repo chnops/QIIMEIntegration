@@ -43,14 +43,10 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	}
 
 	public function acceptInput(array $input) {
-		$input = $this->parameterRelationships->incorporateDefaults($input);
 		$inputErrors = $this->parameterRelationships->getViolations($input);
-		$parameters = $this->getParameters();
-		
-		foreach ($input as $inputName => $inputValue) {
-			$parameter = $parameters[$inputName];
+		foreach ($this->getParameters() as $name => $parameter) {
 			try {
-				$parameter->setValue($inputValue);
+				$parameter->acceptInput($input);
 			}
 			catch (ScriptException $ex) {
 				$inputErrors[] = $ex->getMessage();

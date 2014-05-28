@@ -29,9 +29,9 @@ class ValidateMappingFile extends DefaultScript {
 		$this->parameterRelationships->requireParam($mappingFp);
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
-		$this->parameterRelationships->addDefaultForParam($verboseParameter, false);
 
 		$this->parameterRelationships->makeOptional(array(
+			$verboseParameter->getName() => $verboseParameter,
 			"--output_dir" => new NewFileParameter("--output_dir", ""),
 			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/^.$/"),
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),

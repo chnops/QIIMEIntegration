@@ -18,40 +18,6 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		$this->alwaysRequired[] = $parameter->getName();
 	}
 
-	private $defaults = array();
-	public function addDefaultForParam(ParameterI $parameter, $default) {
-		$this->allParameters[$parameter->getName()] = $parameter;
-		$this->defaults[$parameter->getName()] = $default;
-	}
-	public function incorporateDefaults($values) {
-		foreach ($this->defaults as $argName => $default) {
-			if (!isset($values[$argName])) {
-				$values[$argName] = $default;
-			}
-		}
-		foreach ($this->links as $link) {
-			$eitherOr = $link[0];
-			$defaultName = $link[1];
-			$alternativeName = $link[2];
-			if (isset($values[$defaultName])) {
-			   	if (isset($values[$alternativeName])) {
-					$this->linkViolations[] = "You can choose either {$defaultName} or {$alternativeName}; you cannot have both.";
-				}
-				else {
-					$eitherOr->setValue($defaultName);
-					$eitherOr->getDefault()->setValue($values[$defaultName]);
-				}
-			}
-			else if (isset($values[$alternativeName])) {
-				$eitherOr->setValue($alternativeName);
-				$eitherOr->getAlternative()->setValue($values[$alternativeName]);
-			}
-			unset($values[$defaultName]);
-			unset($values[$alternativeName]);
-		}
-		return $values;
-	}
-
 	private $triggers = array();
 	private $usuallyExcluded = array();
 	private $conditionalAllowers = array();
