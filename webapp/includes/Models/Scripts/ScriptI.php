@@ -16,7 +16,7 @@ interface ScriptI {
 	public function initializeParameters();
 
 	// output
-	public function renderAsForm();
+	public function renderAsForm($disabled);
 	public function renderCommand();
 
 	// input

@@ -10,7 +10,7 @@ class Label extends DefaultParameter {
 	public function renderForOperatingSystem() {
 		return "";
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
 		return $this->value;
 	}
 }

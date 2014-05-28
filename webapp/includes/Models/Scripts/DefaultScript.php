@@ -24,16 +24,19 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	public function getParameters() {
 		return $this->parameterRelationships->getSortedParameters();
 	}
-	public function renderAsForm() {
+	public function renderAsForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
 		$form = "<form method=\"POST\"><h4>{$this->getScriptTitle()}</h4>\n";
 		foreach ($this->getParameters() as $parameter) {
-			$form .= $parameter->renderForForm() . "\n";
+			$form .= $parameter->renderForForm($disabled) . "\n";
 		}
-		$form .= "<input type=\"hidden\" name=\"step\" value=\"run\"/>
-			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"/>
-			<button type=\"submit\">Run</button>\n";
+		$form .= "<input type=\"hidden\" name=\"step\" value=\"run\"{$disabledString}/>
+			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"{$disabledString}/>
+			<button type=\"submit\"{$disabledString}>Run</button>\n";
 
-		$form .= $this->parameterRelationships->renderFormCode($this);
+		if (!$disabled) {
+			$form .= $this->parameterRelationships->renderFormCode($this);
+		}
 
 		$form .= "</form>\n";
 		return $form;

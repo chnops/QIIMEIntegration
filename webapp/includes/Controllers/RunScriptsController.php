@@ -98,11 +98,18 @@ class RunScriptsController extends Controller {
 	}
 
 	public function getForm() {
-		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+		if ($this->project) {
+			$project = $this->project;
+			$shouldBeDisabled = false;
+		}
+		else {
+			$project = $this->workflow->getNewProject();
+			$shouldBeDisabled = true;
+		}
 		$scripts = $project->getScripts();
 		$form = "";
 		foreach ($scripts as $script) {
-			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm()}</div>\n";
+			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm($shouldBeDisabled)}</div>\n";
 		}
 		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
 		if ($this->scriptId) {

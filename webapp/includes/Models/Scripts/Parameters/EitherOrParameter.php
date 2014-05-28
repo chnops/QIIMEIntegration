@@ -21,7 +21,8 @@ class EitherOrParameter extends DefaultParameter {
 		}
 		return "";
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
 		$defaultSelected = " checked";
 		$alternativeSelected = "";
 		if ($this->value == $this->alternative->getName()) {
@@ -29,8 +30,8 @@ class EitherOrParameter extends DefaultParameter {
 			$alternativeSelected = " checked";
 		}
 		$output = "<label for=\"{$this->name}\">{$this->name}<table>
-			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$defaultSelected}/></td><td>{$this->default->renderForForm()}</td></tr>
-			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$alternativeSelected}/></td><td>{$this->alternative->renderForForm()}</td></tr>
+			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$defaultSelected}{$disabledString}/></td><td>{$this->default->renderForForm($disabled)}</td></tr>
+			<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$alternativeSelected}{$disabledString}/></td><td>{$this->alternative->renderForForm($disabled)}</td></tr>
 			</table></label>";
 		return $output;
 	}

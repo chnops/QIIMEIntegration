@@ -19,8 +19,9 @@ class DefaultParameter implements ParameterI {
 		}
 		return "";
 	}
-	public function renderForForm() {
-		return "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";
+	public function renderForForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
+		return "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"{$disabledString}/></label>";
 	}
 	public function setValue($value) {
 		if (!$this->isValueValid($value)) {

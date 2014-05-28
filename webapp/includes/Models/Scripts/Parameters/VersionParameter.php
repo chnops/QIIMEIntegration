@@ -14,7 +14,7 @@ class VersionParameter extends DefaultParameter {
 		return "";
 	}
 
-	public function renderForForm() {
+	public function renderForForm($disabled) {
 		// TODO get actual version info
 		return "<a class=\"button\" onclick=\"alert('{$this->versionString}');\">Version</a>";
 	}

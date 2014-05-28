@@ -13,7 +13,7 @@ class HelpParameter extends DefaultParameter {
 	public function renderForOperatingSystem() {
 		return "";
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
 		return "<a href=\"public/manual/{$this->script->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
 	}
 }
