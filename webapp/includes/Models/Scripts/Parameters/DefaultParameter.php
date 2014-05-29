@@ -113,4 +113,8 @@ class DefaultParameter implements ParameterI {
 			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);
 		}
 	}
+	public function linkTo(ParameterI $parameter) {
+		$eitherOr = new EitherOrParameter($this, $parameter);
+		return $eitherOr;
+	}
 }

@@ -24,11 +24,11 @@ class SplitLibraries extends DefaultScript {
 
 		$barcodeType = new ChoiceParameter("--barcode-type", "golay_12", array("hamming_8", "golay_12", "variable_length"));
 		$b = new TextArgumentParameter("-b", "", "/\\d+\\/");
-		$eitherBarcode = $this->parameterRelationships->linkParams($barcodeType, $b);
+		$eitherBarcode = $barcodeType->linkTo($b);
 
 		$maxAmbig = new TextArgumentParameter("--max-ambig", "6", "/\\d+/");
 		$truncateAmbiBases = new TrueFalseParameter("--truncate_ambi_bases");
-		$eitherAmbig = $this->parameterRelationships->linkParams($maxAmbig, $truncateAmbiBases);
+		$eitherAmbig = $maxAmbig->linkTo($truncateAmbiBases);
 
 		$reversePrimers = new ChoiceParameter("--reverse_primers", "disable", array("disable", "truncate_only", "truncate_remove"));
 		$reversePrimerMismatches = new TextArgumentParameter("--reverse_primer_mismatches", "0", "/\\d+/");

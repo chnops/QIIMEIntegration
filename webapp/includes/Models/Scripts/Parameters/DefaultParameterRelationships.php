@@ -14,14 +14,7 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 	private $alwaysRequired = array();
 	private $usuallyOptional = array();
 	private $conditionalRequirers = array();
-
 	private $links = array();
-	public function linkParams(ParameterI $default, ParameterI $alternative) {
-		$eitherOr = new EitherOrParameter($default, $alternative);
-		$this->allParameters[$eitherOr->getName()] = $eitherOr;
-		$this->links[] = array($eitherOr, $default->getName(), $alternative->getName());
-		return $eitherOr;
-	}
 
 	public function makeOptional(array $parameters) {
 		$this->allParameters = array_merge($this->allParameters, $parameters);

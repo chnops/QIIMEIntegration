@@ -53,10 +53,10 @@ class AssignTaxonomy extends DefaultScript {
 				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
 				// TODO build in files
-		$blastDatabase = $this->parameterRelationships->linkParams($referenceSeqsFp, $blastDb);
+		$eitherBlastDatabase = $referenceSeqsFp->linkTo($blastDb);
 
 		$idToTaxonomyFp->requireIf($assignmentMethod, "blast");
-		$blastDatabase->requireIf($assignmentMethod, "blast");
+		$eitherBlastDatabase->requireIf($assignmentMethod, "blast");
 		$treeFp->requireIf($assignmentMethod, "tax2tree");
 		$treeFp->excludeButAllowIf($assignmentMethod, "tax2tree");
 
@@ -78,7 +78,7 @@ class AssignTaxonomy extends DefaultScript {
 			$confidence->getName() => $confidence,
 			$rdpMaxMemory->getName() => $rdpMaxMemory,
 			$idToTaxonomyFp->getName() => $idToTaxonomyFp,
-			$blastDatabase->getName() => $blastDatabase,
+			$eitherBlastDatabase->getName() => $eitherBlastDatabase,
 			$treeFp->getName() => $treeFp,
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
