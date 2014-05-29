@@ -18,19 +18,19 @@ class PickRepSet extends DefaultScript {
 		$inputFile = new OldFileParameter("--input_file", $this->project);
 		$inputFile->requireIf();
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$inputFile->getName() => $inputFile,
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--fasta_file" => new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
-			"--rep_set_picking_method" => new ChoiceParameter("--rep_set_picking_method", "first", 
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $inputFile,
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 new TrueFalseParameter("--verbose"),
+			 new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
+			 new ChoiceParameter("--rep_set_picking_method", "first", 
 				array("random", "longest", "most_abundant", "first")),
-			"--result_fp" => new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
-			"--log_fp" => new NewFileParameter("--log_fp", ""), 
-			"--sort_by" => new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id")),
-			"--reference_seqs_fp" => new OldFileParameter("--reference_seqs_fp", $this->project),
-		));
+			 new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
+			 new NewFileParameter("--log_fp", ""), 
+			 new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id")),
+			 new OldFileParameter("--reference_seqs_fp", $this->project)
+		);
 	}
 	public function getScriptName() {
 		return "pick_rep_set.py";

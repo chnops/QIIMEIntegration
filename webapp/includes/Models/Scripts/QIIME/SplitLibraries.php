@@ -32,50 +32,57 @@ class SplitLibraries extends DefaultScript {
 
 		$reversePrimers = new ChoiceParameter("--reverse_primers", "disable", array("disable", "truncate_only", "truncate_remove"));
 		$reversePrimerMismatches = new TextArgumentParameter("--reverse_primer_mismatches", "0", "/\\d+/");
-		$this->parameterRelationships->allowParamIf($reversePrimerMismatches, $reversePrimers, true);
+		$reversePrimerMismatches->excludeButAllowIf($reversePrimers);
 
 		$qual = new OldFileParameter("--qual", $this->project);
 		$minQualScore = new TextArgumentParameter("--min-qual-score", "25", "/\\d+/");
 		$recordQualScores = new TrueFalseParameter("--record_qual_scores");
-		$this->parameterRelationships->allowParamIf($minQualScore, $qual, true);
-		$this->parameterRelationships->allowParamIf($recordQualScores, $qual, true);
+		$minQualScore->excludeButAllowIf($qual);
+		$recordQualScores->excludeButAllowIf($qual);
 		$qualScoreWindow = new TextArgumentParameter("--qual_score_window", "0", "/\\d+/");
 		$discardBadWindows = new TrueFalseParameter("--discard_bad_windows");
-		$this->parameterRelationships->allowParamIf($discardBadWindows, $qualScoreWindow, true);
-//		$this->parameterRelationships->allowParamIf($qualScoreWindow, $qual, true);
+		$qualScoreWindow->excludeButAllowIf($qual);
+		$discardBadWindows->excludeButAllowIf($qualScoreWindow);
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$map->getName() => $map, 
-			$fasta->getName() => $fasta, 
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			$verboseParameter->getName() => $verboseParameter,
-			"--qual" => new OldFileParameter("--qual", $this->project),
-			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
-			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-  			"--max-seq-length" => new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
-  			"--trim-seq-length" => new TrueFalseParameter("--trim-seq-length"),
-  			"--min-qual-score" => new TextArgumentParameter("--min-qual-score", "25", "/\\d+/"),
-			$eitherBarcode->getName() => $eitherBarcode,
-			$eitherAmbig->getName() => $eitherAmbig,
-  			"--keep-primer" =>  new TrueFalseParameter("--keep-primer"),
-			"--keep-barcode" => new TrueFalseParameter("--keep-barcode"),
-  			"--max-homopolymer" => new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
-			"--max-primer-mismatch" => new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
-			"--max-barcode-errors" => new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
-			"--disable_bc_correction" => new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
-			"--disable_primers" => new TrueFalseParameter("--disable_primers"),
-			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
-			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-	  		"--max-seq-length" => new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
-	  		"--trim-seq-length" => new TrueFalseParameter("--trim-seq-length"),
-			"--median_length_filtering" => new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $map, 
+			 $fasta, 
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 $verboseParameter,
+			 new OldFileParameter("--qual", $this->project),
+			 new TrueFalseParameter("--remove_unassigned"),
+			 new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+  			 new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+  			 new TrueFalseParameter("--trim-seq-length"),
+  			 new TextArgumentParameter("--min-qual-score", "25", "/\\d+/"),
+			 $eitherBarcode,
+			 $eitherAmbig,
+			$reversePrimers,
+			$reversePrimerMismatches,
+			$qual,
+			$minQualScore,
+			$recordQualScores,
+			$qualScoreWindow,
+			$discardBadWindows,
+  			  new TrueFalseParameter("--keep-primer"),
+			 new TrueFalseParameter("--keep-barcode"),
+  			 new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
+			 new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
+			 new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
+			 new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
+			 new TrueFalseParameter("--disable_primers"),
+			 new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
+			 new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+			 new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+			 new TrueFalseParameter("--trim-seq-length"),
+			 new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
 
 
-			"--dir-prefix" => new NewFileParameter("--dir-prefix", "."),
-			"--start-numbering-at" => new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
-			"--retain_unassigned_reads" => new TrueFalseParameter("--retain_unassigned_reads"),
-		));
+			 new NewFileParameter("--dir-prefix", "."),
+			 new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
+			 new TrueFalseParameter("--retain_unassigned_reads")
+		);
 	}
 	public function getScriptName() {
 		return "split_libraries.py";

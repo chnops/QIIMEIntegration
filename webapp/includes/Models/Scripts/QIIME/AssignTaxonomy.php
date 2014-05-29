@@ -63,29 +63,29 @@ class AssignTaxonomy extends DefaultScript {
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$inputFastaFp->requireIf();
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$inputFastaFp->getName() => $inputFastaFp,
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			$assignmentMethod->getName() => $assignmentMethod,
-			$read1SeqsFp->getName() => $read1SeqsFp,
-			$read2SeqsFp->getName() => $read2SeqsFp,
-			$singleOk->getName() => $singleOk,
-			$noSingleOkGeneric->getName() => $noSingleOkGeneric,
-			$readIdRegex->getName() => $readIdRegex,
-			$ampliconIdRegex->getName() => $ampliconIdRegex,
-			$headerIdRegex->getName() => $headerIdRegex,
-			$confidence->getName() => $confidence,
-			$rdpMaxMemory->getName() => $rdpMaxMemory,
-			$idToTaxonomyFp->getName() => $idToTaxonomyFp,
-			$eitherBlastDatabase->getName() => $eitherBlastDatabase,
-			$treeFp->getName() => $treeFp,
-			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--output_dir" => new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
-			"--e_value" => new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
-			"--training_data_properties_fp" => new OldFileParameter("--training_data_properties_fp", $this->project),
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $inputFastaFp,
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 $assignmentMethod,
+			 $read1SeqsFp,
+			 $read2SeqsFp,
+			 $singleOk,
+			 $noSingleOkGeneric,
+			 $readIdRegex,
+			 $ampliconIdRegex,
+			 $headerIdRegex,
+			 $confidence,
+			 $rdpMaxMemory,
+			 $idToTaxonomyFp,
+			 $eitherBlastDatabase,
+			 $treeFp,
+			 new TrueFalseParameter("--verbose"),
+			 new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
+			 new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
+			 new OldFileParameter("--training_data_properties_fp", $this->project)
 				// TODO This option is overridden by the -t and -r options.
-			));
+			);
 	}
 	public function getScriptName() {
 		return "assign_taxonomy.py";

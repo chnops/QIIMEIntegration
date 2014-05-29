@@ -18,18 +18,18 @@ class MakePhylogeny extends DefaultScript {
 		$inputFp = new OldFileParameter("--input_fp", $this->project);
 		$inputFp->requireIf();
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$inputFp->getName() => $inputFp,
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--tree_method" => new ChoiceParameter("--tree_method", "fasttree", 
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $inputFp,
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 new TrueFalseParameter("--verbose"),
+			 new ChoiceParameter("--tree_method", "fasttree", 
 				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),
-			"--result_fp" => new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
-			"--log_fp" => new NewFileParameter("--log_fp", ""),
-			"--root_method" => new ChoiceParameter("--root_method", "tree_method_default",
-				array("midpoint", "tree_method_default")),
-		));
+			 new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
+			 new NewFileParameter("--log_fp", ""),
+			 new ChoiceParameter("--root_method", "tree_method_default",
+				array("midpoint", "tree_method_default"))
+		);
 	}
 	public function getScriptName() {
 		return "make_phylogeny.py";

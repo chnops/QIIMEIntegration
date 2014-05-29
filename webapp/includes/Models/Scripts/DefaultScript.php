@@ -8,6 +8,7 @@ use Models\Scripts\Parameters\VersionParameter;
 abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
 	protected $project = null;
+	protected $parameters;
 	protected $parameterRelationships;
 
 	public function __construct(\Models\Project $project) {
@@ -18,17 +19,13 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		$versionParameter = new VersionParameter($this->project, $this->getScriptName());
 		$helpParameter->excludeButAllowIf();
 		$versionParameter->excludeButAllowIf();
-		$this->parameterRelationships->makeOptional(
-			array(
-				$helpParameter->getName() => $helpParameter,
-				$versionParameter->getName() => $versionParameter,
-			)
-		);
+		$this->parameters = array($helpParameter->getName() => $helpParameter,
+			$versionParameter->getName() => $versionParameter,);
 
 		$this->initializeParameters();
 	}
 	public function getParameters() {
-		return $this->parameterRelationships->getSortedParameters();
+		return $this->parameters;
 	}
 	public function renderAsForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
@@ -50,7 +47,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
 	public function acceptInput(array $input) {
 		$inputErrors = array();
-		foreach ($this->getParameters() as $name => $parameter) {
+		foreach ($this->getParameters() as $parameter) {
 			try {
 				$parameter->acceptInput($input);
 			}

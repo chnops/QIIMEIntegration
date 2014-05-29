@@ -31,19 +31,19 @@ class ValidateMappingFile extends DefaultScript {
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$mappingFp->getName() => $mappingFp,
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			$verboseParameter->getName() => $verboseParameter,
-			"--output_dir" => new NewFileParameter("--output_dir", ""),
-			"--char_replace" => new TextArgumentParameter("--char_replace", "_", "/^.$/"),
-			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),
-			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes"),
-			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check"),
-			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),
-			"--suppress_html" => new TrueFalseParameter("--suppress_html"),
-		));
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $mappingFp,
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 $verboseParameter,
+			 new NewFileParameter("--output_dir", ""),
+			 new TextArgumentParameter("--char_replace", "_", "/^.$/"),
+			 new TrueFalseParameter("--not_barcoded"),
+			 new TrueFalseParameter("--variable_len_barcodes"),
+			 new TrueFalseParameter("--disable_primer_check"),
+			 new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),
+			 new TrueFalseParameter("--suppress_html")
+		);
 	}
 	public function getScriptName() {
 		return $this->scriptName;

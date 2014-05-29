@@ -28,22 +28,22 @@ class AlignSeqs extends DefaultScript {
 		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
 		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$inputFp->getName() => $inputFp,
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			$alignmentMethod->getName() => $alignmentMethod,
-			$pairwiseAlignmentMethod->getName() => $pairwiseAlignmentMethod,
-			$blastDb->getName() => $blastDb,
-			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--template_fp" => new OldFileParameter("--template_fp", $this->project),
-				// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
-			"--min_length" => new TextArgumentParameter("--min_length", "", "/.*/"),
-				// TODO [default: 75% of the median input sequence length]
-			"--min_percent_id" => new TextArgumentParameter("--min_percent_id", "0.75", "/.*/"),
-			"--muscle_max_memory" => new TextArgumentParameter("--muscle_max_memory", "", "/.*/"),
-			"--output_dir" => new NewFileParameter("--output_dir", "_aligned"), // TODO dynamic default
-		));
+		array_push($this->parameters,
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFp,
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			$alignmentMethod,
+			$pairwiseAlignmentMethod,
+			$blastDb,
+			new TrueFalseParameter("--verbose"),
+			new OldFileParameter("--template_fp", $this->project),
+			// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
+			new TextArgumentParameter("--min_length", "", "/.*/"),
+			// TODO [default: 75% of the median input sequence length]
+			new TextArgumentParameter("--min_percent_id", "0.75", "/.*/"),
+			new TextArgumentParameter("--muscle_max_memory", "", "/.*/"),
+			new NewFileParameter("--output_dir", "_aligned") // TODO dynamic default
+		);
 	}
 	public function getScriptName() {
 		return "align_seqs.py";

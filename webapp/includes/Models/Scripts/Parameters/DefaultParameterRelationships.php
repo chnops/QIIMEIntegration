@@ -3,10 +3,6 @@
 namespace Models\Scripts\Parameters;
 
 class DefaultParameterRelationships implements ParameterRelationshipsI {
-	// TODO allow parameter or array
-	
-	private $allParameters = array();
-
 	// TODO delete
 	private $triggers = array();
 	private $usuallyExcluded = array();
@@ -15,21 +11,6 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 	private $usuallyOptional = array();
 	private $conditionalRequirers = array();
 	private $links = array();
-
-	public function makeOptional(array $parameters) {
-		$this->allParameters = array_merge($this->allParameters, $parameters);
-		return $this->allParameters;
-	}
-
-	public function getSortedParameters() {
-		$sortedParameters = array();
-		// follow up with the rest of the optional ones
-		foreach ($this->allParameters as $name => $parameter) {
-			$sortedParameters[$name] = $parameter;
-		}
-		$this->allParameters = $sortedParameters;
-		return $this->allParameters;
-	}
 
 	public function renderFormCode(\Models\Scripts\ScriptI $script) {
 		$htmlId = $script->getHtmlId();

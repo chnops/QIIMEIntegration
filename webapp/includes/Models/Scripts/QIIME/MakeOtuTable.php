@@ -21,15 +21,15 @@ class MakeOtuTable extends DefaultScript {
 		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom");
 		$outputBiomFp->requireIf();
 
-		$this->parameterRelationships->makeOptional(array(
-			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
-			$otuMapFile->getName() => $otuMapFile,
-			$outputBiomFp->getName() => $outputBiomFp, 
-			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
-			"--verbose" => new TrueFalseParameter("--verbose"),
-			"--taxonomy" => new OldFileParameter("--taxonomy", $this->project),
-			"--exclude_otus_fp" => new OldFileParameter("--exclude_otus_fp", $this->project),
-		));
+		array_push($this->parameters,
+			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 $otuMapFile,
+			 $outputBiomFp, 
+			 new Label("<p><strong>Optional Parameters</strong></p>"),
+			 new TrueFalseParameter("--verbose"),
+			 new OldFileParameter("--taxonomy", $this->project),
+			 new OldFileParameter("--exclude_otus_fp", $this->project)
+		);
 	}
 	public function getScriptName() {
 		return "make_otu_table.py";
