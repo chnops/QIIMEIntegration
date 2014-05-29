@@ -37,7 +37,7 @@ class ValidateMappingFile extends DefaultScript {
 			"--not_barcoded" => new TrueFalseParameter("--not_barcoded"),
 			"--variable_len_barcodes" => new TrueFalseParameter("--variable_len_barcodes"),
 			"--disable_primer_check" => new TrueFalseParameter("--disable_primer_check"),
-			"-j" => new TextArgumentParameter("-j", "", "/.*/"),
+			"--added_demultiplex_field" => new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),
 			"--suppress_html" => new TrueFalseParameter("--suppress_html"),
 		));
 	}
@@ -51,7 +51,10 @@ class ValidateMappingFile extends DefaultScript {
 		return "validate_mapping_file";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to take your map file, and tell you if you did it right.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to take your map file, and tell you if you did it right.</p>";
+		include "views/{$this->getHtmlId()}.html";
+		return ob_get_clean();
 	}
 
 }
