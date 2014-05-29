@@ -10,17 +10,17 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class SplitLibraries extends DefaultScript {
 
 	public function initializeParameters() {
 		$map = new OldFileParameter("--map", $this->project);
-		$this->parameterRelationships->requireParam($map);
-		$fasta= new OldFileParameter("--fasta", $this->project);
-		$this->parameterRelationships->requireParam($fasta);
+		$map->requireIf();
+		$fasta = new OldFileParameter("--fasta", $this->project);
+		$fasta->requireIf();
 
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
-		$this->parameterRelationships->addDefaultForParam($verboseParameter, false);
 
 		$barcodeType = new ChoiceParameter("--barcode-type", "golay_12", array("hamming_8", "golay_12", "variable_length"));
 		$b = new TextArgumentParameter("-b", "", "/\\d+\\/");
@@ -45,6 +45,17 @@ class SplitLibraries extends DefaultScript {
 //		$this->parameterRelationships->allowParamIf($qualScoreWindow, $qual, true);
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$map->getName() => $map, 
+			$fasta->getName() => $fasta, 
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
+			$verboseParameter->getName() => $verboseParameter,
+			"--qual" => new OldFileParameter("--qual", $this->project),
+			"--remove_unassigned" => new TrueFalseParameter("--remove_unassigned"),
+			"--min-seq-length" => new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+  			"--max-seq-length" => new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+  			"--trim-seq-length" => new TrueFalseParameter("--trim-seq-length"),
+  			"--min-qual-score" => new TextArgumentParameter("--min-qual-score", "25", "/\\d+/"),
 			$eitherBarcode->getName() => $eitherBarcode,
 			$eitherAmbig->getName() => $eitherAmbig,
   			"--keep-primer" =>  new TrueFalseParameter("--keep-primer"),

@@ -1,6 +1,7 @@
 <?php
 
 namespace Models\Scripts\Parameters;
+use \Models\Scripts\ScriptException;
 
 class HelpParameter extends DefaultParameter {
 
@@ -13,7 +14,13 @@ class HelpParameter extends DefaultParameter {
 	public function renderForOperatingSystem() {
 		return "";
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
 		return "<a href=\"public/manual/{$this->script->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
+	}
+
+	public function acceptInput(array $input) {
+		if (isset($input[$this->name])) {
+			throw new ScriptException("Using the help parameter is not allowed");
+		}
 	}
 }

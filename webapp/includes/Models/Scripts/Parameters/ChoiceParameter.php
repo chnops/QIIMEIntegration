@@ -11,8 +11,9 @@ class ChoiceParameter extends DefaultParameter {
 		$this->options = $options;
 	}
 
-	public function renderForForm() {
-		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\">\n";
+	public function renderForForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
+		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\"{$disabledString}>\n";
 		foreach ($this->options as $option) {
 			$selected = ($this->value == $option) ? " selected" : "";
 			$output .= "<option value=\"{$option}\"{$selected}>{$option}</option>\n";

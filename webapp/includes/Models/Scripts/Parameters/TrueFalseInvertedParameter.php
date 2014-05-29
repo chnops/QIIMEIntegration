@@ -15,8 +15,19 @@ class TrueFalseInvertedParameter extends DefaultParameter {
 			return "";
 		}
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
 		$checked = ($this->value) ? " checked" : "";
-		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}/> {$this->name}</label>";
+		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name}</label>";
+	}
+
+	public function acceptInput(array $input) {
+		parent::acceptInput($input);
+		if (!isset($input[$this->name])) {
+			$this->setValue(false);
+		}
+		else {
+			$this->setValue(true);
+		}
 	}
 }

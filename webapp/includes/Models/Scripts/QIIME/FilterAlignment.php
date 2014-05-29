@@ -10,14 +10,18 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class FilterAlignment extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
-		$this->parameterRelationships->requireParam($inputFastaFile);
+		$inputFastaFile->requireIf();
 
 		$this->parameterRelationships->makeOptional(array(
+			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFastaFile->getName() => $inputFastaFile,
+			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--output_dir" => new NewFileParameter("--output_dir", "."),
 			"--lane_mask_fp" => new OldFileParameter("--lane_mask_fp", $this->project),

@@ -10,12 +10,12 @@ use Models\Scripts\Parameters\TrueFalseInvertedParameter;
 use Models\Scripts\Parameters\NewFileParameter;
 use Models\Scripts\Parameters\OldFileParameter;
 use Models\Scripts\Parameters\ChoiceParameter;
+use Models\Scripts\Parameters\Label;
 
 class  extends DefaultScript {
 
 	public function initializeParameters() {
-//		$this->parameterRelationships->requireParam();
-//		$this->parameterRelationships->makeOptional();
+		// TODO implement
 	}
 	public function getScriptName() {
 		return "Implement me!";

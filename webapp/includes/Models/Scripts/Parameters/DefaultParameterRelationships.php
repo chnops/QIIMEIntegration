@@ -12,45 +12,6 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		$this->allParameters[$parameter->getName()] = $parameter;
 		$this->alwaysExcluded[] = $parameter->getName();
 	}
-	private $alwaysRequired = array();
-	public function requireParam(ParameterI $parameter) {
-		$this->allParameters[$parameter->getName()] = $parameter;
-		$this->alwaysRequired[] = $parameter->getName();
-	}
-
-	private $defaults = array();
-	public function addDefaultForParam(ParameterI $parameter, $default) {
-		$this->allParameters[$parameter->getName()] = $parameter;
-		$this->defaults[$parameter->getName()] = $default;
-	}
-	public function incorporateDefaults($values) {
-		foreach ($this->defaults as $argName => $default) {
-			if (!isset($values[$argName])) {
-				$values[$argName] = $default;
-			}
-		}
-		foreach ($this->links as $link) {
-			$eitherOr = $link[0];
-			$defaultName = $link[1];
-			$alternativeName = $link[2];
-			if (isset($values[$defaultName])) {
-			   	if (isset($values[$alternativeName])) {
-					$this->linkViolations[] = "You can choose either {$defaultName} or {$alternativeName}; you cannot have both.";
-				}
-				else {
-					$eitherOr->setValue($defaultName);
-					$eitherOr->getDefault()->setValue($values[$defaultName]);
-				}
-			}
-			else if (isset($values[$alternativeName])) {
-				$eitherOr->setValue($alternativeName);
-				$eitherOr->getAlternative()->setValue($values[$alternativeName]);
-			}
-			unset($values[$defaultName]);
-			unset($values[$alternativeName]);
-		}
-		return $values;
-	}
 
 	private $triggers = array();
 	private $usuallyExcluded = array();
@@ -64,16 +25,10 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		$this->conditionalAllowers[$allower->getName()][$value][] = $allowed->getName();
 	}
 
+	// TODO delete
+	private $alwaysRequired = array();
 	private $usuallyOptional = array();
 	private $conditionalRequirers = array();
-	public function requireParamIf(ParameterI $required, ParameterI $requirer, $value) {
-		$this->allParameters[$required->getName()] = $required;
-		$this->allParameters[$requirer->getName()] = $requirer;
-
-		$this->triggers[] = $requirer->getName();
-		$this->usuallyOptional[] = $required->getName();
-		$this->conditionalRequirers[$requirer->getname()][$value][] = $required->getName();
-	}
 
 	private $links = array();
 	private $linkViolations = array();
@@ -98,31 +53,11 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 			unset($this->allParameters[$name]);
 		}
 
-		$sortedParameters[] = new Label("<p><strong>Required Parameters</strong></p>");
-		foreach ($this->alwaysRequired as $name) {
-			$sortedParameters[$name] = $this->allParameters[$name];
-			unset($this->allParameters[$name]);
-		}
-		foreach ($this->usuallyOptional as $paramName) {
-			$sortedParameters[] = new Label("<div for=\"{$paramName}\">{$paramName} is now required</div>");
-		}
-
-		$sortedParameters[] = new Label("<p><strong>Optional Parameters</strong></p>");
 		$triggers = array_unique($this->triggers);
 		asort($triggers);
 		foreach ($triggers as $trigger) {
 			$sortedParameters[$trigger] = $this->allParameters[$trigger];
 			unset($this->allParameters[$trigger]);
-
-			if (isset($this->conditionalRequirers[$trigger])) {
-				$values = $this->conditionalRequirers[$trigger];
-				foreach ($values as $value => $associatedParameterNames) {
-					foreach ($associatedParameterNames as $parameterName) {
-						$sortedParameters[$parameterName] = $this->allParameters[$parameterName];
-						unset($this->allParameters[$parameterName]);
-					}
-				}
-			}
 
 			if (isset($this->conditionalAllowers[$trigger])) {
 				$values = $this->conditionalAllowers[$trigger];
@@ -151,23 +86,6 @@ class DefaultParameterRelationships implements ParameterRelationshipsI {
 		foreach ($this->alwaysExcluded as $name) {
 			if (isset($input[$name])) {
 				$violations[] = "Parameter {$name} should not have a value, but does";
-			}
-		}
-		foreach ($this->alwaysRequired as $name) {
-			if (!isset($input[$name])) {
-				$violations[] = "A required parameter was not found: {$name}";
-			}
-		}
-
-		foreach ($this->conditionalRequirers as $trigger => $requiredParams) {
-			foreach ($requiredParams as $value => $paramNames) {
-				if ($input[$trigger] == $value) {
-					foreach ($paramNames as $paramName) {
-						if (!isset($input[$paramName])) {
-							$violations[] = "If parameter {$trigger} is set to {$value}, {$paramName} is required";
-						}
-					}
-				}
 			}
 		}
 

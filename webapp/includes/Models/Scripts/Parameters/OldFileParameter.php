@@ -30,12 +30,14 @@ class OldFileParameter extends DefaultParameter {
 		$separator = (strlen($this->name) == 2) ? " " : "=";
 		return $this->name . $separator . "'" . $systemFileName . "'";
 	}
-	public function renderForForm() {
+	public function renderForForm($disabled) {
+		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
-		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\" size=\"5\">\n";
+		$output = "{$this->name}<select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		if (!empty($uploadedFiles)) {
+			$output .= "<option value=\"\">None</option>";
 			$output .= "<optgroup label=\"uploaded files\" class=\"big\">\n";
 
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name');
@@ -54,7 +56,7 @@ class OldFileParameter extends DefaultParameter {
 
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
-			$output .= "<optgroup label=\"generated files\" class=\"big\">\n";
+			$output .= "{$this->name}<optgroup label=\"generated files\" class=\"big\">\n";
 			
 			$generatedFilesFormatted = $helper->categorizeArray($generatedFiles, 'run_id', 'name');
 
@@ -70,8 +72,12 @@ class OldFileParameter extends DefaultParameter {
 				$output .= "</optgroup>\n";
 			}
 		}
+		$output .= "</select>\n"; // the </label> is here because if there is an error (below), the label needs to be closed early
 
-		$output .= "</select></label>\n";
-		return $output;
+		if (empty($uploadedFiles) && empty($generatedFiles)) {
+			$output = "<em>You must <a href=\"index.php?step=upload\">upload</a>
+			at least one file in order to use {$this->name}<em>";
+		}
+		return "<label for=\"{$this->name}\">" . $output . "</label>";
 	}
 }
