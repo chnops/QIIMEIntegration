@@ -109,10 +109,6 @@ abstract class Project {
 		return $this->uploadedFiles;
 	}
 	
-	public function getSystemNameForUploadedFile($userFileName) {
-		return $this->database->getUploadedFileSystemName($this->owner, $this->id, $userFileName);
-	}
-
 	public function getPastScriptRuns() {
 		if (empty($this->pastScriptRuns)) {
 			$pastRunsRaw = $this->database->getPastRuns($this->owner, $this->id);

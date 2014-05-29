@@ -70,7 +70,7 @@ class ViewResultsController extends Controller {
 			foreach ($generatedFilesFormatted as $runId => $files) {
 				$output .= "<h4>files from run {$runId}</h4><table>\n";
 				foreach ($files as $file) {
-					$output .= "<tr><td>{$file['name']}</td>
+					$output .= "<tr><td>" . htmlentities(preg_replace("/%FS%/", "/", $file['name'])) . "</td>
 						<td><a class=\"button\" onclick=\"previewFile('download.php?run={$file['run_id']}&file_name={$file['name']}&as_text=true')\">Preview</a></td>
 						<td><a class=\"button\" onclick=\"window.location='download.php?run={$file['run_id']}&file_name={$file['name']}'\">Download</a></td></tr>";
 				}

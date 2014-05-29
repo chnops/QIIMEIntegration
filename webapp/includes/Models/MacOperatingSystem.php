@@ -52,21 +52,9 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 
 	public function getDirContents($name) {
-		$nameParts = explode("/", $name);
-		foreach ($nameParts as $namePart) {
-			if (!$namePart) {
-				continue;
-			}
-			if (!$this->isValidFileName($namePart)) {
-				$exception = new OperatingSystemException("Unable to get directory contents");
-				$exception->setConsoleOutput("Invalid file name: " . htmlentities($name));
-				throw $exception;
-			}
-		}
-
 		$result = 0;
 		ob_start();
-		$code = "ls {$this->home}/{$name}";
+		$code = "ls " . escapeshellarg($this->home . "/" . $name);
 		system($code, $result);
 
 		if ($result) {
@@ -111,5 +99,36 @@ class MacOperatingSystem implements OperatingSystemI {
 			throw new \Exception("unable to check file name");
 		}
 		return $matchesRegex;
+	}
+
+	public function flattenDirsWithin($dirPath) {
+		$contents = $this->getDirContents($dirPath);
+		foreach ($contents as $currentFileName) {
+			ob_start();
+			system("if [ -d '{$this->home}{$dirPath}/{$currentFileName}' ]; then printf '1'; else printf '0'; fi;");
+			$isDir = ob_get_clean();
+			if ($isDir) {
+				$this->flattenDir($dirPath . "/" . $currentFileName);
+			}
+		}
+	}
+
+	public function flattenDir($dirPath) {
+		$fs = "%FS%";
+		$fullDirPath = $this->home . $dirPath;
+		$dirName = explode("/", $dirPath);
+		$dirName = $dirName[count($dirName) - 1];
+
+		$contents = $this->getDirContents($dirPath);
+		foreach ($contents as $currentFileName) {
+			ob_start();
+			system("if [ -d '{$fullDirPath}/{$currentFileName}' ]; then printf '1'; else printf '0'; fi;");
+			$isDir = ob_get_clean();
+			if ($isDir) {
+				$this->flattenDir($dirPath . "/" . $currentFileName);
+			}
+		}
+
+		system("cd {$fullDirPath};for file in `ls`; do if [ -f \$file ]; then mv \$file ../{$dirName}{$fs}\$file; fi; done;cd ..;rmdir {$dirName}");
 	}
 }

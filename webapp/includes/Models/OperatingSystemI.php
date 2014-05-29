@@ -9,4 +9,6 @@ interface OperatingSystemI {
 	public function getDirContents($name);
 	public function executeArbitraryScript($environmentSource, $projectDirectory, $script);
 	public function isValidFileName($name);
+	public function flattenDirsWithin($dirPath);
+	public function flattenDir($dirPath);
 }

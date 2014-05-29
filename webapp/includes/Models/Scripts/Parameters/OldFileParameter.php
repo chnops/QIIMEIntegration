@@ -46,7 +46,7 @@ class OldFileParameter extends DefaultParameter {
 				$output .= "<optgroup label=\"from run {$runId}\">\n";
 				foreach ($fileNames as $fileName) {
 					$selected = ($this->value == "../r{$runId}/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"../r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities($fileName) . "</option>\n";
+					$output .= "<option value=\"../r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities(preg_replace("/%FS%/", "/", $fileName)) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}

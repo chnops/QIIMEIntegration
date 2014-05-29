@@ -30,11 +30,11 @@ class RunScriptsController extends Controller {
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
 				$output .= "<li><strong>Run {$run['id']}</strong><br/>";
 				$output .= "<strong>Script name:</strong> {$run['name']}<br/>";
-				$output .= "<strong>User input:</strong> {$run['input']}<br/>";
+				$output .= "<strong>User input:</strong> " . htmlentities(preg_replace("/%FS%/", "/", $run['input'])) . "<br/>";
 
 				$output .= "<strong>Generated files:</strong><ul>";
 				foreach ($run['file_names'] as $fileName) {
-					$output .= "<li>{$fileName}</li>";
+					$output .= "<li>" . htmlentities(preg_replace("/%FS%/", "/", $fileName)) . "</li>";
 				}
 				$output .= "</ul>";
 

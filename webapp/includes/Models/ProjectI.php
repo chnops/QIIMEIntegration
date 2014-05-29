@@ -25,7 +25,6 @@ interface ProjectI {
 	// complex accessors
 	public function scriptExists($scriptName);
 	public function getVersion($scriptName);
-	public function getSystemNameForUploadedFile($userFileName); // TODO differentiate uploaded vs. generated
 	// (which may change during the execution of the script)
 	public function getProjectDir();
 	public function retrieveAllUploadedFiles();
