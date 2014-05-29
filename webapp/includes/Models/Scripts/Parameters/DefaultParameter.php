@@ -7,8 +7,11 @@ class DefaultParameter implements ParameterI {
 	protected $name;
 	protected $value;
 
-	private $isAlwaysRequired;
+	private $isAlwaysRequired = false;
 	private $requiringTriggers = array();
+
+	private $isEverExcluded = false;
+	private $allowingTriggers = array();
 
 	public function __construct($name, $value) {
 		$this->name = $name;
@@ -66,6 +69,33 @@ class DefaultParameter implements ParameterI {
 			}
 		}
 		else {
+			if ($this->isEverExcluded) {
+				$allowed = false;
+				$errorMessage = (empty($this->allowingTriggers)) ? 
+					"The parameter {$this->name} is not allowed" :
+					"The parameter {$this->name} is only allowed when:";
+
+				foreach ($this->allowingTriggers as $trigger) {
+					$triggerParam = $trigger['parameter'];
+					$triggerValue = $trigger['value'];
+					if ($triggerValue) {
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set to {$triggerValue}";
+						if ($triggerValue == $input[$triggerParam->getName()]) {
+							$allowed = true;
+						}
+					}
+					else {
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set";
+						if (isset($input[$triggerParam->getName()]) && ($input[$triggerParam->getName()])) {
+							$allowed = true;
+						}
+					}
+				}
+
+				if (!$allowed) {
+					throw new ScriptException($errorMessage);
+				}
+			}
 			$this->setValue($input[$this->name]);
 		}
 	}
@@ -76,5 +106,11 @@ class DefaultParameter implements ParameterI {
 			return;
 		}
 		$this->requiringTriggers[] = array ("parameter" => $trigger, "value" => $value);
+	}
+	public function excludeButAllowIf(ParameterI $trigger = null, $value = "") {
+		$this->isEverExcluded = true;
+		if ($trigger) {
+			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);
+		}
 	}
 }

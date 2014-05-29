@@ -18,20 +18,23 @@ class AlignSeqs extends DefaultScript {
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$inputFp->requireIf();
 
-		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
-			array("muscle", "pair_hm", "clustal", "blast", "uclust", "mafft"));
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
 			array("pynast", "infernal", "clustalw", "muscle", "mafft"));
+		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
+			array("muscle", "pair_hm", "clustal", "blast", "uclust", "mafft"));
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
 			// TODO [default: created on-the-fly from template_alignment
-		
-		$this->parameterRelationships->allowParamIf($pairwiseAlignmentMethod, $alignmentMethod, "pynast");
-		$this->parameterRelationships->allowParamIf($blastDb, $alignmentMethod, "pynast");
+	
+		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
+		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
 
 		$this->parameterRelationships->makeOptional(array(
 			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
 			$inputFp->getName() => $inputFp,
 			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
+			$alignmentMethod->getName() => $alignmentMethod,
+			$pairwiseAlignmentMethod->getName() => $pairwiseAlignmentMethod,
+			$blastDb->getName() => $blastDb,
 			"--verbose" => new TrueFalseParameter("--verbose"),
 			"--template_fp" => new OldFileParameter("--template_fp", $this->project),
 				// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]

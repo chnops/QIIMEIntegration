@@ -31,19 +31,19 @@ class AssignTaxonomy extends DefaultScript {
 //		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", "/.*/");  // TODO decimal between 0 and 1
 //		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", "/\\d+/"); 
 
-		$this->parameterRelationships->allowParamIf($read1SeqsFp, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($read2SeqsFp, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($singleOk, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($noSingleOkGeneric, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($readIdRegex, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($ampliconIdRegex, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($headerIdRegex, $assignmentMethod, "rtax");
-		$this->parameterRelationships->allowParamIf($confidence, $assignmentMethod, "rdp");
-		$this->parameterRelationships->allowParamIf($rdpMaxMemory, $assignmentMethod, "rdp");
-		$this->parameterRelationships->allowParamIf($confidence, $assignmentMethod, "mothur");
-//		$this->parameterRelationships->allowParamIf($uclustMinConsensusFraction, $assignmentMethod, "uclust");
-//		$this->parameterRelationships->allowParamIf($uclustSimilarity, $assignmentMethod, "uclust");
-//		$this->parameterRelationships->allowParamIf($uclustMaxAccepts, $assignmentMethod, "uclust");
+		$read1SeqsFp->excludeButAllowIf($assignmentMethod, "rtax");
+		$read2SeqsFp->excludeButAllowIf($assignmentMethod, "rtax");
+		$singleOk->excludeButAllowIf($assignmentMethod, "rtax");
+		$noSingleOkGeneric->excludeButAllowIf($assignmentMethod, "rtax");
+		$readIdRegex->excludeButAllowIf($assignmentMethod, "rtax");
+		$ampliconIdRegex->excludeButAllowIf($assignmentMethod, "rtax");
+		$headerIdRegex->excludeButAllowIf($assignmentMethod, "rtax");
+		$confidence->excludeButAllowIf($assignmentMethod, "mothur");
+		$confidence->excludeButAllowIf($assignmentMethod, "rdp");
+		$rdpMaxMemory->excludeButAllowIf($assignmentMethod, "rdp");
+//		$uclustMinConsensusFraction->excludeButAllowIf($assignmentMethod, "uclust");
+//		$uclustSimilarity->excludeButAllowIf($assignmentMethod, "uclust");
+//		$uclustMaxAccepts->excludeButAllowIf($assignmentMethod, "uclust");
 
 		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project);
 			// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 
@@ -58,7 +58,7 @@ class AssignTaxonomy extends DefaultScript {
 		$idToTaxonomyFp->requireIf($assignmentMethod, "blast");
 		$blastDatabase->requireIf($assignmentMethod, "blast");
 		$treeFp->requireIf($assignmentMethod, "tax2tree");
-		$this->parameterRelationships->allowParamIf($treeFp, $assignmentMethod, "tax2tree");
+		$treeFp->excludeButAllowIf($assignmentMethod, "tax2tree");
 
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$inputFastaFp->requireIf();
@@ -67,6 +67,16 @@ class AssignTaxonomy extends DefaultScript {
 			"1" => new Label("<p><strong>Required Parameters</strong></p>"),
 			$inputFastaFp->getName() => $inputFastaFp,
 			"2" => new Label("<p><strong>Optional Parameters</strong></p>"),
+			$assignmentMethod->getName() => $assignmentMethod,
+			$read1SeqsFp->getName() => $read1SeqsFp,
+			$read2SeqsFp->getName() => $read2SeqsFp,
+			$singleOk->getName() => $singleOk,
+			$noSingleOkGeneric->getName() => $noSingleOkGeneric,
+			$readIdRegex->getName() => $readIdRegex,
+			$ampliconIdRegex->getName() => $ampliconIdRegex,
+			$headerIdRegex->getName() => $headerIdRegex,
+			$confidence->getName() => $confidence,
+			$rdpMaxMemory->getName() => $rdpMaxMemory,
 			$idToTaxonomyFp->getName() => $idToTaxonomyFp,
 			$blastDatabase->getName() => $blastDatabase,
 			$treeFp->getName() => $treeFp,

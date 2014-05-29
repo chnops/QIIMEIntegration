@@ -16,8 +16,14 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
 		$helpParameter = new HelpParameter($this);
 		$versionParameter = new VersionParameter($this->project, $this->getScriptName());
-		$this->parameterRelationships->excludeParam($helpParameter);
-		$this->parameterRelationships->excludeParam($versionParameter);
+		$helpParameter->excludeButAllowIf();
+		$versionParameter->excludeButAllowIf();
+		$this->parameterRelationships->makeOptional(
+			array(
+				$helpParameter->getName() => $helpParameter,
+				$versionParameter->getName() => $versionParameter,
+			)
+		);
 
 		$this->initializeParameters();
 	}
@@ -43,7 +49,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	}
 
 	public function acceptInput(array $input) {
-		$inputErrors = $this->parameterRelationships->getViolations($input);
+		$inputErrors = array();
 		foreach ($this->getParameters() as $name => $parameter) {
 			try {
 				$parameter->acceptInput($input);
