@@ -45,19 +45,17 @@ class SplitLibraries extends DefaultScript {
 		$discardBadWindows->excludeButAllowIf($qualScoreWindow);
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $map, 
-			 $fasta, 
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 $verboseParameter,
-			 new OldFileParameter("--qual", $this->project),
-			 new TrueFalseParameter("--remove_unassigned"),
-			 new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-  			 new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
-  			 new TrueFalseParameter("--trim-seq-length"),
-  			 new TextArgumentParameter("--min-qual-score", "25", "/\\d+/"),
-			 $eitherBarcode,
-			 $eitherAmbig,
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$map, 
+			$fasta, 
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			$verboseParameter,
+			new TrueFalseParameter("--remove_unassigned"),
+			new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+  			new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+  			new TrueFalseParameter("--trim-seq-length"),
+			$eitherBarcode,
+			$eitherAmbig,
 			$reversePrimers,
 			$reversePrimerMismatches,
 			$qual,
@@ -65,23 +63,22 @@ class SplitLibraries extends DefaultScript {
 			$recordQualScores,
 			$qualScoreWindow,
 			$discardBadWindows,
-  			  new TrueFalseParameter("--keep-primer"),
-			 new TrueFalseParameter("--keep-barcode"),
-  			 new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
-			 new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
-			 new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
-			 new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
-			 new TrueFalseParameter("--disable_primers"),
-			 new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
-			 new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-			 new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
-			 new TrueFalseParameter("--trim-seq-length"),
-			 new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
+  			new TrueFalseParameter("--keep-primer"),
+			new TrueFalseParameter("--keep-barcode"),
+  			new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
+			new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
+			new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
+			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
+			new TrueFalseParameter("--disable_primers"),
+			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
+			new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
+			new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+			new TrueFalseParameter("--trim-seq-length"),
+			new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
 
-
-			 new NewFileParameter("--dir-prefix", "."),
-			 new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
-			 new TrueFalseParameter("--retain_unassigned_reads")
+			new NewFileParameter("--dir-prefix", "."),
+			new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
+			new TrueFalseParameter("--retain_unassigned_reads")
 		);
 	}
 	public function getScriptName() {

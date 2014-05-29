@@ -21,7 +21,7 @@ class DefaultParameter implements ParameterI {
 	public function renderForOperatingSystem() {
 		if ($this->value) {
 			$separator = (strlen($this->name) == 2) ? " " : "=";
-			return $this->name . $separator . "'" . $this->value . "'";
+			return $this->name . $separator . escapeshellarg($this->value);
 		}
 		return "";
 	}
