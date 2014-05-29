@@ -64,6 +64,7 @@ class RunScriptsController extends Controller {
 		}
 		$_GET['step'] = $_POST['step'];
 		unset($_POST['step']);
+
 		$this->hasResult = true;
 		$this->scriptId = $_POST['script'];
 

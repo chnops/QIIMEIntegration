@@ -1,6 +1,6 @@
---DROP TABLE IF EXISTS users;
---DROP TABLE IF EXISTS projects;
---DROP TABLE IF EXISTS uploaded_files;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS uploaded_files;
 DROP TABLE IF EXISTS script_runs;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -21,13 +21,11 @@ CREATE TABLE IF NOT EXISTS projects (
 CREATE TABLE IF NOT EXISTS uploaded_files (
 	project_id INT(11) NOT NULL ,
 	project_owner VARCHAR(255) NOT NULL ,
-	given_name VARCHAR(255) NOT NULL ,
-	system_name INT(11) NOT NULL ,
+	name VARCHAR(255) NOT NULL ,
 	file_type VARCHAR(255) NOT NULL DEFAULT "arbitrary_text" ,
 	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
 	);
 --TODO given_name is unique per 'project'
---TODO system_name is unique per 'project'
 
 CREATE TABLE IF NOT EXISTS script_runs (
 	id INTEGER NOT NULL UNIQUE PRIMARY KEY ,

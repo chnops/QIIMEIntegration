@@ -9,27 +9,6 @@ class OldFileParameter extends DefaultParameter {
 		$this->name = $name;
 		$this->project = $project;
 	}
-	public function renderForOperatingSystem() {
-		if (!$this->value) {
-			return "";
-		}
-
-		$fileParts = explode("/", $this->value);
-		$isUploadedFile = ($fileParts[0] == "uploaded");
-		if ($isUploadedFile) {
-			$systemFileName = $this->project->getSystemNameForUploadedFile($fileParts[1]);
-			if (!$systemFileName) {
-				throw new ScriptException("Unable to locate the given file: " . htmlentities($this->value));
-			}
-			$systemFileName = "../uploads/" . $systemFileName;
-		}
-		else {
-			$systemFileName = "../" . $this->value;
-		}
-
-		$separator = (strlen($this->name) == 2) ? " " : "=";
-		return $this->name . $separator . "'" . $systemFileName . "'";
-	}
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
@@ -47,8 +26,8 @@ class OldFileParameter extends DefaultParameter {
 				}
 				$output .= "<optgroup label=\"{$type} files\">\n";
 				foreach ($fileNames as $fileName) {
-					$selected = ($this->value == "uploaded/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"uploaded/{$fileName}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
+					$selected = ($this->value == "../uploads/{$fileName}") ? " selected" : "";
+					$output .= "<option value=\"../uploads/{$fileName}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -66,8 +45,8 @@ class OldFileParameter extends DefaultParameter {
 				}
 				$output .= "<optgroup label=\"from run {$runId}\">\n";
 				foreach ($fileNames as $fileName) {
-					$selected = ($this->value == "r{$runId}/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities($fileName) . "</option>\n";
+					$selected = ($this->value == "../r{$runId}/{$fileName}") ? " selected" : "";
+					$output .= "<option value=\"../r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}

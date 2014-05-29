@@ -83,12 +83,12 @@ abstract class Project {
 	}
 	public function receiveUploadedFile($fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
-		$systemFileName = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
-		if (!$systemFileName) {
+		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
+		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
 			return false;
 		}
-		$fullFileName = $this->operatingSystem->getHome() . $this->getProjectDir() . "/uploads/" . $systemFileName;
+		$fullFileName = $this->operatingSystem->getHome() . $this->getProjectDir() . "/uploads/" . $fileName;
 		return $fullFileName;
 	}
 	public function confirmUploadedFile() {
@@ -102,7 +102,7 @@ abstract class Project {
 		if (empty($this->uploadedFiles)) {
 			$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
 			foreach ($rawFiles as $fileArray) {
-				$this->uploadedFiles[] = array("name" => $fileArray['given_name'], 
+				$this->uploadedFiles[] = array("name" => $fileArray['name'], 
 					"type" => $fileArray['file_type'], "uploaded" => "true");
 			}
 		}

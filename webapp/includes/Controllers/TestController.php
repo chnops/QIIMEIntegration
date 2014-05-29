@@ -12,16 +12,11 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing for appropriate namespace loading</p";
+		echo "<p>Setting up database</p>";
 
-		$parameter = new \Models\Scripts\Parameters\ChoiceParameter("--name", "default", array("default", "non-default"));
-		var_dump($parameter);
-
-		try {
-			$parameter->setValue("notInArray");
-		}
-		catch (\Exception $ex) {
-			var_dump($ex);
+		if (isset($_GET['im_super_serious']) && isset($_GET['i_know_what_im_doing'])) {
+			system("rm ./data/database.sqlite; if [ $? != 0 ]; then echo 'Unable to remove old database<br/>'; else echo 'Removal complete<br/>'; fi; sqlite3 ./data/database.sqlite < ./data/schema.sql; if [ $? != 0 ]; then echo 'Unable to recreate database<br/>'; else echo 'new database created<br/>'; fi;rm -r ./projects/*; if [ $? != 0 ]; then echo 'Unable to remove projects<br/>'; else echo 'Projects removed <br/>'; fi;");
+			$_SESSION = array();
 		}
 
 		return ob_get_clean();

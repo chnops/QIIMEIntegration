@@ -159,21 +159,14 @@ class PDODatabase implements DatabaseI {
 
 	public function createUploadedFile($username, $projectId, $fileName, $fileType) {
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT system_name FROM uploaded_files WHERE project_owner = 
-				:owner AND project_id = :id ORDER BY system_name DESC LIMIT 1");
-			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
-			$systemName = $pdoStatement->fetchColumn(0);
-			$systemName += 1;
-
-			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, given_name, system_name, file_type)
-				VALUES (:id, :owner, :givenName, :systemName, :fileType)");
-			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "givenName" => $fileName,
-				"systemName" => $systemName, "fileType" => $fileType));
+			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type)
+				VALUES (:id, :owner, :name, :fileType)");
+			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName, "fileType" => $fileType));
 			if (!$insertSuccess) {
 				$errorInfo = $pdoStatement->errorInfo();
 				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
 			}
-			return $systemName;
+			return true;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to create uploaded file: " . $ex->getMessage());
