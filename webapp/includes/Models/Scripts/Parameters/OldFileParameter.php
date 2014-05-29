@@ -26,8 +26,9 @@ class OldFileParameter extends DefaultParameter {
 				}
 				$output .= "<optgroup label=\"{$type} files\">\n";
 				foreach ($fileNames as $fileName) {
-					$selected = ($this->value == "../uploads/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"../uploads/{$fileName}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
+					$valueAttr = "../uploads/{$fileName}";
+					$selected = ($this->value == $valueAttr) ? " selected" : "";
+					$output .= "<option value=\"{$valueAttr}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -45,8 +46,9 @@ class OldFileParameter extends DefaultParameter {
 				}
 				$output .= "<optgroup label=\"from run {$runId}\">\n";
 				foreach ($fileNames as $fileName) {
-					$selected = ($this->value == "../r{$runId}/{$fileName}") ? " selected" : "";
-					$output .= "<option value=\"../r{$runId}/{$fileName}\"{$selected}>generated/" . htmlentities(preg_replace("/%FS%/", "/", $fileName)) . "</option>\n";
+					$valueAttr = "../r{$runId}/{$fileName}";
+					$selected = ($this->value == $valueAttr) ? " selected" : "";
+					$output .= "<option value=\"{$valueAttr}\"{$selected}>generated/" . htmlentities(preg_replace("/%FS%/", "/", $fileName)) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}

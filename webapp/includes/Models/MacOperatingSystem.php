@@ -105,7 +105,8 @@ class MacOperatingSystem implements OperatingSystemI {
 		$contents = $this->getDirContents($dirPath);
 		foreach ($contents as $currentFileName) {
 			ob_start();
-			system("if [ -d '{$this->home}{$dirPath}/{$currentFileName}' ]; then printf '1'; else printf '0'; fi;");
+			$potentialDirectory = escapeshellarg($this->home . $dirPath . "/" . $currentFileName);
+			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
 			$isDir = ob_get_clean();
 			if ($isDir) {
 				$this->flattenDir($dirPath . "/" . $currentFileName);
@@ -116,19 +117,21 @@ class MacOperatingSystem implements OperatingSystemI {
 	public function flattenDir($dirPath) {
 		$fs = "%FS%";
 		$fullDirPath = $this->home . $dirPath;
-		$dirName = explode("/", $dirPath);
-		$dirName = $dirName[count($dirName) - 1];
 
 		$contents = $this->getDirContents($dirPath);
 		foreach ($contents as $currentFileName) {
 			ob_start();
-			system("if [ -d '{$fullDirPath}/{$currentFileName}' ]; then printf '1'; else printf '0'; fi;");
+			$potentialDirectory = escapeshellarg($fullDirPath . "/" . $currentFileName);
+			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
 			$isDir = ob_get_clean();
 			if ($isDir) {
 				$this->flattenDir($dirPath . "/" . $currentFileName);
 			}
 		}
 
+		$fullDirPath = escapeshellarg($fullDirPath);
+		$dirName = explode("/", $dirPath);
+		$dirName = escapeshellarg($dirName[count($dirName) - 1]);
 		system("cd {$fullDirPath};for file in `ls`; do if [ -f \$file ]; then mv \$file ../{$dirName}{$fs}\$file; fi; done;cd ..;rmdir {$dirName}");
 	}
 }

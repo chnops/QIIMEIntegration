@@ -3,5 +3,7 @@
 namespace Models\Scripts\Parameters;
 
 class NewFileParameter extends DefaultParameter { 
-	// TODO since we escape all file names, I think isValueValid should always be true.  Implement if otherwise
+	public function isValueValid($value) {
+		return !preg_match("/\"/", $value);
+	}
 }
