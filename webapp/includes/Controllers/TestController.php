@@ -7,23 +7,40 @@ class TestController extends Controller {
 		return;
 	}
 	public function parseInput() {
+		if (isset($_GET['clean'])) {
+			$this->clean();
+		}
 		return;
+	}
+	private function clean() {
+		system("rm -rf ./projects/*;
+			rm ./data/database.sqlite;
+			sqlite3 ./data/database.sqlite < ./data/schema.sql;");
+		$_SESSION = array();
 	}
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing form submission with escaped quotes</p>";
-		if (!empty($_POST)) {
-			echo "<pre>";
-			print_r($_POST);
-			echo "</pre><br/><br/>";
-		}
+		echo "<p>Testing new getDirContents</p>";
+		system ("
+			rm -rf ./projects/test_get*;
+			mkdir ./projects/test_get/;
+			mkdir ./projects/test_get/d1;
+			mkdir ./projects/test_get/d1/d2;
+			mkdir ./projects/test_get/d3;
+			touch ./projects/test_get/f1;
+			touch ./projects/test_get/d1/f2;
+			touch ./projects/test_get/d1/d2/f3;
+			touch ./projects/test_get/d3/f4;
+			mkdir ./projects/test_get/d99");
 
-		echo "<form method=\"POST\">
-			<input type=\"hidden\" name=\"step\" value=\"test\"/>
-			<input type=\"text\" value='Aaron' name=\"input\"/>
-			<button type=\"submit\">Submit</button>
-		</form>";
+		$os = new \Models\MacOperatingSystem();
+		$contents = $os->getDirContents("test_get");
+		echo "<pre>";
+		print_r($contents);
+		echo "</pre>";
+
+		system("rm -rf ./projects/test_get*");
 
 		return ob_get_clean();
 	}

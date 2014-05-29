@@ -61,14 +61,32 @@ class MacOperatingSystem implements OperatingSystemI {
 			ob_end_clean();
 			throw new OperatingSystemException("ls failed.  See error log");
 		}
-		$output = ob_get_clean();
-		$output = trim($output);
-		if ($output) {
-			$output = explode("\n", $output);
+
+		$immediateOutput = ob_get_clean();
+		if (!$immediateOutput) {
+			return array();
 		}
-		else {
-			$output = array();
+		$immediateOutput = explode("\n", trim($immediateOutput));
+		$output = array();
+
+		foreach ($immediateOutput as $currentFileName) {
+			ob_start();
+			$potentialDirectory = escapeshellarg($this->home . $name . "/" . $currentFileName);
+			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
+			$isDir = ob_get_clean();
+			if ($isDir) {
+				$childOutput = $this->getDirContents($name . "/" . $currentFileName);
+				if (!empty($childOutput)) {
+					foreach ($childOutput as $file) {
+						$output[] = $currentFileName . "/" . $file;					
+					}
+				}
+			}
+			else {
+				$output[] = $currentFileName;
+			}
 		}
+
 		return $output;
 	}
 
@@ -99,39 +117,5 @@ class MacOperatingSystem implements OperatingSystemI {
 			throw new \Exception("unable to check file name");
 		}
 		return $matchesRegex;
-	}
-
-	public function flattenDirsWithin($dirPath) {
-		$contents = $this->getDirContents($dirPath);
-		foreach ($contents as $currentFileName) {
-			ob_start();
-			$potentialDirectory = escapeshellarg($this->home . $dirPath . "/" . $currentFileName);
-			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
-			$isDir = ob_get_clean();
-			if ($isDir) {
-				$this->flattenDir($dirPath . "/" . $currentFileName);
-			}
-		}
-	}
-
-	public function flattenDir($dirPath) {
-		$fs = "%FS%";
-		$fullDirPath = $this->home . $dirPath;
-
-		$contents = $this->getDirContents($dirPath);
-		foreach ($contents as $currentFileName) {
-			ob_start();
-			$potentialDirectory = escapeshellarg($fullDirPath . "/" . $currentFileName);
-			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
-			$isDir = ob_get_clean();
-			if ($isDir) {
-				$this->flattenDir($dirPath . "/" . $currentFileName);
-			}
-		}
-
-		$fullDirPath = escapeshellarg($fullDirPath);
-		$dirName = explode("/", $dirPath);
-		$dirName = escapeshellarg($dirName[count($dirName) - 1]);
-		system("cd {$fullDirPath};for file in `ls`; do if [ -f \$file ]; then mv \$file ../{$dirName}{$fs}\$file; fi; done;cd ..;rmdir {$dirName}");
 	}
 }

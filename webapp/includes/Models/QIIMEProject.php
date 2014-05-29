@@ -111,7 +111,6 @@ class QIIMEProject extends Project {
 				$result .= "<br/>Here is the output from the console:<br/>" . htmlentities($codeOutput);
 			}
 
-			$this->operatingSystem->flattenDirsWithin($runDir);
 		}
 		catch (OperatingSystemException $ex) {
 			$consoleError = true;
