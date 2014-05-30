@@ -25,6 +25,7 @@ class OldFileParameter extends DefaultParameter {
 					continue;
 				}
 				$output .= "<optgroup label=\"{$type} files\">\n";
+				asort($fileNames);
 				foreach ($fileNames as $fileName) {
 					$valueAttr = "../uploads/{$fileName}";
 					$selected = ($this->value == $valueAttr) ? " selected" : "";
@@ -45,6 +46,7 @@ class OldFileParameter extends DefaultParameter {
 					continue;
 				}
 				$output .= "<optgroup label=\"from run {$runId}\">\n";
+				asort($fileNames);
 				foreach ($fileNames as $fileName) {
 					$valueAttr = "../r{$runId}/{$fileName}";
 					$selected = ($this->value == $valueAttr) ? " selected" : "";
