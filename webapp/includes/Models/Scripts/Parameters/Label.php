@@ -17,4 +17,8 @@ class Label extends DefaultParameter {
 	public function acceptInput(array $input) {
 		return;
 	}
+
+	public function renderFormScript($formJsVar, $disabled) {
+		return "";
+	}
 }

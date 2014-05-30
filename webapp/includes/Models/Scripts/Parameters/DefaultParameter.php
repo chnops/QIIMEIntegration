@@ -13,6 +13,9 @@ class DefaultParameter implements ParameterI {
 	private $isEverExcluded = false;
 	private $allowingTriggers = array();
 
+	private $isARequiringTrigger = false;
+	private $isAnAllowingTrigger = false;
+
 	public function __construct($name, $value) {
 		$this->name = $name;
 		$this->value = $value;
@@ -28,6 +31,33 @@ class DefaultParameter implements ParameterI {
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		return "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"{$disabledString}/></label>";
+	}
+	public function renderFormScript($formJsVar, $disabled) {
+		if ($disabled) {
+			return "";
+		}
+		$parameterJsVar = $this->getJsVar($formJsVar);
+		$code = "var {$parameterJsVar} = {$formJsVar}.find(\"[name={$this->name}]\");";
+		
+		if ($this->isAlwaysRequired) {
+			$code .= "requireParam({$parameterJsVar});";
+		}
+		if ($this->isARequiringTrigger() || $this->isAnAllowingTrigger()) {
+			$code .= "{$parameterJsVar}.change(function() {changeTrigger({$parameterJsVar});});";
+		}
+		foreach ($this->allowingTriggers as $allowingTrigger) {
+			$triggerJsVar = $allowingTrigger['parameter']->getJsVar($formJsVar);
+			$code .= "makeAllowingRelationship({$parameterJsVar}, {$triggerJsVar}, '{$allowingTrigger['value']}');";
+		}
+		foreach ($this->requiringTriggers as $allowingTrigger) {
+			$triggerJsVar = $allowingTrigger['parameter']->getJsVar($formJsVar);
+			$code .= "makeRequiringRelationship({$parameterJsVar}, {$triggerJsVar}, '{$allowingTrigger['value']}');";
+		}
+
+		return $code . "\n";
+	}
+	public function getJsVar($formJsVar) {
+		return $formJsVar . "_" . preg_replace("/-/", "_", preg_replace("/--/", "", $this->name));
 	}
 	public function setValue($value) {
 		if (!$this->isValueValid($value)) {
@@ -106,15 +136,39 @@ class DefaultParameter implements ParameterI {
 			return;
 		}
 		$this->requiringTriggers[] = array ("parameter" => $trigger, "value" => $value);
+		$trigger->isARequiringTrigger(true);
 	}
 	public function excludeButAllowIf(ParameterI $trigger = null, $value = "") {
 		$this->isEverExcluded = true;
 		if ($trigger) {
 			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);
+			$trigger->isAnAllowingTrigger(true);
 		}
 	}
 	public function linkTo(ParameterI $parameter) {
 		$eitherOr = new EitherOrParameter($this, $parameter);
 		return $eitherOr;
+	}
+	public function isARequiringTrigger($isIt = -1) {
+		if ($isIt === -1) {
+			return $this->isARequiringTrigger;
+		}
+		if ($isIt) {
+			$this->isARequiringTrigger = true;
+		}
+		else {
+			$this->isARequiringTrigger = false;
+		}
+	}
+	public function isAnAllowingTrigger($isIt = -1) {
+		if ($isIt === -1) {
+			return $this->isAnAllowingTrigger;
+		}
+		if ($isIt) {
+			$this->isAnAllowingTrigger = true;
+		}
+		else {
+			$this->isAnAllowingTrigger = false;
+		}
 	}
 }

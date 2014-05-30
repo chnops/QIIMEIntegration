@@ -95,6 +95,7 @@ class RunScriptsController extends Controller {
 			<hr class=\"small\"/>\n";
 
 		$instructions .= $project->renderOverview();
+		$instructions .= "\n<script type=\"text/javascript\" src=\"parameter_relationships.js\"></script>\n";
 		return $instructions;
 	}
 
