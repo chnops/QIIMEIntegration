@@ -30,6 +30,7 @@ interface ProjectI {
 	public function retrieveAllUploadedFiles();
 	public function getPastScriptRuns();
 	public function retrieveAllGeneratedFiles();
+	public function retrieveAllBuiltInFiles();
 
 	// complex mutators
 	public function beginProject();

@@ -51,10 +51,15 @@ class MacOperatingSystem implements OperatingSystemI {
 		return true;
 	}
 
-	public function getDirContents($name) {
+	public function getDirContents($name, $prependHome = true) {
 		$result = 0;
 		ob_start();
-		$code = "ls " . escapeshellarg($this->home . "/" . $name);
+		if ($prependHome) {
+			$code = "ls " . escapeshellarg($this->home . "/" . $name);
+		}
+		else {
+			$code = "ls " . escapeshellarg($name);
+		}
 		system($code, $result);
 
 		if ($result) {
@@ -71,11 +76,16 @@ class MacOperatingSystem implements OperatingSystemI {
 
 		foreach ($immediateOutput as $currentFileName) {
 			ob_start();
-			$potentialDirectory = escapeshellarg($this->home . $name . "/" . $currentFileName);
+			if ($prependHome) {
+				$potentialDirectory = escapeshellarg($this->home . $name . "/" . $currentFileName);
+			}
+			else {
+				$potentialDirectory = escapeshellarg($name . "/" . $currentFileName);
+			}
 			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
 			$isDir = ob_get_clean();
 			if ($isDir) {
-				$childOutput = $this->getDirContents($name . "/" . $currentFileName);
+				$childOutput = $this->getDirContents($name . "/" . $currentFileName, $prependHome);
 				if (!empty($childOutput)) {
 					foreach ($childOutput as $file) {
 						$output[] = $currentFileName . "/" . $file;					

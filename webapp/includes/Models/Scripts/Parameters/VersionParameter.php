@@ -6,7 +6,7 @@ use \Models\Scripts\ScriptException;
 class VersionParameter extends DefaultParameter {
 
 	private $versionString = "";
-	public function __construct(\Models\Project $project, $scriptName) {
+	public function __construct(\Models\ProjectI $project, $scriptName) {
 		$this->name = "--version";
 		$this->versionString = $project->getVersion($scriptName);
 	}

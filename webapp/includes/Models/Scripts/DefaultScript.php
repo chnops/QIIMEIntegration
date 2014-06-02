@@ -9,7 +9,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	protected $project = null;
 	protected $parameters;
 
-	public function __construct(\Models\Project $project) {
+	public function __construct(\Models\ProjectI $project) {
 		$this->project = $project;
 
 		$helpParameter = new HelpParameter($this);

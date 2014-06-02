@@ -15,7 +15,7 @@ use Models\Scripts\Parameters\Label;
 class ValidateMappingFile extends DefaultScript {
 
 	private $scriptName;
-	public function __construct(\Models\Project $project) {
+	public function __construct(\Models\ProjectI $project) {
 		if ($project->scriptExists("validate_mapping_file.py")) {
 			$this->scriptName = "validate_mapping_file.py";
 		}

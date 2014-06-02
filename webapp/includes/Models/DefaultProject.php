@@ -2,7 +2,7 @@
 
 namespace Models;
 
-abstract class Project {
+abstract class DefaultProject implements ProjectI {
 	protected $owner;
 	protected $id;
 	protected $name;
@@ -177,4 +177,5 @@ abstract class Project {
 	public abstract function getInitialFileTypes();
 	public abstract function runScript(array $allInput);
 	public abstract function renderOverview();
+	public abstract function retrieveAllBuiltInFiles();
 }

@@ -5,7 +5,7 @@ use \Models\Scripts\ScriptException;
 
 class OldFileParameter extends DefaultParameter {
 	private $project = NULL;
-	public function __construct($name, \Models\Project $project) {
+	public function __construct($name, \Models\ProjectI $project) {
 		$this->name = $name;
 		$this->project = $project;
 	}
@@ -55,9 +55,21 @@ class OldFileParameter extends DefaultParameter {
 				$output .= "</optgroup>\n";
 			}
 		}
-		$output .= "</select>\n"; // the </label> is here because if there is an error (below), the label needs to be closed early
 
-		if (empty($uploadedFiles) && empty($generatedFiles)) {
+		$builtInFiles = $this->project->retrieveAllBuiltInFiles();
+		if (!empty($builtInFiles)) {
+			$output .= "{$this->name}<optgroup label=\"built in files\" class=\"big\">\n";
+			$output .= "{$this->name}<optgroup>\n";
+
+			foreach ($builtInFiles as $fileName) {
+				$selected = ($this->value == $fileName) ? " selected" : "";
+				$output .= "<option value=\"{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+			}
+		}
+
+		$output .= "</select>\n";
+
+		if (empty($uploadedFiles) && empty($generatedFiles) && empty($builtInFiles)) {
 			$output = "<em>You must <a href=\"index.php?step=upload\">upload</a>
 			at least one file in order to use {$this->name}<em>";
 		}

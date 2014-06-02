@@ -15,7 +15,7 @@
 		div#content,div#help{background-color:#ffcc66;border:3px solid;margin:.25em .5em;padding:.5em;}
 		div#content{width:65%;float:left;display:inline}
 		div#help{width:25%;float:left;display:inline}
-		div#content div.form{margin-left:2.5em;text-align:left;width:45%;border:2px #999966 ridge;padding:1em;}
+		div#content div.form{margin-left:2.5em;border:2px #999966 ridge;padding:1em;display:inline-block}
 		div#session_data{margin-left:0px;margin-right:auto;border-style:solid;border-color:#999966;border-width:0px 0px 1px 1px;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#result{border:2px #999966 ridge;display:inline-block;margin-left:2.5em;padding:.25em;background-color:#ffffcc}
 		div#result.error{background-color:#cc6600}

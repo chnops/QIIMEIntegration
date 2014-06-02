@@ -4,7 +4,7 @@ namespace Models\Scripts;
 
 interface ScriptI {
 
-	public function __construct(\Models\Project $project);
+	public function __construct(\Models\ProjectI $project);
 
 	// Dumb accessors
 	public function getParameters();

@@ -2,7 +2,9 @@
 
 namespace Models;
 
-class QIIMEProject extends Project {
+class QIIMEProject extends DefaultProject {
+
+	private $builtInFiles = array();
 
 	public function beginProject() {
 		$this->database->startTakingRequests();
@@ -143,6 +145,22 @@ class QIIMEProject extends Project {
 		}
 		$overview .= "</table>\n</div>\n";
 		return $overview;
+	}
+
+	public function retrieveAllBuiltInFiles() {
+		if (empty($this->builtInFiles)) {
+			try {
+				$fileNames = $this->operatingSystem->getDirContents('/macqiime/greengenes', $prependHome = false);
+				foreach ($fileNames as $fileName) {
+					$this->builtInFiles[] = "/macqiime/greengenes/{$fileName}";
+				}
+			}
+			catch (OperatingSystemException $ex) {
+				error_log("Unable to retrieve built in files: " . $ex->getMessage());
+				$this->builtInFiles = array();
+			}
+		}
+		return $this->builtInFiles;
 	}
 
 }
