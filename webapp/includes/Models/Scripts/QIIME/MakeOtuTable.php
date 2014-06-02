@@ -22,13 +22,14 @@ class MakeOtuTable extends DefaultScript {
 		$outputBiomFp->requireIf();
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $otuMapFile,
-			 $outputBiomFp, 
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 new TrueFalseParameter("--verbose"),
-			 new OldFileParameter("--taxonomy", $this->project),
-			 new OldFileParameter("--exclude_otus_fp", $this->project)
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$otuMapFile,
+			$outputBiomFp, 
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new OldFileParameter("--taxonomy", $this->project),
+			new OldFileParameter("--exclude_otus_fp", $this->project),
+			new Label("<p><strong>Output Options</strong></p>"),
+			new TrueFalseParameter("--verbose")
 		);
 	}
 	public function getScriptName() {
@@ -41,7 +42,10 @@ class MakeOtuTable extends DefaultScript {
 		return "make_otu_table";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>An OTU table contains organized information about the abundance of different OTUs in a set of sequences.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>An OTU table contains organized information about the abundance of different OTUs in a set of sequences.</p>";
+		include 'views/make_otu_table.html';
+		return ob_get_clean();
 	}
 
 }

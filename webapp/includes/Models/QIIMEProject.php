@@ -44,11 +44,11 @@ class QIIMEProject extends DefaultProject {
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Organize into OTUs'][] = $script;
 
-		$script = new \Models\Scripts\QIIME\MakeOtuTable($this);
+		$script = new \Models\Scripts\QIIME\AssignTaxonomy($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
 
-		$script = new \Models\Scripts\QIIME\AssignTaxonomy($this);
+		$script = new \Models\Scripts\QIIME\MakeOtuTable($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
 

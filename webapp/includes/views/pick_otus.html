@@ -1,0 +1,23 @@
+<ol>
+<li>Decide on a sequence file<br/>
+	<ul><li>Should be <a onclick="displayHideables('split_libraries');">demultiplexed</a> first</li></ul>
+</li>
+<li>Decide on a clustering threshold<br/>
+
+</li>
+<li>Decide on a clustering method<br/>
+	<ul>
+		<li title="(Edgar, RC 2010) Uses percent identity">uclust</li>
+		<li title="(Edgar, RC 2010) Uses perecnet identity, but with a database of pre-generated 'seeds'">uclust_ref</li>
+		<li title="(Altschul, Gish, Miller, Myers, & Lipman, 1990) Compares each sequence against a reference database">blast</li>
+		<li title="(Schloss et al., 2009) Uses sequence alignments">Mothur</li>
+		<li title="(Li & Godzik, 2006; Li, Jaroszewski, & Godzik, 2001) Applies a 'longest-sequence-first list removal algorithm'">cd-hit</li>
+		<li title="(Edgar, RC 2010, version v5.2.236) As uclust, but with additional functionality">usearch</li>
+		<li title="(Edgar, RC 2010, version v5.2.236) As uclust, but with additional functionality including a database of pre-generated 'seeds'">usearch_ref</li>
+		<li title="(Edgar, RC 2010, version v6.1.544) As usearch">usearch61</li>
+		<li title="(Edgar, RC 2010, version v6.1.544) As usearch_ref">usearch61_ref</li>
+		<li title="[Qiime team, unpublished] Collapses sequences which are identical in their first and/or last bases">prefix/suffix</li>
+		<li title="[Qiime team, unpublished] Collapses sequences that are identical to or subsequences of other sequences">Trie</li>
+	</ul>
+</li>
+</ol>

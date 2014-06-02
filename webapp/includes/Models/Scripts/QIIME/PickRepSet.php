@@ -19,17 +19,20 @@ class PickRepSet extends DefaultScript {
 		$inputFile->requireIf();
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $inputFile,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 new TrueFalseParameter("--verbose"),
-			 new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
-			 new ChoiceParameter("--rep_set_picking_method", "first", 
-				array("random", "longest", "most_abundant", "first")),
-			 new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
-			 new NewFileParameter("--log_fp", ""), 
-			 new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id")),
-			 new OldFileParameter("--reference_seqs_fp", $this->project)
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFile,
+
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new OldFileParameter("--reference_seqs_fp", $this->project),
+			new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
+			new ChoiceParameter("--rep_set_picking_method", "first", 
+				array("first", "random", "longest", "most_abundant")),
+
+			new Label("<strong>Output options</strong>"),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--log_fp", ""), 
+			new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
+			new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id"))
 		);
 	}
 	public function getScriptName() {
@@ -42,6 +45,9 @@ class PickRepSet extends DefaultScript {
 		return "pick_rep_set";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>Once you have organized sequence reads into OTUs, it is efficient to select one read that represents the whole OTU.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p>";
+		include 'views/pick_rep_sets.html';
+		return ob_get_clean();
 	}
 }

@@ -64,27 +64,28 @@ class AssignTaxonomy extends DefaultScript {
 		$inputFastaFp->requireIf();
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $inputFastaFp,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 $assignmentMethod,
-			 $read1SeqsFp,
-			 $read2SeqsFp,
-			 $singleOk,
-			 $noSingleOkGeneric,
-			 $readIdRegex,
-			 $ampliconIdRegex,
-			 $headerIdRegex,
-			 $confidence,
-			 $rdpMaxMemory,
-			 $idToTaxonomyFp,
-			 $eitherBlastDatabase,
-			 $treeFp,
-			 new TrueFalseParameter("--verbose"),
-			 new NewFileParameter("--output_dir", "_assigned_taxonomy"), // TODO dynamic default
-			 new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
-			 new OldFileParameter("--training_data_properties_fp", $this->project)
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFastaFp,
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			$assignmentMethod,
+			$read1SeqsFp,
+			$read2SeqsFp,
+			$singleOk,
+			$noSingleOkGeneric,
+			$readIdRegex,
+			$ampliconIdRegex,
+			$headerIdRegex,
+			$confidence,
+			$rdpMaxMemory,
+			$idToTaxonomyFp,
+			$eitherBlastDatabase,
+			$treeFp,
+			new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
+			new OldFileParameter("--training_data_properties_fp", $this->project),
 				// TODO This option is overridden by the -t and -r options.
+			new Label("<strong>Output Options</strong>"),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--output_dir", "_assigned_taxonomy") // TODO dynamic default
 			);
 	}
 	public function getScriptName() {
@@ -97,7 +98,10 @@ class AssignTaxonomy extends DefaultScript {
 		return "assign_taxonomy";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>This script takes OTUs and assigns them to a real-world taxonomy.  To do this, it uses sequence databases.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>This script takes OTUs and assigns them to a real-world taxonomy.  To do this, it uses sequence databases.</p>";
+		include 'views/assign_taxonomy.html';
+		return ob_get_clean();
 	}
 
 }

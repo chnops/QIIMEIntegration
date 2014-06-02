@@ -21,7 +21,7 @@
 		div#result.error{background-color:#cc6600}
 		div#past_results{display:inline-block;background-color:#ffffcc;padding:0em .5em;border:1px #999966 solid}
 		div#past_results,div#result{overflow:auto;max-width:90%}
-		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.75em}
+		div.file_example{border:1px solid;background-color:#999966;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.5em;margin:.5em;}
 		div.script_form input[type="text"],div.script_form input[type="file"],select{display:block}
 		div.hideable{display:none;}
 		a{color:#003366;cursor:pointer;}

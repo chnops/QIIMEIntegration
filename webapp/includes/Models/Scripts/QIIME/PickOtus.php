@@ -18,68 +18,246 @@ class PickOtus extends DefaultScript {
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
 		$inputSeqsFilePath->requireIf();
 
-		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $inputSeqsFilePath,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 new TrueFalseParameter("--verbose"),
-			 new ChoiceParameter("--otu_picking_method", "uclust", 
-				array("mothur", "trie", "uclust_ref", "usearch", "usearch_ref", "blast", "usearch61",
-					"usearch61_ref", "prefix_suffix", "cdhit", "uclust")),
-                        /* TODO The mothur method requires an input file of
-                        aligned sequences.*/ 
-			 new ChoiceParameter("--clustering_algorithm", "furthest",
-				array("furthest", "nearest", "average")),
-  			 new TextArgumentParameter("--max_cdhit_memory", "400", "/\\d+/"),
-			 new NewFileParameter("--output_dir", "uclust_picked_otus"), // TODO dynamic default
-  			 new OldFileParameter("--refseqs_fp", $this->project), 
-			 new OldFileParameter("--blast_db", $this->project), 
-  			 new TextArgumentParameter("--min_aligned_percent", "0.5", "/.*/"),
-			 new TextArgumentParameter("--similarity", "0.97", "/.*/"),
-			 new TextArgumentParameter("--max_e_value", "1e-10", "/.*/"),
-			 new TrueFalseParameter("--trie_reverse_seqs"),
-			 new TextArgumentParameter("--prefix_prefilter_length", "", "/\\d+/"),
-			 new TrueFalseParameter("--trie_prefilter"),
-  			 new TextArgumentParameter("--prefix_length", "50", "/\\d+/"),
-  			 new TextArgumentParameter("--suffix_length", "50", "/\\d+/"),
-			 new TrueFalseParameter("--enable_rev_strand_match"),
-  			 new TrueFalseParameter("--suppress_presort_by_abundance_uclust"),
-  			 new TrueFalseParameter("--optimal_uclust"),
-			 new TrueFalseParameter("--exact_uclust"),
-  			 new TrueFalseParameter("--user_sort"),
-			 new TrueFalseParameter("--suppress_new_clusters"),
-			 new TextArgumentParameter("--max_accepts", "20", "/\\d+/"), // TODO dynamic default
-			 new TextArgumentParameter("--max_rejects", "500", "/\\d+/"), // TODO dynamic default
-			 new TextArgumentParameter("--stepwords", "20", "/\\d+/"),
-			 new TextArgumentParameter("--word_length", "12", "/\\d+/"), // TODO dynamic default
-			 new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", "/.*/"), // TODO no whitespace
-			 new TrueFalseParameter("--suppress_uclust_stable_sort"),
-  			 new TrueFalseParameter("--suppress_uclust_prefilter_exact_match"),
-  			 new TrueFalseInvertedParameter("--save_uc_files"),
-			 new TextArgumentParameter("--percent_id_err", "0.97", "/.*/"), // TODO decimal between 1 and 0
-			 new TextArgumentParameter("--minsize", "4", "/\\d+/"),
-			 new TextArgumentParameter("--abundance_skew", "2.0", "/.*/"), // TODO any float
-			 new OldFileParameter("--db_filepath", $this->project),
-			 new TextArgumentParameter("--perc_id_blast", "0.97", "/.*/"), // TODO fload between 1 and 0
-			 //new TrueFalseInvertedParameter("--de_novo_chimera_detection"), // TODO deprecated
-			 new TrueFalseParameter("--suppress_de_novo_chimera_detection"),
-			 //new TrueFalseInvertedParameter("--reference_chimera_detection"), // TODO deprecated
-			 new TrueFalseParameter("--suppress_reference_chimera_detection"),
-			 //new TrueFalseInvertedParameter("--cluster_size_filtering"), // TODO deprecated
-			 new TrueFalseParameter("--suppress_cluster_size_filtering"),
-			 new TrueFalseParameter("--remove_usearch_logs"),
-			 new TrueFalseParameter("--derep_fullseq"),
-			 new ChoiceParameter("--non_chimeras_retention", "union", array("union", "intersect")),
-			 new TextArgumentParameter("--minlen", "64", "/\\d+/"),
-			 new TrueFalseParameter("--usearch_fast_cluster"), 
+		$triePrefilter = new TrueFalseParameter("--trie_prefilter");
+		$prefixPrefilterLength = new TextArgumentParameter("--prefix_prefilter_length", "", "/\\d+/");
+		$prefixPrefilterLength->excludeButAllowIf($triePrefilter);
+
+		$otuPickingMethod = new ChoiceParameter("--otu_picking_method", "uclust", 
+			array("uclust", "uclust_ref", "blast", "mothur", "cdhit", "usearch", "usearch_ref", "usearch61",
+				"usearch61_ref", "prefix_suffix", "trie"));// TODO sort
+
+		$clusteringAlgorithm = new ChoiceParameter("--clustering_algorithm", "furthest",
+			array("furthest", "nearest", "average"));
+		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mother");
+
+		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", "/\\d+/");
+		$maxCdhitMemory->excludeButAllowIf($otuPickingMethod, "cdhit");
+
+		$trieReverseSeqs = new TrueFalseParameter("--trie_reverse_seqs");
+		$trieReverseSeqs->excludeButAllowIf($otuPickingMethod, "trie");
+
+		$prefixLength = new TextArgumentParameter("--prefix_length", "50", "/\\d+/");
+		$prefixLength->excludeButAllowIf($otuPickingMethod, "prefix_suffix");
+		$suffixLength = new TextArgumentParameter("--suffix_length", "50", "/\\d+/");
+		$suffixLength->excludeButAllowIf($otuPickingMethod, "prefix_suffix");
+
+		$blastDb = new OldFileParameter("--blast_db", $this->project);
+		$blastDb->excludeButAllowIf($otuPickingMethod, "blast");
+		$minAlignedPercent = new TextArgumentParameter("--min_aligned_percent", "0.5", "/.*/");
+		$minAlignedPercent->excludeButAllowIf($otuPickingMethod, "blast");
+		$maxEValue = new TextArgumentParameter("--max_e_value", "1e-10", "/.*/");
+		$maxEValue->excludeButAllowIf($otuPickingMethod, "blast");
+
+		$refSeqsFp = new OldFileParameter("--refseqs_fp", $this->project);
+		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "blast");
+		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$suppressNewClusters = new TrueFalseParameter("--suppress_new_clusters");
+		$suppressNewClusters->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$suppressNewClusters->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$suppressNewClusters->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+
+		$similarity = new TextArgumentParameter("--similarity", "0.97", "/.*/");
+		$similarity->excludeButAllowIf($otuPickingMethod, "cdhit");
+		$similarity->excludeButAllowIf($otuPickingMethod, "blast");
+		$similarity->excludeButAllowIf($otuPickingMethod, "usearch");
+		$similarity->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$similarity->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$similarity->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$similarity->excludeButAllowIf($otuPickingMethod, "uclust");
+		$similarity->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$wordLength = new TextArgumentParameter("--word_length", "12", "/\\d+/"); // TODO dynamic default
+		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust");
+		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch");
+		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+
+
+		$suppressPresortByAbundanceUclut = new TrueFalseParameter("--suppress_presort_by_abundance_uclust");
+		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust");
+		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$optimalUclust = new TrueFalseParameter("--optimal_uclust");
+		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust");
+		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$exactUclust = new TrueFalseParameter("--exact_uclust");
+		$exactUclust->excludeButAllowIf($otuPickingMethod, "uclust");
+		$exactUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$userSort = new TrueFalseParameter("--user_sort");
+		$userSort->excludeButAllowIf($otuPickingMethod, "uclust");
+		$userSort->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$stepwords = new TextArgumentParameter("--stepwords", "20", "/\\d+/");
+		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust");
+		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$uclustOtuIdPrefix = new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", "/.*/"); // TODO no whitespace
+		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust");
+		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$suppressUclustStableSort = new TrueFalseParameter("--suppress_uclust_stable_sort");
+		$suppressUclustStableSort->excludeButAllowIf($otuPickingMethod, "uclust");
+		$suppressUclustStableSort->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$suppressUclustPrefilterExactMatch = new TrueFalseParameter("--suppress_uclust_prefilter_exact_match");
+		$suppressUclustPrefilterExactMatch->excludeButAllowIf($otuPickingMethod, "uclust");
+		$suppressUclustPrefilterExactMatch->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$saveUcFiles = new TrueFalseInvertedParameter("--save_uc_files");
+		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust");
+		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+
+		$maxAccepts = new TextArgumentParameter("--max_accepts", "20", "/\\d+/"); // TODO dynamic default
+		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust");
+		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$maxRejects = new TextArgumentParameter("--max_rejects", "500", "/\\d+/"); // TODO dynamic default
+		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust");
+		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+
+		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); // TODO forces usearch61_sort_method = long
 				// TODO can't be used with --enable_rev_strand_matchign
-				// TODO forces usearch61_sort_method = long
-			 new ChoiceParameter("--usearch61_sort_method", "abundance", 
-				array("abundance", "length", "None")),
-			 new TrueFalseParameter("--sizeorder")
-				//TODO Requires that --usearch61_sort_method be abundance. [default: False]
-//			 new TextArgumentParameter("--threads", "1.0", "/.*/"),  TODO not supported in all MacQIIME versions 
-				// TODO this one is tough...
+		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch");
+		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$enableRevStrandMatch = new TrueFalseParameter("--enable_rev_strand_match");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "uclust");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "usearch");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$enableRevStrandMatch->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$fastOrThoroughUsearchClustering = $usearchFastCluster->linkTo($enableRevStrandMatch);
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "uclust");
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch");
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+
+		$percentIdError = new TextArgumentParameter("--percent_id_err", "0.97", "/.*/"); // TODO decimal between 1 and 0
+		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch");
+		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$minSize = new TextArgumentParameter("--minsize", "4", "/\\d+/");
+		$minSize->excludeButAllowIf($otuPickingMethod, "usearch");
+		$minSize->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$minSize->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$minSize->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$abundanceSkew = new TextArgumentParameter("--abundance_skew", "2.0", "/.*/"); // TODO any float
+		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch"); // TODO exclude if suppress_chimera_detection
+		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$dbFilePath = new OldFileParameter("--db_filepath", $this->project);
+		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch");
+		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$percIdBlast = new TextArgumentParameter("--perc_id_blast", "0.97", "/.*/"); // TODO fload between 1 and 0
+		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch");
+		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		//new TrueFalseInvertedParameter("--de_novo_chimera_detection"), // TODO deprecated
+		$suppressDeNovoChimeraDetection = new TrueFalseParameter("--suppress_de_novo_chimera_detection");
+		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch");
+		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		//new TrueFalseInvertedParameter("--reference_chimera_detection"), // TODO deprecated
+		$suppressReferenceChimeraDetection = new TrueFalseParameter("--suppress_reference_chimera_detection");
+		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch");
+		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		//new TrueFalseInvertedParameter("--cluster_size_filtering"), // TODO deprecated
+		$suppressClusterSizeFiltering = new TrueFalseParameter("--suppress_cluster_size_filtering");
+		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch");
+		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$removeUsearchLogs = new TrueFalseParameter("--remove_usearch_logs");
+		$removeUsearchLogs->excludeButAllowIf($otuPickingMethod, "usearch");
+		$removeUsearchLogs->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$removeUsearchLogs->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$removeUsearchLogs->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$derepFullseq = new TrueFalseParameter("--derep_fullseq");
+		$derepFullseq->excludeButAllowIf($otuPickingMethod, "usearch");
+		$derepFullseq->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$derepFullseq->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$derepFullseq->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$nonChimerasRetention = new ChoiceParameter("--non_chimeras_retention", "union", array("union", "intersect"));
+		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch");
+		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$minLen = new TextArgumentParameter("--minlen", "64", "/\\d+/");
+		$minLen->excludeButAllowIf($otuPickingMethod, "usearch");
+		$minLen->excludeButAllowIf($otuPickingMethod, "usearch_ref");
+		$minLen->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$minLen->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+
+		$usearch61SortMethod = new ChoiceParameter("--usearch61_sort_method", "abundance",
+				array("abundance", "length", "None"));
+		$usearch61SortMethod->excludeButAllowIf($otuPickingMethod, "usearch61");
+		$usearch61SortMethod->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
+		$sizeOrder = new TrueFalseParameter("--sizeorder");
+		$sizeOrder->excludeButAllowIf($usearch61SortMethod, "abundance");
+
+
+		array_push($this->parameters,
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputSeqsFilePath,
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			$triePrefilter,
+			$prefixPrefilterLength,
+			$otuPickingMethod,
+			$clusteringAlgorithm,
+			$maxCdhitMemory,
+			$trieReverseSeqs,
+			$prefixLength,
+			$suffixLength,
+			$blastDb,
+			$minAlignedPercent,
+			$maxEValue,
+			$refSeqsFp,
+			$suppressNewClusters,
+			$similarity,
+			$wordLength,
+			$suppressPresortByAbundanceUclut,
+			$optimalUclust,
+			$exactUclust,
+			$userSort,
+			$stepwords,
+			$uclustOtuIdPrefix,
+			$suppressUclustStableSort,
+			$suppressUclustPrefilterExactMatch,
+			$saveUcFiles,
+			$maxAccepts,
+			$maxRejects,
+			$fastOrThoroughUsearchClustering,
+			$percentIdError,
+			$minSize,
+			$abundanceSkew,
+			$dbFilePath,
+			$percIdBlast,
+			$suppressDeNovoChimeraDetection,
+			$suppressReferenceChimeraDetection,
+			$suppressClusterSizeFiltering,
+			$removeUsearchLogs,
+			$derepFullseq,
+			$nonChimerasRetention,
+			$minLen,
+			$usearch61SortMethod,
+			$sizeOrder,
+
+			new Label("<strong>Ouput options</strong>"),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--output_dir", "uclust_picked_otus") // TODO dynamic default
+//			new TextArgumentParameter("--threads", "1.0", "/.*/"), TODO not supported in all MacQIIME versions 
 		);
 	}
 	public function getScriptName() {
@@ -92,7 +270,10 @@ class PickOtus extends DefaultScript {
 		return "pick_otus";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>OTU stands for Operational Taxonomic Unit</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>OTU stands for Operational Taxonomic Unit. This script attempts to group sequences into taxonomic units based on similarity.</p>";
+		include "views/{$this->getHtmlId()}.html";
+		return ob_get_clean();
 	}
 
 }
