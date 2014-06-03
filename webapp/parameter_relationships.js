@@ -42,6 +42,9 @@ function makeRequiringRelationship(dependent, trigger, value) {
 
 function changeTrigger(jQueryObj) {
 	var value = jQueryObj.val();
+	if (value == "on") {
+		value = jQueryObj.is(':checked');
+	}
 	if (value) {
 		if (jQueryObj['allowed']) {
 			var elemsToAllow = null;

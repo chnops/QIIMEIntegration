@@ -1,0 +1,18 @@
+<ol>
+<li>
+Choose your input file (perhaps the .fasta result of <a onclick="displayHideables('align_seqs')">Align sequences</a>)
+</li>
+<li>
+Decide if you want to use a lanemask.  A lanemask specifies which positions are conserved (non-informative, should be ignored) and which are variable (should be included).
+If you used greengenes to align your sequences, the greengenes lanemask will be appropriate (/macqiime/greengenes/lanemask_in_1s_and_os).
+If you don't want to use one, you must specify using --suppress_lane_mask_filter.
+</li>
+<li>
+Decide on filtering criteria:
+	<ul>
+	<li>--entropy_threshold: A proportion of base pair positions you want removed for being 'too variable.' A value of .1 for this parameter means that the most entropic 10% of base positions (accross all the sequences in your alignment) will be removed form all sequences.</li>
+	<li>--allowed_gap_frac: QIIME will remove positions that are gaps in 'too many' of your sequences. You define too many with this parameter (default: .999999, so very few gaps positions are removed)</li>
+	<li>--remove_outliers/--threshold: QIIME can also remove sequences that are 'too dissimilar' from the consensus.  To do so, you must select --remove_outliers, and provide a --threshold value. The --threshold is measured in standard deviations, so the default, 3.0, will remove sequences whose dissimilarity is approximately greater than 3 standard deviations away from the mean dissimilarity of all sequences.</li>
+	</ul>
+</li>
+</ol>

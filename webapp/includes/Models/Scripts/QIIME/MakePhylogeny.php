@@ -19,16 +19,17 @@ class MakePhylogeny extends DefaultScript {
 		$inputFp->requireIf();
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $inputFp,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 new TrueFalseParameter("--verbose"),
-			 new ChoiceParameter("--tree_method", "fasttree", 
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFp,
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new ChoiceParameter("--tree_method", "fasttree", 
 				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),
-			 new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
-			 new NewFileParameter("--log_fp", ""),
-			 new ChoiceParameter("--root_method", "tree_method_default",
-				array("midpoint", "tree_method_default"))
+			new ChoiceParameter("--root_method", "tree_method_default",
+				array("midpoint", "tree_method_default")),
+			new Label("<p><strong>Output Options</strong></p>"),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
+			new NewFileParameter("--log_fp", "")
 		);
 	}
 	public function getScriptName() {
@@ -41,7 +42,10 @@ class MakePhylogeny extends DefaultScript {
 		return "make_phylogeny";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>Once sequences have been aligned, QIIME will organize them for you into a phylogenetic tree</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>Once sequences have been aligned, QIIME will organize them for you into a phylogenetic tree</p>";
+		include 'views/make_phylogeny.html';
+		return ob_get_clean();
 	}
 
 }

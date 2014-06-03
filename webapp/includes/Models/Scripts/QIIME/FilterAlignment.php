@@ -18,22 +18,28 @@ class FilterAlignment extends DefaultScript {
 		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
 		$inputFastaFile->requireIf();
 
+		$removeOutliers = new TrueFalseParameter("--remove_outliers");
+		$threshold = new TextArgumentParameter("--threshold", "3.0", "/.*/"); // TODO arbitrary float
+			//TODO only used with remove_outliers
+
+		$threshold->excludeButAllowIf($removeOutliers);
+
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
-			 $inputFastaFile,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 new TrueFalseParameter("--verbose"),
-			 new NewFileParameter("--output_dir", "."),
-			 new OldFileParameter("--lane_mask_fp", $this->project),
-				// TODO [default:/macqiime/greengenes/lanemask_in_1s_and_0s]
-			 new TrueFalseParameter("--suppress_lane_mask_filter"),
+			new Label("<p><strong>Required Parameters</strong></p>"),
+			$inputFastaFile,
+			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new TrueFalseParameter("--suppress_lane_mask_filter"),
 				// TODO supresses lane_mask_fp
-			 new TextArgumentParameter("--allowed_gap_frac", "0.999999", "/.*/"), // TODO 0 < fraction < 1
-			 new TrueFalseParameter("--remove_outliers"),
-			 new TextArgumentParameter("--threshold", "3.0", "/.*/"), // TODO arbitrary float
-				//TODO only used with remove_outliers
-			 new TextArgumentParameter("--entropy_threshold", "", "/.*/") // TODO 0 < fraction < 1
+			new OldFileParameter("--lane_mask_fp", $this->project),
+				// TODO [default:/macqiime/greengenes/lanemask_in_1s_and_0s]
+			new TextArgumentParameter("--entropy_threshold", "", "/.*/"), // TODO 0 < fraction < 1
 				// TODO If this value is used, any lane mask supplied will be ignored.
+			new TextArgumentParameter("--allowed_gap_frac", "0.999999", "/.*/"), // TODO 0 < fraction < 1
+			$removeOutliers,
+			$threshold,
+			new Label('<p><strong>Output Options</strong></p>'),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--output_dir", ".")
 		);
 	}
 	public function getScriptName() {
@@ -46,7 +52,9 @@ class FilterAlignment extends DefaultScript {
 		return "filter_alignment";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>Typically, aligned sequences have a lot of identical bases on both the 3' and 5' end.  It will drasticaly reduce processing time if you filter out identical bases.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>Typically, aligned sequences have a lot of identical bases on both the 3' and 5' end.  It will drasticaly reduce processing time if you filter out all those identical bases.</p>";
+		include 'views/filter_alignment.html';
+		return ob_get_clean();
 	}
-
 }
