@@ -19,29 +19,36 @@ class AlignSeqs extends DefaultScript {
 		$inputFp->requireIf();
 
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
-			array("pynast", "infernal", "clustalw", "muscle", "mafft"));
-		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
-			array("muscle", "pair_hm", "clustal", "blast", "uclust", "mafft"));
+//			array("pynast", "infernal", "clustalw", "muscle", "mafft")); // TODO not supported in all versions
+			array("pynast", "muscle", "infernal"));
+
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
 			// TODO [default: created on-the-fly from template_alignment
-	
-		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
+		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
+			array("muscle", "pair_hmm", "clustal", "blast", "uclust", "mafft"));
+		$minPercentId = new TextArgumentParameter("--min_percent_id", "0.75", "/.*/");
 		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
+		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
+		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
+
+		$muscleMaxMemory = new TextArgumentParameter("--muscle_max_memory", "", "/.*/");
+		$muscleMaxMemory->excludeButAllowIf($alignmentMethod, "muscle");
 
 		array_push($this->parameters,
 			new Label("<p><strong>Required Parameters</strong></p>"),
 			$inputFp,
 			new Label("<p><strong>Optional Parameters</strong></p>"),
-			$alignmentMethod,
-			$pairwiseAlignmentMethod,
-			$blastDb,
-			new TrueFalseParameter("--verbose"),
 			new OldFileParameter("--template_fp", $this->project),
 			// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
 			new TextArgumentParameter("--min_length", "", "/.*/"),
 			// TODO [default: 75% of the median input sequence length]
-			new TextArgumentParameter("--min_percent_id", "0.75", "/.*/"),
-			new TextArgumentParameter("--muscle_max_memory", "", "/.*/"),
+			$alignmentMethod,
+			$pairwiseAlignmentMethod,
+			$blastDb,
+			$minPercentId,
+			$muscleMaxMemory,
+			new Label("<p><strong>Output Options</strong></p>"),
+			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_aligned") // TODO dynamic default
 		);
 	}
@@ -55,6 +62,9 @@ class AlignSeqs extends DefaultScript {
 		return "align_seqs";
 	}
 	public function renderHelp() {
-		return "<p>{$this->getScriptTitle()}</p><p>The initial step in performing phylogeny analysis is aligning the sequences.</p>";
+		ob_start();
+		echo "<p>{$this->getScriptTitle()}</p><p>The initial step in performing phylogeny analysis is aligning the sequences.</p>";
+		include 'views/align_seqs.html';
+		return ob_get_clean();
 	}
 }
