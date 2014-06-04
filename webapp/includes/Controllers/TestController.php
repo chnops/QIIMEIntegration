@@ -21,13 +21,21 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing built in files<p>";
-		$project = $this->workflow->getNewProject();		
-		$files = $project->retrieveAllBuiltInFiles();
+		echo "<p>Testing regular expression for TextArgumentParameter<p>";
 
-		echo "<pre>";
-		print_r($files);
-		echo "</pre>";
+		if (!empty($_POST)) {
+			echo "Results: ";
+			echo "preg_match({$_POST['regex']}, {$_POST['input']}): ";
+			echo preg_match($_POST['regex'], $_POST['input']);
+			echo "!<hr/>";
+		}
+
+		echo "<form method=\"POST\">";
+		echo "<input type=\"hidden\" name=\"step\" value=\"test\">";
+		echo "<label for=\"regex\">Regex: <input name=\"regex\" value=\"{$_POST['regex']}\"></label><br/>";
+		echo "<label for=\"input\">Input: <input name=\"input\" value=\"{$_POST['input']}\"></label><br/>";
+		echo "<button type=\"submit\">Submit</button>";
+		echo "</form>";
 
 		return ob_get_clean();
 	}

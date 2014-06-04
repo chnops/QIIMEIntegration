@@ -19,33 +19,33 @@ class PickOtus extends DefaultScript {
 		$inputSeqsFilePath->requireIf();
 
 		$triePrefilter = new TrueFalseParameter("--trie_prefilter");
-		$prefixPrefilterLength = new TextArgumentParameter("--prefix_prefilter_length", "", "/\\d+/");
+		$prefixPrefilterLength = new TextArgumentParameter("--prefix_prefilter_length", "", TextArgumentParameter::PATTERN_DIGIT);
 		$prefixPrefilterLength->excludeButAllowIf($triePrefilter);
 
 		$otuPickingMethod = new ChoiceParameter("--otu_picking_method", "uclust", 
 			array("uclust", "uclust_ref", "blast", "mothur", "cdhit", "usearch", "usearch_ref", "usearch61",
-				"usearch61_ref", "prefix_suffix", "trie"));// TODO sort
+				"usearch61_ref", "prefix_suffix", "trie"));
 
 		$clusteringAlgorithm = new ChoiceParameter("--clustering_algorithm", "furthest",
 			array("furthest", "nearest", "average"));
 		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mother");
 
-		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", "/\\d+/");
+		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", TextArgumentParameter::PATTERN_DIGIT); // TODO units = Mbyte
 		$maxCdhitMemory->excludeButAllowIf($otuPickingMethod, "cdhit");
 
 		$trieReverseSeqs = new TrueFalseParameter("--trie_reverse_seqs");
 		$trieReverseSeqs->excludeButAllowIf($otuPickingMethod, "trie");
 
-		$prefixLength = new TextArgumentParameter("--prefix_length", "50", "/\\d+/");
+		$prefixLength = new TextArgumentParameter("--prefix_length", "50", TextArgumentParameter::PATTERN_DIGIT);
 		$prefixLength->excludeButAllowIf($otuPickingMethod, "prefix_suffix");
-		$suffixLength = new TextArgumentParameter("--suffix_length", "50", "/\\d+/");
+		$suffixLength = new TextArgumentParameter("--suffix_length", "50", TextArgumentParameter::PATTERN_DIGIT);
 		$suffixLength->excludeButAllowIf($otuPickingMethod, "prefix_suffix");
 
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
 		$blastDb->excludeButAllowIf($otuPickingMethod, "blast");
-		$minAlignedPercent = new TextArgumentParameter("--min_aligned_percent", "0.5", "/.*/");
+		$minAlignedPercent = new TextArgumentParameter("--min_aligned_percent", "0.5", TextArgumentParameter::PATTERN_PROPORTION);
 		$minAlignedPercent->excludeButAllowIf($otuPickingMethod, "blast");
-		$maxEValue = new TextArgumentParameter("--max_e_value", "1e-10", "/.*/");
+		$maxEValue = new TextArgumentParameter("--max_e_value", "1e-10", TextArgumentParameter::PATTERN_NUMBER);
 		$maxEValue->excludeButAllowIf($otuPickingMethod, "blast");
 
 		$refSeqsFp = new OldFileParameter("--refseqs_fp", $this->project);
@@ -58,7 +58,7 @@ class PickOtus extends DefaultScript {
 		$suppressNewClusters->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$suppressNewClusters->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
-		$similarity = new TextArgumentParameter("--similarity", "0.97", "/.*/");
+		$similarity = new TextArgumentParameter("--similarity", "0.97", TextArgumentParameter::PATTERN_PROPORTION);
 		$similarity->excludeButAllowIf($otuPickingMethod, "cdhit");
 		$similarity->excludeButAllowIf($otuPickingMethod, "blast");
 		$similarity->excludeButAllowIf($otuPickingMethod, "usearch");
@@ -67,7 +67,7 @@ class PickOtus extends DefaultScript {
 		$similarity->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 		$similarity->excludeButAllowIf($otuPickingMethod, "uclust");
 		$similarity->excludeButAllowIf($otuPickingMethod, "uclust_ref");
-		$wordLength = new TextArgumentParameter("--word_length", "12", "/\\d+/"); // TODO dynamic default
+		$wordLength = new TextArgumentParameter("--word_length", "12", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
 		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust");
 		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch");
@@ -88,10 +88,10 @@ class PickOtus extends DefaultScript {
 		$userSort = new TrueFalseParameter("--user_sort");
 		$userSort->excludeButAllowIf($otuPickingMethod, "uclust");
 		$userSort->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
-		$stepwords = new TextArgumentParameter("--stepwords", "20", "/\\d+/");
+		$stepwords = new TextArgumentParameter("--stepwords", "20", TextArgumentParameter::PATTERN_DIGIT);
 		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust");
 		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust_ref");
-		$uclustOtuIdPrefix = new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", "/.*/"); // TODO no whitespace
+		$uclustOtuIdPrefix = new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", TextArgumentParameter::PATTERN_NO_WHITE_SPACE); // TODO no whitespace
 		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust");
 		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$suppressUclustStableSort = new TrueFalseParameter("--suppress_uclust_stable_sort");
@@ -104,12 +104,12 @@ class PickOtus extends DefaultScript {
 		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust");
 		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 
-		$maxAccepts = new TextArgumentParameter("--max_accepts", "20", "/\\d+/"); // TODO dynamic default
+		$maxAccepts = new TextArgumentParameter("--max_accepts", "20", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$maxRejects = new TextArgumentParameter("--max_rejects", "500", "/\\d+/"); // TODO dynamic default
+		$maxRejects = new TextArgumentParameter("--max_rejects", "500", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust");
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -136,17 +136,17 @@ class PickOtus extends DefaultScript {
 		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$fastOrThoroughUsearchClustering->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
-		$percentIdError = new TextArgumentParameter("--percent_id_err", "0.97", "/.*/"); // TODO decimal between 1 and 0
+		$percentIdError = new TextArgumentParameter("--percent_id_err", "0.97", TextArgumentParameter::PATTERN_PROPORTION);
 		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch");
 		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$percentIdError->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$minSize = new TextArgumentParameter("--minsize", "4", "/\\d+/");
+		$minSize = new TextArgumentParameter("--minsize", "4", TextArgumentParameter::PATTERN_DIGIT);
 		$minSize->excludeButAllowIf($otuPickingMethod, "usearch");
 		$minSize->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$minSize->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$minSize->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$abundanceSkew = new TextArgumentParameter("--abundance_skew", "2.0", "/.*/"); // TODO any float
+		$abundanceSkew = new TextArgumentParameter("--abundance_skew", "2.0", TextArgumentParameter::PATTERN_NUMBER);
 		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch"); // TODO exclude if suppress_chimera_detection
 		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$abundanceSkew->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -156,7 +156,7 @@ class PickOtus extends DefaultScript {
 		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$dbFilePath->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$percIdBlast = new TextArgumentParameter("--perc_id_blast", "0.97", "/.*/"); // TODO fload between 1 and 0
+		$percIdBlast = new TextArgumentParameter("--perc_id_blast", "0.97", TextArgumentParameter::PATTERN_PROPORTION); 
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch");
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -194,7 +194,7 @@ class PickOtus extends DefaultScript {
 		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$nonChimerasRetention->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$minLen = new TextArgumentParameter("--minlen", "64", "/\\d+/");
+		$minLen = new TextArgumentParameter("--minlen", "64", TextArgumentParameter::PATTERN_DIGIT);
 		$minLen->excludeButAllowIf($otuPickingMethod, "usearch");
 		$minLen->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$minLen->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -257,7 +257,8 @@ class PickOtus extends DefaultScript {
 			new Label("<strong>Ouput options</strong>"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "uclust_picked_otus") // TODO dynamic default
-//			new TextArgumentParameter("--threads", "1.0", "/.*/"), TODO not supported in all MacQIIME versions 
+//			new TextArgumentParameter("--threads", "1.0", TextArgumentParameter::PATTERN_NUMBER), TODO not supported in all MacQIIME versions 
+				//TODO only applies to usearch61
 		);
 	}
 	public function getScriptName() {

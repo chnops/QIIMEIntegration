@@ -24,12 +24,12 @@ class AssignTaxonomy extends DefaultScript {
 		$readIdRegex = new TextArgumentParameter("--read_id_regex", "\\S+\\s+(\\S+)", "/.*/"); // TODO really complex regex
 		$ampliconIdRegex = new TextArgumentParameter("--amplicon_id_regex", "(\\S+)\\s+(\\S+?)\\/", "/.*/"); // TODO really complex regex
 		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", "/.*/"); // TODO really complex regex
-		$confidence = new TextArgumentParameter("--confidence", "0.8", "/.*/"); // TODO decimal between 0 and 1
-		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", "/\\d+/"); // TODO units = MB
+		$confidence = new TextArgumentParameter("--confidence", "0.8", TextArgumentParameter::PATTERN_PROPORTION);
+		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", TextArgumentParameter::PATTERN_DIGIT); // TODO units = MB
 //		TODO not supported in all macqiime version
-//		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", "/.*/"); // TODO decimal between 0 and 1
-//		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", "/.*/");  // TODO decimal between 0 and 1
-//		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", "/\\d+/"); 
+//		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", TextArgumentParameter::PATTERN_PROPORTION);
+//		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", TextArgumentParameter::PATTERN_PROPORTION);
+//		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", TextArgumentParameter::PATTERN_DIGIT); 
 
 		$read1SeqsFp->excludeButAllowIf($assignmentMethod, "rtax");
 		$read2SeqsFp->excludeButAllowIf($assignmentMethod, "rtax");
@@ -80,7 +80,7 @@ class AssignTaxonomy extends DefaultScript {
 			$idToTaxonomyFp,
 			$eitherBlastDatabase,
 			$treeFp,
-			new TextArgumentParameter("--e_value", "0.001", "/.*/"), // TODO potentially, but not necessarily, scientific notation
+			new TextArgumentParameter("--e_value", "0.001", TextArgumentParameter::PATTERN_NUMBER),
 			new OldFileParameter("--training_data_properties_fp", $this->project),
 				// TODO This option is overridden by the -t and -r options.
 			new Label("<strong>Output Options</strong>"),

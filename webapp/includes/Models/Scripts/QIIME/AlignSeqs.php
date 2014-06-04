@@ -26,12 +26,12 @@ class AlignSeqs extends DefaultScript {
 			// TODO [default: created on-the-fly from template_alignment
 		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
 			array("muscle", "pair_hmm", "clustal", "blast", "uclust", "mafft"));
-		$minPercentId = new TextArgumentParameter("--min_percent_id", "0.75", "/.*/");
+		$minPercentId = new TextArgumentParameter("--min_percent_id", "0.75", TextArgumentParameter::PATTERN_PROPORTION);
 		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
 		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
 		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
 
-		$muscleMaxMemory = new TextArgumentParameter("--muscle_max_memory", "", "/.*/");
+		$muscleMaxMemory = new TextArgumentParameter("--muscle_max_memory", "", TextArgumentParameter::PATTERN_PROPORTION);
 		$muscleMaxMemory->excludeButAllowIf($alignmentMethod, "muscle");
 
 		array_push($this->parameters,
@@ -40,7 +40,7 @@ class AlignSeqs extends DefaultScript {
 			new Label("<p><strong>Optional Parameters</strong></p>"),
 			new OldFileParameter("--template_fp", $this->project),
 			// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
-			new TextArgumentParameter("--min_length", "", "/.*/"),
+			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_PROPORTION),
 			// TODO [default: 75% of the median input sequence length]
 			$alignmentMethod,
 			$pairwiseAlignmentMethod,

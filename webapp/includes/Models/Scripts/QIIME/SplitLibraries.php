@@ -23,23 +23,23 @@ class SplitLibraries extends DefaultScript {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 
 		$barcodeType = new ChoiceParameter("--barcode-type", "golay_12", array("hamming_8", "golay_12", "variable_length"));
-		$b = new TextArgumentParameter("-b", "", "/\\d+\\/");
+		$b = new TextArgumentParameter("-b", "", TextArgumentParameter::PATTERN_DIGIT);
 		$eitherBarcode = $barcodeType->linkTo($b);
 
-		$maxAmbig = new TextArgumentParameter("--max-ambig", "6", "/\\d+/");
+		$maxAmbig = new TextArgumentParameter("--max-ambig", "6", TextArgumentParameter::PATTERN_DIGIT);
 		$truncateAmbiBases = new TrueFalseParameter("--truncate_ambi_bases");
 		$eitherAmbig = $maxAmbig->linkTo($truncateAmbiBases);
 
 		$reversePrimers = new ChoiceParameter("--reverse_primers", "disable", array("disable", "truncate_only", "truncate_remove"));
-		$reversePrimerMismatches = new TextArgumentParameter("--reverse_primer_mismatches", "0", "/\\d+/");
+		$reversePrimerMismatches = new TextArgumentParameter("--reverse_primer_mismatches", "0", TextArgumentParameter::PATTERN_DIGIT);
 		$reversePrimerMismatches->excludeButAllowIf($reversePrimers);
 
 		$qual = new OldFileParameter("--qual", $this->project);
-		$minQualScore = new TextArgumentParameter("--min-qual-score", "25", "/\\d+/");
+		$minQualScore = new TextArgumentParameter("--min-qual-score", "25", TextArgumentParameter::PATTERN_DIGIT);
 		$recordQualScores = new TrueFalseParameter("--record_qual_scores");
 		$minQualScore->excludeButAllowIf($qual);
 		$recordQualScores->excludeButAllowIf($qual);
-		$qualScoreWindow = new TextArgumentParameter("--qual_score_window", "0", "/\\d+/");
+		$qualScoreWindow = new TextArgumentParameter("--qual_score_window", "0", TextArgumentParameter::PATTERN_DIGIT);
 		$discardBadWindows = new TrueFalseParameter("--discard_bad_windows");
 		$qualScoreWindow->excludeButAllowIf($qual);
 		$discardBadWindows->excludeButAllowIf($qualScoreWindow);
@@ -51,8 +51,8 @@ class SplitLibraries extends DefaultScript {
 			new Label("<p><strong>Optional Parameters</strong></p>"),
 			$verboseParameter,
 			new TrueFalseParameter("--remove_unassigned"),
-			new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-  			new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+			new TextArgumentParameter("--min-seq-length", "200", TextArgumentParameter::PATTERN_DIGIT),
+  			new TextArgumentParameter("--max-seq-length", "1000", TextArgumentParameter::PATTERN_DIGIT),
   			new TrueFalseParameter("--trim-seq-length"),
 			$eitherBarcode,
 			$eitherAmbig,
@@ -65,19 +65,19 @@ class SplitLibraries extends DefaultScript {
 			$discardBadWindows,
   			new TrueFalseParameter("--keep-primer"),
 			new TrueFalseParameter("--keep-barcode"),
-  			new TextArgumentParameter("--max-homopolymer", "6", "/\\d+/"),
-			new TextArgumentParameter("--max-primer-mismatch", "0", "/\\d+/"),
-			new TextArgumentParameter("--max-barcode-errors", "1.5", "/.*/"),
+  			new TextArgumentParameter("--max-homopolymer", "6", TextArgumentParameter::PATTERN_DIGIT),
+			new TextArgumentParameter("--max-primer-mismatch", "0", TextArgumentParameter::PATTERN_DIGIT),
+			new TextArgumentParameter("--max-barcode-errors", "1.5", TextArgumentParameter::PATTERN_NUMBER),
 			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
 			new TrueFalseParameter("--disable_primers"),
-			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]*/"), // TODO or run_header
-			new TextArgumentParameter("--min-seq-length", "200", "/\\d+/"),
-			new TextArgumentParameter("--max-seq-length", "1000", "/\\d+/"),
+			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]+/"), // TODO or run_header
+			new TextArgumentParameter("--min-seq-length", "200", TextArgumentParameter::PATTERN_DIGIT),
+			new TextArgumentParameter("--max-seq-length", "1000", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--trim-seq-length"),
-			new TextArgumentParameter("--median_length_filtering", "", "/\\d+/"),
+			new TextArgumentParameter("--median_length_filtering", "", TextArgumentParameter::PATTERN_NUMBER),
 
 			new NewFileParameter("--dir-prefix", "."),
-			new TextArgumentParameter("--start-numbering-at", "1", "/\\d+/"),
+			new TextArgumentParameter("--start-numbering-at", "1", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--retain_unassigned_reads")
 		);
 	}

@@ -19,7 +19,7 @@ class FilterAlignment extends DefaultScript {
 		$inputFastaFile->requireIf();
 
 		$removeOutliers = new TrueFalseParameter("--remove_outliers");
-		$threshold = new TextArgumentParameter("--threshold", "3.0", "/.*/"); // TODO arbitrary float
+		$threshold = new TextArgumentParameter("--threshold", "3.0", TextArgumentParameter::PATTERN_NUMBER);
 			//TODO only used with remove_outliers
 
 		$threshold->excludeButAllowIf($removeOutliers);
@@ -32,9 +32,9 @@ class FilterAlignment extends DefaultScript {
 				// TODO supresses lane_mask_fp
 			new OldFileParameter("--lane_mask_fp", $this->project),
 				// TODO [default:/macqiime/greengenes/lanemask_in_1s_and_0s]
-			new TextArgumentParameter("--entropy_threshold", "", "/.*/"), // TODO 0 < fraction < 1
+			new TextArgumentParameter("--entropy_threshold", "", TextArgumentParameter::PATTERN_PROPORTION),
 				// TODO If this value is used, any lane mask supplied will be ignored.
-			new TextArgumentParameter("--allowed_gap_frac", "0.999999", "/.*/"), // TODO 0 < fraction < 1
+			new TextArgumentParameter("--allowed_gap_frac", "0.999999", TextArgumentParameter::PATTERN_PROPORTION),
 			$removeOutliers,
 			$threshold,
 			new Label('<p><strong>Output Options</strong></p>'),
