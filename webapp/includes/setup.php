@@ -8,3 +8,6 @@ spl_autoload_register(function($class) {
 	require_once("./includes/" . str_replace("\\", "/", $class) . ".php");
 });
 
+// Make it so that a user can leave/log out, and the script will still run
+ignore_user_abort(true);
+set_time_limit(0);
