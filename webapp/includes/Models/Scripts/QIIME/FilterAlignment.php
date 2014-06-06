@@ -30,8 +30,7 @@ class FilterAlignment extends DefaultScript {
 			new Label("Optional Parameters"),
 			new TrueFalseParameter("--suppress_lane_mask_filter"),
 				// TODO supresses lane_mask_fp
-			new OldFileParameter("--lane_mask_fp", $this->project),
-				// TODO [default:/macqiime/greengenes/lanemask_in_1s_and_0s]
+			new OldFileParameter("--lane_mask_fp", $this->project, '/macqiime/greengenes/lanemask_in_1s_and_0s'),
 			new TextArgumentParameter("--entropy_threshold", "", TextArgumentParameter::PATTERN_PROPORTION),
 				// TODO If this value is used, any lane mask supplied will be ignored.
 			new TextArgumentParameter("--allowed_gap_frac", "0.999999", TextArgumentParameter::PATTERN_PROPORTION),

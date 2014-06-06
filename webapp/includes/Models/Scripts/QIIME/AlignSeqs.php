@@ -35,8 +35,7 @@ class AlignSeqs extends DefaultScript {
 			new Label("Required Parameters"),
 			$inputFp,
 			new Label("Optional Parameters"),
-			new OldFileParameter("--template_fp", $this->project),
-			// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
+			new OldFileParameter("--template_fp", $this->project, '/macqiime/greengenes/core_set_aligned.fasta.imputed'),
 			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_PROPORTION),
 			// TODO [default: 75% of the median input sequence length]
 			$alignmentMethod,

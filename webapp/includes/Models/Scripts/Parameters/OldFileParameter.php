@@ -5,9 +5,14 @@ use \Models\Scripts\ScriptException;
 
 class OldFileParameter extends DefaultParameter {
 	private $project = NULL;
-	public function __construct($name, \Models\ProjectI $project) {
+	public function __construct($name, \Models\ProjectI $project, $default = "") {
 		$this->name = $name;
 		$this->project = $project;
+		$this->value = $default;
+	}
+	public function renderForOperatingSystem() {
+		$separator = (strlen($this->name) == 2) ? " " : "=";
+		return $this->name . $separator . escapeshellarg($this->value);
 	}
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
