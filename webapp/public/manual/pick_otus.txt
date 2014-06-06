@@ -286,6 +286,13 @@ Options:
   --sizeorder           Enable size based preference in clustering with
                         usearch61. Requires that --usearch61_sort_method be
                         abundance. [default: False]
+  --threads=THREADS     Specify number of threads per core to be used for
+                        usearch61 commands that utilize multithreading. By
+                        default, will calculate the number of cores to utilize
+                        so a single thread will be used per CPU. Specify a
+                        fractional number, e.g. 1.0 for 1 thread per core, or
+                        0.5 for a single thread on a two core CPU. Only
+                        applies to usearch61. [default: one_per_cpu]
 
   REQUIRED options:
     The following options must be provided under all circumstances.

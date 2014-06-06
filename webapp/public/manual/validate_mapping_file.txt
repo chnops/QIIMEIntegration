@@ -1,4 +1,4 @@
-Usage: check_id_map.py [options] {-m/--mapping_fp MAPPING_FP}
+Usage: validate_mapping_file.py [options] {-m/--mapping_fp MAPPING_FP}
 
 [] indicates optional input (order unimportant)
 {} indicates required input (order unimportant)
@@ -58,10 +58,10 @@ Specifically, we check that:
 
 Example usage: 
 Print help message and exit
- check_id_map.py -h
+ validate_mapping_file.py -h
 
-Example: Check the Fasting_Map.txt mapping file for problems, supplying the required mapping file, and output the results in the check_id_map_output directory
- check_id_map.py -m Fasting_Map.txt -o check_id_map_output
+Example: Check the Fasting_Map.txt     mapping file for problems, supplying the required mapping file, and output     the results in the validate_mapping_file_output directory
+ validate_mapping_file.py -m     Fasting_Map.txt -o validate_mapping_file_output
 
 Options:
   --version             show program's version number and exit
@@ -84,7 +84,7 @@ Options:
                         [default: False]
   -p, --disable_primer_check
                         Use -p to disable checks for primers.
-                        LinkerPrimerSequence header still required.  [default:
+                        LinkerPrimerSequence header still required. [default:
                         False]
   -j ADDED_DEMULTIPLEX_FIELD, --added_demultiplex_field=ADDED_DEMULTIPLEX_FIELD
                         Use -j to add a field to use in the mapping file as

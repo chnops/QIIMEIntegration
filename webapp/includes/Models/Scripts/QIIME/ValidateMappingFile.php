@@ -16,12 +16,7 @@ class ValidateMappingFile extends DefaultScript {
 
 	private $scriptName;
 	public function __construct(\Models\ProjectI $project) {
-		if ($project->scriptExists("validate_mapping_file.py")) {
-			$this->scriptName = "validate_mapping_file.py";
-		}
-		else {
-			$this->scriptName = "check_id_map.py";
-		}
+		$this->scriptName = "validate_mapping_file.py";
 		parent::__construct($project);
 	}
 

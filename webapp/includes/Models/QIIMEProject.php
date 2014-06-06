@@ -34,7 +34,11 @@ class QIIMEProject extends DefaultProject {
 
 		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
 		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['De-multiplex libraries'][] = $script;
+		$this->scriptsFormatted['Prepare libraries'][] = $script;
+
+		$script = new \Models\Scripts\QIIME\JoinPairedEnds($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Prepare libraries'][] = $script;
 
 		$script = new \Models\Scripts\QIIME\PickOtus($this);
 		$this->scripts[$script->getHtmlId()] = $script;
@@ -153,6 +157,10 @@ class QIIMEProject extends DefaultProject {
 				$fileNames = $this->operatingSystem->getDirContents('/macqiime/greengenes', $prependHome = false);
 				foreach ($fileNames as $fileName) {
 					$this->builtInFiles[] = "/macqiime/greengenes/{$fileName}";
+				}
+				$fileNames = $this->operatingSystem->getDirContents('/macqiime/UNITe', $prependHome = false);
+				foreach ($fileNames as $fileName) {
+					$this->builtInFiles[] = "/macqiime/UNITe/{$fileName}";
 				}
 			}
 			catch (OperatingSystemException $ex) {

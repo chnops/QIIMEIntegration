@@ -6,9 +6,11 @@ use \Models\Scripts\ScriptException;
 class VersionParameter extends DefaultParameter {
 
 	private $versionString = "";
-	public function __construct(\Models\ProjectI $project, $scriptName) {
+	public function __construct(\Models\Scripts\ScriptI $script) {
 		$this->name = "--version";
-		$this->versionString = $project->getVersion($scriptName);
+		ob_start();
+		include "public/versions/{$script->getHtmlId()}.txt";
+		$this->versionString = trim(ob_get_clean());
 	}
 
 	public function renderForOperatingSystem() {

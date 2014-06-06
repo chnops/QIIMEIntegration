@@ -13,7 +13,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		$this->project = $project;
 
 		$helpParameter = new HelpParameter($this);
-		$versionParameter = new VersionParameter($this->project, $this->getScriptName());
+		$versionParameter = new VersionParameter($this);
 		$helpParameter->excludeButAllowIf();
 		$versionParameter->excludeButAllowIf();
 		$this->parameters = array($helpParameter->getName() => $helpParameter,

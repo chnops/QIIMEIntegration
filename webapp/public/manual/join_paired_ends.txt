@@ -1,0 +1,80 @@
+Usage: join_paired_ends.py [options] {-f/--forward_reads_fp FORWARD_READS_FP -r/--reverse_reads_fp REVERSE_READS_FP -o/--output_dir OUTPUT_DIR}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+This script takes forward and reverse Illumina reads and joins them using the method chosen. Will optionally create an updated index reads file containing index reads for the surviving joined paired end reads. If the option to write an updated index file is chosen, be sure that the order and header format of the index reads is the same as the order and header format of reads in the files that will be joined (this is the default for reads generated on the Illumina instruments).
+
+Currently, there are two methods that can be selected by the user to join paired-end data:
+
+1. fastq-join - Erik Aronesty, 2011. ea-utils : "Command-line tools for processing biological sequencing data" (http://code.google.com/p/ea-utils)
+
+2. SeqPrep - (https://github.com/jstjohn/SeqPrep)
+
+
+Example usage: 
+Print help message and exit
+ join_paired_ends.py -h
+
+Join paired-ends with 'fastq-join': This is the default method to join paired-end Illumina data
+ join_paired_ends.py -f $PWD/forward_reads.fastq -r $PWD/reverse_reads.fastq -o $PWD/fastq-join_joined
+
+Join paired-ends with 'SeqPrep': Produces similar output to the 'fastq-join' but returns data in gzipped format.
+ join_paired_ends.py -m SeqPrep -f $PWD/forward_reads.fastq -r $PWD/reverse_reads.fastq -o $PWD/SeqPrep_joined
+
+Update the index / barcode reads file to match the surviving joined pairs.: This is required if you will be using 'split_libraries_fastq.py'.
+ join_paired_ends.py -f $PWD/forward_reads.fastq -r $PWD/reverse_reads.fastq -b $PWD/barcodes.fastq -o $PWD/fastq-join_joined
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         Print information during execution -- useful for
+                        debugging [default: False]
+  -m PE_JOIN_METHOD, --pe_join_method=PE_JOIN_METHOD
+                        Method to use for joining paired-ends. Valid choices
+                        are: fastq-join, SeqPrep [default: fastq-join]
+  -b INDEX_READS_FP, --index_reads_fp=INDEX_READS_FP
+                        Path to the barcode / index reads in FASTQ format.
+                        Will be filtered based on surviving joined pairs.
+  -j MIN_OVERLAP, --min_overlap=MIN_OVERLAP
+                        Applies to both fastq-join and SeqPrep methods.
+                        Minimum allowed overlap in base-pairs required to join
+                        pairs. If not set, progam defaults will be used. Must
+                        be an integer. [default: none]
+  -p PERC_MAX_DIFF, --perc_max_diff=PERC_MAX_DIFF
+                        Only applies to fastq-join method, otherwise ignored.
+                        Maximum allowed % differences within region of
+                        overlap. If not set, progam defaults will be used.
+                        Must be an integer between 1-100 [default: none]
+  -y MAX_ASCII_SCORE, --max_ascii_score=MAX_ASCII_SCORE
+                        Only applies to SeqPrep method, otherwise ignored.
+                        Maximum quality score / ascii code allowed to appear
+                        within joined pairs output. For more information,
+                        please see: http://en.wikipedia.org/wiki/FASTQ_format.
+                        [default: J]
+  -n MIN_FRAC_MATCH, --min_frac_match=MIN_FRAC_MATCH
+                        Only applies to SeqPrep method, otherwise ignored.
+                        Minimum allowed fraction of matching bases required to
+                        join reads. Must be a float between 0-1. If not set,
+                        progam defaults will be used. [default: none]
+  -g MAX_GOOD_MISMATCH, --max_good_mismatch=MAX_GOOD_MISMATCH
+                        Only applies to SeqPrep method, otherwise ignored.
+                        Maximum mis-matched high quality bases allowed to join
+                        reads. Must be a float between 0-1. If not set, progam
+                        defaults will be used. [default: none]
+  -6 PHRED_64, --phred_64=PHRED_64
+                        Only applies to SeqPrep method, otherwise ignored. Set
+                        if input reads are in phred+64 format. Output will
+                        always be phred+33. [default: False]
+
+  REQUIRED options:
+    The following options must be provided under all circumstances.
+
+    -f FORWARD_READS_FP, --forward_reads_fp=FORWARD_READS_FP
+                        Path to input forward reads in FASTQ format.
+                        [REQUIRED]
+    -r REVERSE_READS_FP, --reverse_reads_fp=REVERSE_READS_FP
+                        Path to input reverse reads in FASTQ format.
+                        [REQUIRED]
+    -o OUTPUT_DIR, --output_dir=OUTPUT_DIR
+                        Directory to store result files [REQUIRED]

@@ -128,25 +128,6 @@ abstract class DefaultProject implements ProjectI {
 		return $this->pastScriptRuns;
 	}
 
-	public function scriptExists($scriptName) {
-		try {
-			$whichOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), "", "which {$scriptName}");
-			return true;
-		}
-		catch (\Exception $ex) {
-			return false;
-		}
-	}
-	public function getVersion($scriptName) {
-		try {
-			$consoleOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), "", "{$scriptName} --version");
-			return trim($consoleOutput);
-		}
-		catch (\Exception $ex) {
-			return "Unable to obtain version information";
-		}
-	}
-
 	public function retrieveAllGeneratedFiles() {
 		if (empty($this->generatedFiles)) {
 			$pastRuns = $this->database->getPastRuns($this->owner, $this->id);

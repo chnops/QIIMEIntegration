@@ -23,8 +23,6 @@ interface ProjectI {
 	public function getFileTypeFromHtmlId($htmlId);
 	
 	// complex accessors
-	public function scriptExists($scriptName);
-	public function getVersion($scriptName);
 	// (which may change during the execution of the script)
 	public function getProjectDir();
 	public function retrieveAllUploadedFiles();
