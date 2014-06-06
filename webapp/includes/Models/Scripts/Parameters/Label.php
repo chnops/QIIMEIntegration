@@ -11,7 +11,7 @@ class Label extends DefaultParameter {
 		return "";
 	}
 	public function renderForForm($disabled) {
-		return $this->value;
+		return "<p><strong>{$this->value}</strong></p>\n";
 	}
 
 	public function acceptInput(array $input) {

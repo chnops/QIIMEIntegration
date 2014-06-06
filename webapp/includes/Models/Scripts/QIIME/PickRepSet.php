@@ -19,16 +19,16 @@ class PickRepSet extends DefaultScript {
 		$inputFile->requireIf();
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputFile,
 
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			new OldFileParameter("--reference_seqs_fp", $this->project),
 			new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
 			new ChoiceParameter("--rep_set_picking_method", "first", 
 				array("first", "random", "longest", "most_abundant")),
 
-			new Label("<strong>Output options</strong>"),
+			new Label("Output options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--log_fp", ""), 
 			new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 

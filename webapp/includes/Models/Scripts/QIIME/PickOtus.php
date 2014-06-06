@@ -207,11 +207,13 @@ class PickOtus extends DefaultScript {
 		$sizeOrder = new TrueFalseParameter("--sizeorder");
 		$sizeOrder->excludeButAllowIf($usearch61SortMethod, "abundance");
 
+		$threads = new TextArgumentParameter("--threads", "1.0", TextArgumentParameter::PATTERN_NUMBER);
+		$threads->excludeButAllowIf($otuPickingMethod, "usearch61");
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputSeqsFilePath,
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			$triePrefilter,
 			$prefixPrefilterLength,
 			$otuPickingMethod,
@@ -253,12 +255,11 @@ class PickOtus extends DefaultScript {
 			$minLen,
 			$usearch61SortMethod,
 			$sizeOrder,
+			$threads,
 
-			new Label("<strong>Ouput options</strong>"),
+			new Label("Ouput options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "uclust_picked_otus") // TODO dynamic default
-//			new TextArgumentParameter("--threads", "1.0", TextArgumentParameter::PATTERN_NUMBER), TODO not supported in all MacQIIME versions 
-				//TODO only applies to usearch61
 		);
 	}
 	public function getScriptName() {

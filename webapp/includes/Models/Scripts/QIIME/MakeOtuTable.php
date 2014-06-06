@@ -22,13 +22,13 @@ class MakeOtuTable extends DefaultScript {
 		$outputBiomFp->requireIf();
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$otuMapFile,
 			$outputBiomFp, 
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			new OldFileParameter("--taxonomy", $this->project),
 			new OldFileParameter("--exclude_otus_fp", $this->project),
-			new Label("<p><strong>Output Options</strong></p>"),
+			new Label("Output Options"),
 			new TrueFalseParameter("--verbose")
 		);
 	}

@@ -27,16 +27,17 @@ class ValidateMappingFile extends DefaultScript {
 		$verboseParameter = new TrueFalseInvertedParameter("--verbose");
 
 		array_push($this->parameters,
-			 new Label("<p><strong>Required Parameters</strong></p>"),
+			 new Label("Required Parameters"),
 			 $mappingFp,
-			 new Label("<p><strong>Optional Parameters</strong></p>"),
-			 $verboseParameter,
-			 new NewFileParameter("--output_dir", ""),
+			 new Label("Optional Parameters"),
 			 new TextArgumentParameter("--char_replace", "_", "/^.$/"),
 			 new TrueFalseParameter("--not_barcoded"),
 			 new TrueFalseParameter("--variable_len_barcodes"),
 			 new TrueFalseParameter("--disable_primer_check"),
 			 new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),// TODO same as split_libraries or run header 
+			 new Label("Output Options"),
+			 $verboseParameter,
+			 new NewFileParameter("--output_dir", ""),
 			 new TrueFalseParameter("--suppress_html")
 		);
 	}

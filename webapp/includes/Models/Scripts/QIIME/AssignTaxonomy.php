@@ -64,9 +64,9 @@ class AssignTaxonomy extends DefaultScript {
 		$inputFastaFp->requireIf();
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputFastaFp,
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			$assignmentMethod,
 			$read1SeqsFp,
 			$read2SeqsFp,
@@ -83,7 +83,7 @@ class AssignTaxonomy extends DefaultScript {
 			new TextArgumentParameter("--e_value", "0.001", TextArgumentParameter::PATTERN_NUMBER),
 			new OldFileParameter("--training_data_properties_fp", $this->project),
 				// TODO This option is overridden by the -t and -r options.
-			new Label("<strong>Output Options</strong>"),
+			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_assigned_taxonomy") // TODO dynamic default
 			);

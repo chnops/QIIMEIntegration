@@ -19,14 +19,14 @@ class MakePhylogeny extends DefaultScript {
 		$inputFp->requireIf();
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputFp,
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			new ChoiceParameter("--tree_method", "fasttree", 
 				array("clearcut", "clustalw", "fasttree_v1", "fasttree", "raxml_v730", "muscle")),
 			new ChoiceParameter("--root_method", "tree_method_default",
 				array("midpoint", "tree_method_default")),
-			new Label("<p><strong>Output Options</strong></p>"),
+			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
 			new NewFileParameter("--log_fp", "")

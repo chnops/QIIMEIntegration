@@ -25,9 +25,9 @@ class FilterAlignment extends DefaultScript {
 		$threshold->excludeButAllowIf($removeOutliers);
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputFastaFile,
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			new TrueFalseParameter("--suppress_lane_mask_filter"),
 				// TODO supresses lane_mask_fp
 			new OldFileParameter("--lane_mask_fp", $this->project),
@@ -37,7 +37,7 @@ class FilterAlignment extends DefaultScript {
 			new TextArgumentParameter("--allowed_gap_frac", "0.999999", TextArgumentParameter::PATTERN_PROPORTION),
 			$removeOutliers,
 			$threshold,
-			new Label('<p><strong>Output Options</strong></p>'),
+			new Label('Output Options'),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", ".")
 		);

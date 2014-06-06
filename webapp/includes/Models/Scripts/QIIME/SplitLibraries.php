@@ -45,11 +45,10 @@ class SplitLibraries extends DefaultScript {
 		$discardBadWindows->excludeButAllowIf($qualScoreWindow);
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$map, 
 			$fasta, 
-			new Label("<p><strong>Optional Parameters</strong></p>"),
-			$verboseParameter,
+			new Label("Optional Parameters"),
 			new TrueFalseParameter("--remove_unassigned"),
 			new TextArgumentParameter("--min-seq-length", "200", TextArgumentParameter::PATTERN_DIGIT),
   			new TextArgumentParameter("--max-seq-length", "1000", TextArgumentParameter::PATTERN_DIGIT),
@@ -76,6 +75,8 @@ class SplitLibraries extends DefaultScript {
 			new TrueFalseParameter("--trim-seq-length"),
 			new TextArgumentParameter("--median_length_filtering", "", TextArgumentParameter::PATTERN_NUMBER),
 
+			new Label("Output Options"),
+			$verboseParameter,
 			new NewFileParameter("--dir-prefix", "."),
 			new TextArgumentParameter("--start-numbering-at", "1", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--retain_unassigned_reads")

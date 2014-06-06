@@ -16,28 +16,25 @@ class AlignSeqs extends DefaultScript {
 
 	public function initializeParameters() {
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
-		$inputFp->requireIf();
-
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
-//			array("pynast", "infernal", "clustalw", "muscle", "mafft")); // TODO not supported in all versions
-			array("pynast", "muscle", "infernal"));
-
+			array("pynast", "infernal", "clustalw", "muscle", "mafft"));
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
 			// TODO [default: created on-the-fly from template_alignment
 		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
 			array("muscle", "pair_hmm", "clustal", "blast", "uclust", "mafft"));
 		$minPercentId = new TextArgumentParameter("--min_percent_id", "0.75", TextArgumentParameter::PATTERN_PROPORTION);
-		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
-		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
-		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
-
 		$muscleMaxMemory = new TextArgumentParameter("--muscle_max_memory", "", TextArgumentParameter::PATTERN_PROPORTION);
+
+		$inputFp->requireIf();
+		$pairwiseAlignmentMethod->excludeButAllowIf($alignmentMethod, "pynast");
+		$blastDb->excludeButAllowIf($alignmentMethod, "pynast");
+		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
 		$muscleMaxMemory->excludeButAllowIf($alignmentMethod, "muscle");
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</strong></p>"),
+			new Label("Required Parameters"),
 			$inputFp,
-			new Label("<p><strong>Optional Parameters</strong></p>"),
+			new Label("Optional Parameters"),
 			new OldFileParameter("--template_fp", $this->project),
 			// TODO [default: /macqiime/greengenes/core_set_aligned.fasta.imputed]
 			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_PROPORTION),
@@ -47,7 +44,7 @@ class AlignSeqs extends DefaultScript {
 			$blastDb,
 			$minPercentId,
 			$muscleMaxMemory,
-			new Label("<p><strong>Output Options</strong></p>"),
+			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_aligned") // TODO dynamic default
 		);

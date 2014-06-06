@@ -41,10 +41,10 @@ class JoinPairedEnds extends DefaultScript {
 		$verbose = new TrueFalseParameter("--verbose");
 
 		array_push($this->parameters,
-			new Label("<p><strong>Required Parameters</p></strong>"),
+			new Label("Required Parameters"),
 			$forwardReadsFp,
 			$reverseReadsFp,
-			new Label("<p><strong>Optional Parameters</p></strong>"),
+			new Label("Optional Parameters"),
 			$indexReadsFp,
 			$minOverlap,
 			$peJoinMethod,
@@ -53,7 +53,7 @@ class JoinPairedEnds extends DefaultScript {
 			$minFracMatch,
 			$maxGoodMismatch,
 			$phred64,
-			new Label("<p><strong>Output Options</p></strong>"),
+			new Label("Output Options"),
 			$verbose,
 			$outputDir
 		);
