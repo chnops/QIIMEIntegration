@@ -70,9 +70,6 @@ class SplitLibraries extends DefaultScript {
 			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
 			new TrueFalseParameter("--disable_primers"),
 			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]+/"), // TODO or run_header
-			new TextArgumentParameter("--min-seq-length", "200", TextArgumentParameter::PATTERN_DIGIT),
-			new TextArgumentParameter("--max-seq-length", "1000", TextArgumentParameter::PATTERN_DIGIT),
-			new TrueFalseParameter("--trim-seq-length"),
 			new TextArgumentParameter("--median_length_filtering", "", TextArgumentParameter::PATTERN_NUMBER),
 
 			new Label("Output Options"),
