@@ -1,15 +1,15 @@
-<p>Some next generation sequencers (notably Illumina) produce paired end reads, generating two .fasta files whose corresponding reads are known to be a certain distance apart.  This script combines paired ends into a single .fasta file, so that QIIME is better able to process them.</p>
+<p>Some next generation sequencers (notably Illumina) produce paired end reads, generating two .fasta files whose corresponding reads are known to be a certain distance apart.  This script combines paired ends into a single .fasta file, so that QIIME is better able to process them</p>
 
 <p><strong>Here are scripts to execute before this one</strong>
 <ul>
-<li>None - You only need to use this script if you have paired end reads. It doesn't rely on any other scripts or QIIME specific files (e.g. a map file).</li>
+<li>None - You only need to use this script if you have paired end reads. It doesn't rely on any other scripts or QIIME specific files (e.g. a map file)</li>
 </ul>
 </p>
 
 <p><strong>Here are the main decisions you should make before running this script</strong>
 <ol>
 <li>Decide if you want/have an index read file (.fasta formatted file where the header corresponds to you input files, and the sequence is just the sample's barcode)
-<ul><li>If you do, make sure the read order is the same in your input files, and that the header format is the same in both as well.</li></ul></li>
+<ul><li>If you do, make sure the read order is the same in your input files, and that the header format is the same in both as well</li></ul></li>
 <li>Select your input files, --forward_reads_fp, --reverse_reads_fp, and (optionally) --index_reads_fp</li>
 <li>Decide on --min_overlap</li>
 <li>Pick a --pe_join_method, and specify corresponding options<ul>
@@ -22,8 +22,8 @@
 
 <p><strong>Here are the scripts to run after this one</strong>
 <ul>
-<li><a onclick="displayHideables('validate_mapping_file')">Validate mapping file</a> - If you have not already completed this step, now would be a good time to do so.</li>
-<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - Similar to this script, de-multiplexing is an important step (assuming your reads are multiplexed) before you can begin the rest of your analysis.</li>
+<li><a onclick="displayHideables('validate_mapping_file')">Validate mapping file</a> - If you have not already completed this step, now would be a good time to do so</li>
+<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - Similar to this script, de-multiplexing is an important step (assuming your reads are multiplexed) before you can begin the rest of your analysis</li>
 <li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - If you do not have to demultiplex your data, you can skip straight to OTU picking</li>
 </ul>
 </p>

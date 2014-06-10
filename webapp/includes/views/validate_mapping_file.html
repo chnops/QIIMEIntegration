@@ -1,8 +1,8 @@
-<p>Map files provide meta data about your samples.  The purpose of this script is to verify that the map file you have created is correctly formatted, and that it will not cause QIIME any problems later on in the pipeline.  It's not that we don't trust you; it's that we don't trust QIIME.</p>
+<p>Map files provide meta data about your samples.  The purpose of this script is to verify that the map file you have created is correctly formatted, and that it will not cause QIIME any problems later on in the pipeline.  It's not that we don't trust you; it's that we don't trust QIIME</p>
 
 <p><strong>Here are scripts to execute before this one</strong>
 <ul>
-<li>None - This is the first script in the QIIME pipeline.  Before you do run this script, though, you must create a map file.  Notes about the map file format are listed below.</li>
+<li>None - This is the first script in the QIIME pipeline.  Before you do run this script, though, you must create a map file.  Notes about the map file format are listed below</li>
 </ul>
 </p>
 
@@ -16,9 +16,9 @@
 
 <p><strong>Here are the scripts to run after this one</strong>
 <ul>
-<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - If your sequence data is multiplexed (multiple samples in one sequencing lane to save money; samples differentiated by a unique sequence barcode), you must explicitly assign each read to a sample by using this script.</li>
-<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - If your sequence has paired ends (two fasta files with corresponding reads; this is likely if you used Illumina), you will need to join them using this script before you can continue the QIIME pipeline.</li>
-<li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - If your sequences are neither multiplexed, nor paired-ended, you can just straight to this step.</li>
+<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - If your sequence data is multiplexed (multiple samples in one sequencing lane to save money; samples differentiated by a unique sequence barcode), you must explicitly assign each read to a sample by using this script</li>
+<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - If your sequence has paired ends (two fasta files with corresponding reads; this is likely if you used Illumina), you will need to join them using this script before you can continue the QIIME pipeline</li>
+<li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - If your sequences are neither multiplexed, nor paired-ended, you can just straight to this step</li>
 </ul>
 </p>
 
@@ -29,7 +29,7 @@
 <ul>
 	<li>Required headers (SampleID, BarcodeSqeuence, LinkerPrimerSequence,
 	and Description) are not all present.  The first three must be in this order.
-	Description must be the last column.</li>
+	Description must be the last column</li>
 	<li>Duplicate IDs or barcode/primer pairs exist </li>
 	<li>Sequences use non-IUPAC DNA characters</li>
 	<li>Barcode sequences are different lengths</li>
