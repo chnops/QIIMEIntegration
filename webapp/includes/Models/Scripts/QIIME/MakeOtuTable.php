@@ -41,11 +41,4 @@ class MakeOtuTable extends DefaultScript {
 	public function getHtmlId() {
 		return "make_otu_table";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>An OTU table contains organized information about the abundance of different OTUs in a set of sequences.</p>";
-		include 'views/make_otu_table.html';
-		return ob_get_clean();
-	}
-
 }

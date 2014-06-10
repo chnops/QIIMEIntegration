@@ -271,11 +271,4 @@ class PickOtus extends DefaultScript {
 	public function getHtmlId() {
 		return "pick_otus";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>OTU stands for Operational Taxonomic Unit. This script attempts to group sequences into taxonomic units based on similarity.</p>";
-		include "views/{$this->getHtmlId()}.html";
-		return ob_get_clean();
-	}
-
 }

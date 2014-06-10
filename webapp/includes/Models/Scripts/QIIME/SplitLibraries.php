@@ -48,35 +48,35 @@ class SplitLibraries extends DefaultScript {
 			new Label("Required Parameters"),
 			$map, 
 			$fasta, 
-			new Label("Optional Parameters"),
-			new TrueFalseParameter("--remove_unassigned"),
+			new Label("Optional Parameters - Demultiplexing"),
+			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]+/"), // TODO or run_header
+			$eitherBarcode,
+			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
+			new TextArgumentParameter("--max-barcode-errors", "1.5", TextArgumentParameter::PATTERN_NUMBER),
+			new TrueFalseParameter("--disable_primers"),
+			new TextArgumentParameter("--max-primer-mismatch", "0", TextArgumentParameter::PATTERN_DIGIT),
+			$reversePrimers,
+			$reversePrimerMismatches,
+			new Label("Optional Parameters - Filtering (non quality)"),
+			$eitherAmbig,
+  			new TextArgumentParameter("--max-homopolymer", "6", TextArgumentParameter::PATTERN_DIGIT),
 			new TextArgumentParameter("--min-seq-length", "200", TextArgumentParameter::PATTERN_DIGIT),
   			new TextArgumentParameter("--max-seq-length", "1000", TextArgumentParameter::PATTERN_DIGIT),
   			new TrueFalseParameter("--trim-seq-length"),
-			$eitherBarcode,
-			$eitherAmbig,
-			$reversePrimers,
-			$reversePrimerMismatches,
+			new TextArgumentParameter("--median_length_filtering", "", TextArgumentParameter::PATTERN_NUMBER),
+			new Label("Optional Parameters - Filtering (quality)"),
 			$qual,
 			$minQualScore,
 			$recordQualScores,
 			$qualScoreWindow,
 			$discardBadWindows,
-  			new TrueFalseParameter("--keep-primer"),
-			new TrueFalseParameter("--keep-barcode"),
-  			new TextArgumentParameter("--max-homopolymer", "6", TextArgumentParameter::PATTERN_DIGIT),
-			new TextArgumentParameter("--max-primer-mismatch", "0", TextArgumentParameter::PATTERN_DIGIT),
-			new TextArgumentParameter("--max-barcode-errors", "1.5", TextArgumentParameter::PATTERN_NUMBER),
-			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
-			new TrueFalseParameter("--disable_primers"),
-			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]+/"), // TODO or run_header
-			new TextArgumentParameter("--median_length_filtering", "", TextArgumentParameter::PATTERN_NUMBER),
-
 			new Label("Output Options"),
 			$verboseParameter,
 			new NewFileParameter("--dir-prefix", "."),
 			new TextArgumentParameter("--start-numbering-at", "1", TextArgumentParameter::PATTERN_DIGIT),
-			new TrueFalseParameter("--retain_unassigned_reads")
+			new TrueFalseParameter("--retain_unassigned_reads"),
+  			new TrueFalseParameter("--keep-primer"),
+			new TrueFalseParameter("--keep-barcode")
 		);
 	}
 	public function getScriptName() {
@@ -88,12 +88,4 @@ class SplitLibraries extends DefaultScript {
 	public function getHtmlId() {
 		return "split_libraries";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to use the barcodes you provided in your map file to separate sequences 
-			from a single run into their respective libraries.</p>";
-		include "views/{$this->getHtmlId()}.html";
-		return ob_get_clean();
-	}
-
 }

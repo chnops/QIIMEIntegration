@@ -57,10 +57,4 @@ class AlignSeqs extends DefaultScript {
 	public function getHtmlId() {
 		return "align_seqs";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>The initial step in performing phylogeny analysis is aligning the sequences.</p>";
-		include 'views/align_seqs.html';
-		return ob_get_clean();
-	}
 }

@@ -26,8 +26,4 @@ class  extends DefaultScript {
 	public function getHtmlId() {
 		return "";
 	}
-	public function renderHelp() {
-		return "Help for this script has not yet been implemented";
-	}
-
 }

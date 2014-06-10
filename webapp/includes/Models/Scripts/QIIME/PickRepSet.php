@@ -39,15 +39,9 @@ class PickRepSet extends DefaultScript {
 		return "pick_rep_set.py";
 	}
 	public function getScriptTitle() {
-		return "Pick Representative OTU sequence";
+		return "Pick representative OTU sequence";
 	}
 	public function getHtmlId() {
 		return "pick_rep_set";
-	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p>";
-		include 'views/pick_rep_sets.html';
-		return ob_get_clean();
 	}
 }

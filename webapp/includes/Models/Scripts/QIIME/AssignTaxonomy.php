@@ -97,11 +97,4 @@ class AssignTaxonomy extends DefaultScript {
 	public function getHtmlId() {
 		return "assign_taxonomy";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>This script takes OTUs and assigns them to a real-world taxonomy.  To do this, it uses sequence databases.</p>";
-		include 'views/assign_taxonomy.html';
-		return ob_get_clean();
-	}
-
 }

@@ -44,6 +44,7 @@ class JoinPairedEnds extends DefaultScript {
 			new Label("Required Parameters"),
 			$forwardReadsFp,
 			$reverseReadsFp,
+			$outputDir,
 			new Label("Optional Parameters"),
 			$indexReadsFp,
 			$minOverlap,
@@ -54,8 +55,7 @@ class JoinPairedEnds extends DefaultScript {
 			$maxGoodMismatch,
 			$phred64,
 			new Label("Output Options"),
-			$verbose,
-			$outputDir
+			$verbose
 		);
 			
 	}
@@ -63,16 +63,9 @@ class JoinPairedEnds extends DefaultScript {
 		return "join_paired_ends.py";
 	}
 	public function getScriptTitle() {
-		return "Join Paired Ends";
+		return "Join paired ends";
 	}
 	public function getHtmlId() {
 		return "join_paired_ends";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptName()}</p><p>The purpose of this script is to join two sequence files, which contain corresponding paired end reads.</p>";
-		include 'views/' . $this->getHtmlId() . '.html';
-		return ob_get_clean();
-	}
-
 }

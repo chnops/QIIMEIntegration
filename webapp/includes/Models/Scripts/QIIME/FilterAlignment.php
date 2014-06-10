@@ -50,10 +50,4 @@ class FilterAlignment extends DefaultScript {
 	public function getHtmlId() {
 		return "filter_alignment";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>Typically, aligned sequences have a lot of identical bases on both the 3' and 5' end.  It will drasticaly reduce processing time if you filter out all those identical bases.</p>";
-		include 'views/filter_alignment.html';
-		return ob_get_clean();
-	}
 }

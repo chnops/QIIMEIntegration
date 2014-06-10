@@ -26,7 +26,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	}
 	public function renderAsForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
-		$form = "<form method=\"POST\"><h4>{$this->getScriptTitle()}</h4>\n";
+		$form = "<form method=\"POST\"><h4>{$this->getScriptTitle()} - {$this->getScriptName()}</h4>\n";
 		foreach ($this->getParameters() as $parameter) {
 			$form .= $parameter->renderForForm($disabled) . "\n";
 		}
@@ -74,10 +74,15 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 		return $script;
 	}
+	public function renderHelp() {
+		ob_start();
+		echo "<p><strong>{$this->getScriptTitle()} - {$this->getScriptName()}</strong></p>";
+		include "views/{$this->getHtmlId()}.html";
+		return ob_get_clean();
+	}
 
 	public abstract function getScriptName();
 	public abstract function getScriptTitle();
 	public abstract function getHtmlId();
-	public abstract function renderHelp();
 	public abstract function initializeParameters();
 }

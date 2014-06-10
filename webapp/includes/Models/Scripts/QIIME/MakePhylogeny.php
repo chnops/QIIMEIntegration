@@ -41,11 +41,4 @@ class MakePhylogeny extends DefaultScript {
 	public function getHtmlId() {
 		return "make_phylogeny";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>Once sequences have been aligned, QIIME will organize them for you into a phylogenetic tree</p>";
-		include 'views/make_phylogeny.html';
-		return ob_get_clean();
-	}
-
 }

@@ -1,15 +1,24 @@
-<p>You can sequence a whole bunch of difference organisms/samples on a single
-run of a next-generation sequencing machine.  In fact, it's highly economical
-to do so.  This script takes all the reads that came from a single run (or
-multiple runs) and assigns them to the correct organism/sample based on their
-barcodes.  It can optionally perform quality-filtering at the same time.</p>
+<p>It is highly economical to sequence multiple samples on a single NGS run. This script splits reads from a single fasta file (a single run) into their respective samples. It also can perform quality filtering at the same time.</p>
 
-<p></p>
+<p><strong>Here are scripts to execute before this one</strong>
+<ul>
+<li><a onclick="displayHideables('validate_mapping_file')">Validate mapping file</a> - This script relies on a mapping file to accurately tell which samples correspond to which sequence barcodes.  You may want to check the format of your file before running this script.</li>
+<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - This script only works on a single fasta file.  QIIME provides you a script to join paired end reads into a single file.</li>
+</ul>
+</p>
 
-<p>If I were to put running this script into order for you, it would go like
-this:
+<p><strong>Here are the main decisions you should make before running this script</strong>
 <ol>
-	<li>Choose options for de-multiplexing</li>
-	<li>Choose options for quality trimming</li>
-	<li>Choose output options</li>
+<li>Select input options</li>
+<li>Pick options for de-multiplexing</li>
+<li>Pick options for filtering</li>
+<li>If you have a quality file, pick additional options for quality filtering</li>
+<li>Pick output options</li>
 </ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - Once your multiplexed reads have been assigned to samples, you are ready to select OTUs.</li>
+</ul>
+</p>

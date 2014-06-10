@@ -30,7 +30,6 @@ class ValidateMappingFile extends DefaultScript {
 			 new Label("Required Parameters"),
 			 $mappingFp,
 			 new Label("Optional Parameters"),
-			 new TextArgumentParameter("--char_replace", "_", "/^.$/"),
 			 new TrueFalseParameter("--not_barcoded"),
 			 new TrueFalseParameter("--variable_len_barcodes"),
 			 new TrueFalseParameter("--disable_primer_check"),
@@ -38,7 +37,8 @@ class ValidateMappingFile extends DefaultScript {
 			 new Label("Output Options"),
 			 $verboseParameter,
 			 new NewFileParameter("--output_dir", ""),
-			 new TrueFalseParameter("--suppress_html")
+			 new TrueFalseParameter("--suppress_html"),
+			 new TextArgumentParameter("--char_replace", "_", "/^.$/")
 		);
 	}
 	public function getScriptName() {
@@ -50,11 +50,4 @@ class ValidateMappingFile extends DefaultScript {
 	public function getHtmlId() {
 		return "validate_mapping_file";
 	}
-	public function renderHelp() {
-		ob_start();
-		echo "<p>{$this->getScriptTitle()}</p><p>The purpose of this script is to take your map file, and tell you if you did it right.</p>";
-		include "views/{$this->getHtmlId()}.html";
-		return ob_get_clean();
-	}
-
 }

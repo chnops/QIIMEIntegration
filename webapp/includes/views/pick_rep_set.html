@@ -1,0 +1,26 @@
+<p>After you have grouped sequence reads into OTUs, this script will select one sequence per OTU as a representative.</p>
+
+<p><strong>Here are scripts to execute before this one</strong>
+<ul>
+<li><a onclick="pick_otus">Pick OTUs</a> - You must have a list of OTUs with accompanying sequences in order to select one as the representative.  Pick OTUs generates that list.</li>
+</ul>
+</p>
+
+<p><strong>Here are the main decisions you should make before running this script</strong>
+<ol>
+<li>Pick an OTU list --input file (the output of Pick OTUs)</li>
+<li>Include sequence data for said OTUs.  You may do this one of three ways:<ol>
+	<li>A reference fasta file (you used it already if you picked OTUs using uclust_ref, usearch_ref, or usearch61_ref</li>
+	<li>A reference fasta file AND your input fasta file (if you allowed the picking methods above to create de novo OTUs)</li>
+	<li>The input fasta file only (if you used any other OTU picking method)</li>
+</ol></li>
+<li>Specify --rep_set_picking_method.<br/><em>The default--first--is only appropriate if you picked OTUs using uclust</em></li>
+<li>Pick output options<br/><em>NOTE: No log file will be created if you don't specify a file path for it.</em></li>
+</ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="assign_taxonomy">Assign taxonomy</a> - Once you have a sequence representing the whole OTU, it is feasible to determine the real world taxonomy of that OTU.</li>
+</ul>
+</p>

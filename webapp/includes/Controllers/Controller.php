@@ -26,7 +26,6 @@ abstract class Controller {
 		$this->database = $database;
 		$this->workflow = $workflow;
 		$this->step = $this->workflow->getCurrentStep($this);
-		$this->help = "<a href=\"index.php?step=" . $this->workflow->getNextStep($this->step) . "\">Go to next step</a>";
 	}
 
 	public abstract function parseInput(); 

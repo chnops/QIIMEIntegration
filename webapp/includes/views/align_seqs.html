@@ -1,19 +1,42 @@
+<p>Aligning sequences to a reference is the first step in phylogeny analysis.</p>
+
+<p><strong>Here are scripts to run before this one</strong>
+<ul>
+<li><a onclick="displayHideables('pick_rep_set');">Pick representative OTU sequence</a> - This will generate a .fasta file, in which each sequence represents one OTU. Those are most likely the sequences you want to align.</li>
+</ul>
+</p>
+
+<p><strong>Here are the main decisions you should make before running this script</strong>
 <ol>
 <li>
-Pick --template_fp (default: /macqiime/greengenes/core_set_aligned.fasta.imputed)
+Pick --template_fp:<br/>
+QIIME can align to any reference fasta file, but it has some built-ins, one of which you will probably want to use.
+	<ul>
+	<li><strong>/macqiime/greengenes/core_set_aligned.fasta.imputed</strong> - 16S ribosomal subunit sequences for several bacterial taxa</li>
+	<li><strong>/macqiime/UNITe/sh_refs_qiime_ver6_97_13.05.2014.fasta</strong> - ITS sequences for several fungal taxa</li>
+	</ul>
+<li>Other UNITe reference sequences are present as well, with different levels of sequence similarity defining taxonomic boundaries.</li>
+<li>
+Pick --min_length: the minimum length for an input sequence to be included in the alignment
 </li>
 <li>
-Pick --min_length (minimum length for an input sequence to be included in the alignment)
+Pick an --alignment_method
+	<ul>
+	<li><a target="_BLANK" href="http://www.ncbi.nlm.nih.gov/pubmed/19914921">PyNAST</a></li>
+	<li><a target="_BLANK" href="http://www.ncbi.nlm.nih.gov/pubmed/15034147">Muscle</a></li>
+	<li><a target="_BLANK" href="http://www.ncbi.nlm.nih.gov/pubmed/19307242">Infernal</a></li>
+	</ul>
 </li>
 <li>
-Pick an alignment method
-	<ol>
-	<li>PyNAST</li>
-	<li>Muscle</li>
-	<li>Infernal</li>
-	</ol>
+Pick alignment specific options (they will appear when you select an --alignment_method)
 </li>
-<li>
-Pick alignment specific options (they will appear when you select --alignment_method)
-</li>
+<li>Pick output options</li>
 </ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="displayHideables('filter_alignment');">Filter sequence alignment</a> - Removing base-pair positions that are not very informative will drastically improve the efficiency of phylogenetic tree creation</li>
+<li><a onclick="displayHideables('make_phylogeny');">Make phylogenetic tree</a> - Filtering is not technically necessary, so you can skip straight to tree creation</li>
+</ul>
+</p>

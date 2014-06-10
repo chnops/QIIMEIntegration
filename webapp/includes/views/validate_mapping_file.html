@@ -1,81 +1,42 @@
-<p>Map files provide per-sample meta data.  Full documentation on their format can be found <a target=\"_blank\" href=\"http://www.qiime.org/documentation/file_formats.html#metadata-mapping-files\">here</a>, and I will also provide a brief summary. Each row is a sample (except the first, which is a header), and each column (separated by tabs) is an attribute.  There are four required attributes (a unique sample id, the barcode sequence, the linker sequence and a brief description), which require specific header names (#SampleID, BarcodeSequence, LinkerPrimerSequence, and Description).  There are also  some not-required columns, which explain experiment design and potetial sources of bias.</p>
+<p>Map files provide meta data about your samples.  The purpose of this script is to verify that the map file you have created is correctly formatted, and that it will not cause QIIME any problems later on in the pipeline.  It's not that we don't trust you; it's that we don't trust QIIME.</p>
+
+<p><strong>Here are scripts to execute before this one</strong>
+<ul>
+<li>None - This is the first script in the QIIME pipeline.  Before you do run this script, though, you must create a map file.  Notes about the map file format are listed below.</li>
+</ul>
+</p>
+
+<p><strong>Here are the main decisions you should make before running this script</strong>
+<ol>
+<li>Pick your map file, --mapping_fp.  <a href="index.php?step=upload">If you haven't uploaded your map file yet, do so here</a></li>
+<li>If your map file has any known exceptions, indicate them (--not_barcoded, --variable_len_barcodes, --disable_primer_check)</li>
+<li>Pick output options</li>
+</ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - If your sequence data is multiplexed (multiple samples in one sequencing lane to save money; samples differentiated by a unique sequence barcode), you must explicitly assign each read to a sample by using this script.</li>
+<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - If your sequence has paired ends (two fasta files with corresponding reads; this is likely if you used Illumina), you will need to join them using this script before you can continue the QIIME pipeline.</li>
+<li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - If your sequences are neither multiplexed, nor paired-ended, you can just straight to this step.</li>
+</ul>
+</p>
+
+<p><strong>Here are notes about the map file format</strong><br/>
+<a target=\"_blank\" href=\"http://www.qiime.org/documentation/file_formats.html#metadata-mapping-files\">Full documentation can be found here</a>. Each row is a sample (except the first, which is a header), and each column (separated by tabs) is an attribute. Valid attributes include ids, barcode sequences, primer sequences, reverse primer sequences, descriptions, case-control status, potential sources of bias, etc.</p>
 
 <p>This script checks for the following problems in your mapping file:
 <ul>
+	<li>Required headers (SampleID, BarcodeSqeuence, LinkerPrimerSequence,
+	and Description) are not all present.  The first three must be in this order.
+	Description must be the last column.</li>
+	<li>Duplicate IDs or barcode/primer pairs exist </li>
 	<li>Sequences use non-IUPAC DNA characters</li>
-	<li>BarcodeSequences are degenerate</li>
-	<li>Required parameters (SampleID, BarcodeSqeuence, LinkerPrimerSequence,
-	and Description) are not all present.  They must be in this order, except that
-	Description must be the last column, following even your custom columns</li>
-	<li>Duplicate IDs or barcodes exist (barcodes count as duplicated if the
-	primer (appended to the barcode) makes the same sequence as another
-	barcode, or when combining the barcode and added demultiplex field.</li>
 	<li>Barcode sequences are different lengths</li>
-	<li>Headers contain invalid characters (only alphanumerics and underscores
-	are allowed)</li>
-	<li>Data fields contain invalid characters (only alphanumeric, space, and
-	+-%./:,; are allowed)</li>
-	<li>SampleIDs contain characters other than alphanumeric and .</li>
+	<li>Headers, data fields, or SampleIDs contain invalid characters:
+	<ul>
+		<li>Headers: alphanumerics underscores</li>
+		<li>Data fields: alphanumerics spaces + - % . / : , ;</li>
+		<li>SampleIDs: alphanumerics periods</li>
+	</ul>
 </ul></p>
-
-<p>Someimes, a single sample is described by multiple primer sequences.  In
-this case, separate them with commas (no white space) in the PrimerSequence
-column.</p>
-
-<p>This script produces the following files:
-<ul>
-	<li>&lt;input_file&gt;.log</li>
-	<li>&lt;input_file&gt;_corrected.txt</li>
-	<li>&lt;input_file&gt;.html</li>
-	<li>overlib.js</li>
-</ul>
-The log file contains error and warning messages, and the _corrected.txt file
-is a duplicate of your input file, but with invalid characters replaced with a
-character of your choice.  The .html and .js files display errors and warnings
-in a nice way, but aren't really necessary.  You can choose to suppress them.</p>
-
-<p>Many of the arguments are self-explanatory.  Here are the ones that are
-not:
-<ul>
-	<li>--char_replace: if invalid characters are found in the headers or data
-	fields of your map file, they are replaced with whatever you specify here</li>
-	<li>--not_barcoded: if you don't have barcodes (for example, if you only
-	sequenced one sample and all the sequences you have come from that
-	sample), you must still include the Barcode header.  However, by
-	specifying this option, you can get away with leaving the field
-	blank.</li>
-	<li>--variable_len_barcode: Generally, your barcodes will all be the same
-	length.  If, for some reason, they are not, use this argument to
-	specify</li>
-	<li>--disable_primer_check: Again, your sequence data will usually have
-	LinkerPrimer data.  If it does not, you must tell QIIME explicitely using
-	this argument</li>
-	<li>--added_demultiplex_field: What you type in to this parameter must
-	match one of the column headers in your map file.  The column header must
-	also correspond to an entity that exists in the header of your sequence
-	file. For example, the header could be plate if the sequence file had
-	the header:<br/>
-	>FLP3FBN01ELBSX plate=R_2014_01_09<br/>
-	Additionally (and more complexly) you can use the first word of the
-	sequence header as the added demultiplex field by creating a column
-	run_prefix in your map file.  Once again, the sample (row) in your map
-	file will have a value for this column that corresponds with some of the
-	sequences in your sequence file.  Those sequences will be associated with
-	said sample.  Using this option, you can have samples with identical
-	barcodes, as long as their additional fields make them unique</li>
-	<li>--suppress_html: I recommend using this.  It keeps the script from
-	creating useless HTML versions of you log file, and so it keeps down
-	clutter in your project.</li>
-</ul></p>
-
-<p>If I were to put running this script into order for you, it would go like
-this:
-<ol>
-	<li>Find your map file, and look through it on your own</li>
-	<li>Upload your map file <a href="index.php?step=upload">return here to do
-		so</a></li>
-	<li>Enable --suppress_html and disable --verbose</li>
-	<li>Decide if your map file is so exceptional that it needs one of the
-	addiitonal options I listed above</li>
-	<li>Click run</li>
-</ol>

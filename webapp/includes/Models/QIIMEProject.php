@@ -32,11 +32,11 @@ class QIIMEProject extends DefaultProject {
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Validate input'][] = $script;
 
-		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
+		$script = new \Models\Scripts\QIIME\JoinPairedEnds($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Prepare libraries'][] = $script;
 
-		$script = new \Models\Scripts\QIIME\JoinPairedEnds($this);
+		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Prepare libraries'][] = $script;
 
@@ -143,7 +143,7 @@ class QIIMEProject extends DefaultProject {
 		foreach ($this->scriptsFormatted as $category => $scriptArray) {
 			$overview .= "<tr><td>{$category}</td>";
 			foreach ($scriptArray as $script) {
-				$overview .= "<td><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\">{$script->getScriptTitle()}</a></td>";
+				$overview .= "<td><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></td>";
 			}
 			$overview .= "</tr>\n";
 		}
