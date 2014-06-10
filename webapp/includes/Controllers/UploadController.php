@@ -50,20 +50,26 @@ class UploadController extends Controller {
 		else {
 			$this->result = "";
 		}
+		$compressionAlgorithm = ($_POST['compression']) ? 
+			\Models\FileCompressionAlgorithm::getAlgorithmFromString($_POST['compression']) : NULL;
+		$uncompressedName = "";
+		if ($compressionAlgorithm) {
+			$uncompressedName = preg_replace($compressionAlgorithm->getFileExtensionRegex(), "", $_FILES['file']['name']);
+		}
 		
 		// TODO if is valid form
 		$pastUploads = $this->project->retrieveAllUploadedFiles();
 		foreach ($pastUploads as $extantFile) {
-			if ($extantFile['name'] == $_FILES['file']['name']) {
+			if ($extantFile['name'] == $_FILES['file']['name'] || $extantFile['name'] == $uncompressedName) {
 				$this->isResultError = true;
 				$this->result .= "You have already uploaded a file with that file name. File names must be unique";
 				return;
 			}
 		}
-		$this->uploadFile($_FILES['file'], $this->fileType);
+		$this->uploadFile($_FILES['file'], $this->fileType, $compressionAlgorithm);
 	}
 
-	private function uploadFile(array $file, \Models\FileType $fileType) {
+	private function uploadFile(array $file, \Models\FileType $fileType, \Models\FileCompressionAlgorithm $compressionAlgorithm = NULL) {
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
 			$fileUploadErrors = new FileUploadErrors();
@@ -73,18 +79,23 @@ class UploadController extends Controller {
 		// TODO if size/type are valid
 
 		$fileName = $file['name'];
-		$systemFileName = $this->project->receiveUploadedFile($fileName, $fileType);	
+		$systemFileName = $this->project->receiveUploadedFile($fileName, $fileType);
+		// TODO replace nasty nested ifs with try{}catch{}
 		if (!$systemFileName) {
 			$this->isResultError = true;
 			$this->result = "There was an error adding your file to the project.";
 		}
 		else {
 			$moveResult = move_uploaded_file($file['tmp_name'], $systemFileName);
+			$compressionResult = true;
 			if ($moveResult) {
-				$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
-				$this->project->confirmUploadedFile();	
+				$compressionResult = $this->project->uncompressFile($fileName, $compressionAlgorithm);
+				if ($compressionResult) {
+					$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
+					$this->project->confirmUploadedFile();	
+				}
 			}
-			else {
+			if (!$moveResult || !$compressionResult) {
 				$this->isResultError = true;
 				$this->result = "There was an error moving your file on to the system.";
 				$this->project->forgetUploadedFile();
@@ -117,6 +128,11 @@ class UploadController extends Controller {
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
 				<label for=\"file\">Select a file to upload:
 				<input type=\"file\" name=\"file\"/{$this->disabled}></label>
+				<label for=\"compression\">Is compressed?
+				<select name=\"compression\"{$this->disabled}>
+					<option value=\"none\">No</option>
+					<option value=\"gzip\">Yes, with gzip (.gz)</option>
+				</select></label>
 				<label for=\"type\">File type:
 				<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
 

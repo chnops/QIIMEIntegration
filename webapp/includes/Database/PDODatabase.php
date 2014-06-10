@@ -244,6 +244,23 @@ class PDODatabase implements DatabaseI {
 			return array();
 		}
 	}
+	
+	public function updateUncompressedFile($username, $id, $oldName, $newName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("UPDATE uploaded_files SET name = :newName
+				WHERE project_id = :id AND project_owner = :username AND name = :oldName");
+			return $pdoStatement->execute(array(
+				"newName" => $newName, "oldName" => $oldName, "id" => $id, "username" => $username,
+			));
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to uncompress file: " . $ex->getMessage());
+			// TODO error handling
+			// TODO transactions
+			return false;
+		}
+	}
+	
 	/*Try catch block commong to all functions
 		try {
 		}

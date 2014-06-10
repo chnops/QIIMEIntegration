@@ -153,6 +153,24 @@ abstract class DefaultProject implements ProjectI {
 			return $dirContents;
 	}
 
+	public function uncompressFile($fileName, FileCompressionAlgorithm $algorithm = NULL) {
+		if (!$algorithm) {
+			return true;
+		}
+		try {
+			// TODO add transaction
+			$this->operatingSystem->executeArbitraryScript($environmentSource = $this->workflow->getEnvironmentSource(),
+				$runDirectory = $this->getProjectDir() . "/uploads",
+				$algorithm->getUncompressCommand() . " " . $fileName);
+			return $this->database->updateUncompressedFile($this->owner, $this->id, $fileName, 
+				preg_replace($algorithm->getFileExtensionRegex(), "", $fileName));
+		}
+		catch (OperatingSystemException $ex) {
+			error_log("Unable to uncompress file: {$ex->getConsoleOutput()}");
+			return false;
+		}
+	}
+
 	public abstract function beginProject();
 	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();

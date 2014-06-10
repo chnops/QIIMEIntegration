@@ -17,6 +17,7 @@ interface DatabaseI {
 
 	public function createUploadedFile($username, $projectId, $fileName, $fileType);
 	public function getAllUploadedFiles($username, $projectId);
+	public function updateUncompressedFile($username, $id, $oldName, $newName);
 
 	public function saveRun($username, $projectId, $sriptName, $scriptText);
 	public function addRunResults($runId, $consoleOutput, $version);

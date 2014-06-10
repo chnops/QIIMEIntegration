@@ -36,4 +36,5 @@ interface ProjectI {
 	public function confirmUploadedFile();
 	public function forgetUploadedFile();
 	public function runScript(array $allInput);
+	public function uncompressFile($systemFileName, FileCompressionAlgorithm $algorithm);
 }
