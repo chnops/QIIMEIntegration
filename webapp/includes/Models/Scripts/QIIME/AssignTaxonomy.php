@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class AssignTaxonomy extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$assignmentMethod = new ChoiceParameter("--assignment_method", "rdp", 
 			array("rdp", "blast", "rtax", "mothur", "tax2tree"));
 		$read1SeqsFp = new OldFileParameter("--read_1_seqs_fp", $this->project);

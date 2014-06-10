@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class AlignSeqs extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
 			array("pynast", "infernal", "clustalw", "muscle", "mafft"));

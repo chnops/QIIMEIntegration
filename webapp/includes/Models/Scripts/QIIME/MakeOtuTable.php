@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class MakeOtuTable extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
 		$otuMapFile->requireIf();
 		// TODO dynamic default / no default

@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class JoinPairedEnds extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$forwardReadsFp = new OldFileParameter("--forward_reads_fp", $this->project);
 		$forwardReadsFp->requireIf();
 		$reverseReadsFp = new OldFileParameter("--reverse_reads_fp", $this->project);

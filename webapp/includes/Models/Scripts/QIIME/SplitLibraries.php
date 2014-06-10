@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class SplitLibraries extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$map = new OldFileParameter("--map", $this->project);
 		$map->requireIf();
 		$fasta = new OldFileParameter("--fasta", $this->project);

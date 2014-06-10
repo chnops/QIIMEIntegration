@@ -21,6 +21,7 @@ class ValidateMappingFile extends DefaultScript {
 	}
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$mappingFp = new OldFileParameter("--mapping_fp", $this->project);
 		$mappingFp->requireIf();
 

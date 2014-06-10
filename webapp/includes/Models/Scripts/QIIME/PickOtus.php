@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class PickOtus extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
 		$inputSeqsFilePath->requireIf();
 

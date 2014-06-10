@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class MakePhylogeny extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$inputFp = new OldFileParameter("--input_fp", $this->project);
 		$inputFp->requireIf();
 

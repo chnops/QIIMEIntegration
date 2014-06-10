@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class FilterAlignment extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
 		$inputFastaFile->requireIf();
 

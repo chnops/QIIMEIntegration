@@ -130,7 +130,7 @@ class DefaultParameter implements ParameterI {
 		}
 	}
 
-	public function requireIf(ParameterI $trigger = null, $value = "") {
+	public function requireIf(ParameterI $trigger = NULL, $value = "") {
 		if (!$trigger) {
 			$this->isAlwaysRequired = true;
 			return;
@@ -138,7 +138,7 @@ class DefaultParameter implements ParameterI {
 		$this->requiringTriggers[] = array ("parameter" => $trigger, "value" => $value);
 		$trigger->isARequiringTrigger(true);
 	}
-	public function excludeButAllowIf(ParameterI $trigger = null, $value = "") {
+	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = "") {
 		$this->isEverExcluded = true;
 		if ($trigger) {
 			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);

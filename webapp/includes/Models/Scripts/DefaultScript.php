@@ -6,22 +6,24 @@ use Models\Scripts\Parameters\VersionParameter;
 
 abstract class DefaultScript implements ScriptI, \Models\HideableI {
 
-	protected $project = null;
-	protected $parameters;
+	protected $project = NULL;
+	protected $parameters = array();
 
 	public function __construct(\Models\ProjectI $project) {
 		$this->project = $project;
-
+	}
+	public function initializeParameters() {
 		$helpParameter = new HelpParameter($this);
 		$versionParameter = new VersionParameter($this);
 		$helpParameter->excludeButAllowIf();
 		$versionParameter->excludeButAllowIf();
 		$this->parameters = array($helpParameter->getName() => $helpParameter,
 			$versionParameter->getName() => $versionParameter,);
-
-		$this->initializeParameters();
 	}
 	public function getParameters() {
+		if (empty($parameters)) {
+			$this->initializeParameters();
+		}
 		return $this->parameters;
 	}
 	public function renderAsForm($disabled) {
@@ -84,5 +86,4 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	public abstract function getScriptName();
 	public abstract function getScriptTitle();
 	public abstract function getHtmlId();
-	public abstract function initializeParameters();
 }

@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class  extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		// TODO implement
 	}
 	public function getScriptName() {

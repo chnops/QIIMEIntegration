@@ -15,6 +15,7 @@ use Models\Scripts\Parameters\Label;
 class PickRepSet extends DefaultScript {
 
 	public function initializeParameters() {
+		parent::initializeParameters();
 		$inputFile = new OldFileParameter("--input_file", $this->project);
 		$inputFile->requireIf();
 
