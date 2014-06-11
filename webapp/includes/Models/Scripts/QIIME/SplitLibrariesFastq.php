@@ -59,7 +59,7 @@ class SplitLibrariesFastq extends DefaultScript {
 		return "split_libraries_fastq.py";
 	}
 	public function getScriptTitle() {
-		return "De-multiplex libraries (fastq)";
+		return "De-multiplex fastq";
 	}
 	public function getHtmlId() {
 		return "split_libraries_fastq";

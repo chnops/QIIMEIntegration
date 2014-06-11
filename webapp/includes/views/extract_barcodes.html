@@ -1,0 +1,28 @@
+<p></p>
+
+<p><strong>Here are scripts to execute before this one</strong>
+<ul>
+<li><a onclick="displayHideables('join_paried_ends')">Join paired ends</a> - This script can manage either paired end, single end, or combined .fastq files. The rest of QIIME cannot handle non-joined paired-ends. You can run Join paired ends either before, or after this script.  If you run it before, use --input_type = paired_end_stitched</li>
+<li><a onclick="displayHideables('validate_mapping_file')">Validate mapping file</a> - This script optionally takes a mapping file as input.  You should validate it before you use it here</li>
+</ul>
+</p>
+
+<p><strong>Here are the main decisions you should make before running this script</strong>
+<ol>
+<li>Pick your --input_type</li>
+<li>Specify your one or two input .fastq files (depends on --input_type)</li>
+<li>Decide on barcode options<ul>
+	<li>Length of one or both barcodes</li>
+	<li>Do you want to attempt reordering based on a map file?</li>
+</ul>If working with two .fastq files, do you want to --disable_header_match</li>
+<li>Pick output options<ul>
+	<li>Do you want to reverse complement barcodes before printing them?</li>
+</ul></li>
+</ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="displayHideables('split_libraries_fastq')">De-multiplex libraries (fastq)</a> - This script generates a new .fastq file that has just barcodes as its sequences</li>
+</ul>
+</p>

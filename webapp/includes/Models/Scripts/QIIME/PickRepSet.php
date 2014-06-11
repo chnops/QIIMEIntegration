@@ -40,7 +40,7 @@ class PickRepSet extends DefaultScript {
 		return "pick_rep_set.py";
 	}
 	public function getScriptTitle() {
-		return "Pick representative OTU sequence";
+		return "Pick representative sequences";
 	}
 	public function getHtmlId() {
 		return "pick_rep_set";

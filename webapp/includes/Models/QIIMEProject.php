@@ -40,6 +40,10 @@ class QIIMEProject extends DefaultProject {
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Prepare libraries'][] = $script;
 
+		$script = new \Models\Scripts\QIIME\ExtractBarcodes($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Prepare libraries'][] = $script;
+
 		$script = new \Models\Scripts\QIIME\SplitLibrariesFastq($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Prepare libraries'][] = $script;
