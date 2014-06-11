@@ -10,10 +10,6 @@ class OldFileParameter extends DefaultParameter {
 		$this->project = $project;
 		$this->value = $default;
 	}
-	public function renderForOperatingSystem() {
-		$separator = (strlen($this->name) == 2) ? " " : "=";
-		return $this->name . $separator . escapeshellarg($this->value);
-	}
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
