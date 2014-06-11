@@ -1,0 +1,101 @@
+Usage: split_libraries_fastq.py [options] {-i/--sequence_read_fps SEQUENCE_READ_FPS -o/--output_dir OUTPUT_DIR -m/--mapping_fps MAPPING_FPS}
+
+[] indicates optional input (order unimportant)
+{} indicates required input (order unimportant)
+
+
+
+Example usage: 
+Print help message and exit
+ split_libraries_fastq.py -h
+
+Demultiplex and quality filter (at Phred >= Q20) one lane of Illumina fastq data and write results to ./slout_q20.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz -b lane1_barcode.fastq.gz --rev_comp_mapping_barcodes -o slout_q20/ -m map.txt -q 19
+
+Demultiplex and quality filter (at Phred >= Q20) one lane of Illumina fastq data and write results to ./slout_q20. Store trimmed quality scores in addition to sequence data.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz -b lane1_barcode.fastq.gz --rev_comp_mapping_barcodes -o slout_q20/ -m map.txt --store_qual_scores -q 19
+
+Demultiplex and quality filter (at Phred >= Q20) two lanes of Illumina fastq data and write results to ./slout_q20.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz,lane2_read1.fastq.gz -b lane1_barcode.fastq.gz,lane2_barcode.fastq.gz --rev_comp_mapping_barcodes -o slout_q20/ -m map.txt,map.txt --store_qual_scores -q 19
+
+Quality filter (at Phred >= Q20) one non-multiplexed lane of Illumina fastq data and write results to ./slout_single_sample_q20.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz --sample_id my.sample -o slout_single_sample_q20/ -m map_not_multiplexed.txt  -q 19 --barcode_type 'not-barcoded'
+
+Quality filter (at Phred >= Q20) one non-multiplexed lane of Illumina fastq data and write results to ./slout_single_sample_q20.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz --sample_id my.sample.1 -o slout_single_sample_q20/ -m map_not_multiplexed.txt -q 19 --barcode_type 'not-barcoded'
+
+Quality filter (at Phred >= Q20) two non-multiplexed lanes of Illumina fastq data with different samples in each and write results to ./slout_not_multiplexed_q20.: 
+ split_libraries_fastq.py -i lane1_read1.fastq.gz,lane2_read1.fastq.gz --sample_id my.sample.1,my.sample.2 -o slout_not_multiplexed_q20/ -m map_not_multiplexed.txt -q 19 --barcode_type 'not-barcoded'
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         Print information during execution -- useful for
+                        debugging [default: False]
+  -b BARCODE_READ_FPS, --barcode_read_fps=BARCODE_READ_FPS
+                        the barcode read fastq files (comma-separated if more
+                        than one) [default: none]
+  --store_qual_scores   store qual strings in .qual files [default: False]
+  --sample_ids=SAMPLE_IDS
+                        comma-separated list of samples id to be applied to
+                        all sequences, must be one per input file path (used
+                        when data is not multiplexed) [default: none]
+  --store_demultiplexed_fastq
+                        write demultiplexed fastq files [default: False]
+  --retain_unassigned_reads
+                        retain sequences which don't map to a barcode in the
+                        mapping file (sample ID will be "Unassigned")
+                        [default: False]
+  -r MAX_BAD_RUN_LENGTH, --max_bad_run_length=MAX_BAD_RUN_LENGTH
+                        max number of consecutive low quality base calls
+                        allowed before truncating a read [default: 3]
+  -p MIN_PER_READ_LENGTH_FRACTION, --min_per_read_length_fraction=MIN_PER_READ_LENGTH_FRACTION
+                        min number of consecutive high quality base calls to
+                        include a read (per single end read) as a fraction of
+                        the input read length [default: 0.75]
+  -n SEQUENCE_MAX_N, --sequence_max_n=SEQUENCE_MAX_N
+                        maximum number of N characters allowed in a sequence
+                        to retain it -- this is applied after quality
+                        trimming, and is total over combined paired end reads
+                        if applicable [default: 0]
+  -s START_SEQ_ID, --start_seq_id=START_SEQ_ID
+                        start seq_ids as ascending integers beginning with
+                        start_seq_id [default: 0]
+  --rev_comp_barcode    reverse complement barcode reads before lookup
+                        [default: False]
+  --rev_comp_mapping_barcodes
+                        reverse complement barcode in mapping before lookup
+                        (useful if barcodes in mapping file are reverse
+                        complements of golay codes) [default: False]
+  --rev_comp            reverse complement sequence before writing to output
+                        file (useful for reverse-orientation reads) [default:
+                        False]
+  -q PHRED_QUALITY_THRESHOLD, --phred_quality_threshold=PHRED_QUALITY_THRESHOLD
+                        the maximum unacceptable Phred quality score (e.g.,
+                        for Q20 and better, specify -q 19) [default: 3]
+  --last_bad_quality_char=LAST_BAD_QUALITY_CHAR
+                        DEPRECATED: use -q instead. This method of setting is
+                        not robust to different versions of CASAVA.
+  --barcode_type=BARCODE_TYPE
+                        The type of barcode used. This can be an integer, e.g.
+                        for length 6 barcodes, or golay_12 for golay error-
+                        correcting barcodes. Error correction will only be
+                        applied for golay_12 barcodes. [default: golay_12]
+  --max_barcode_errors=MAX_BARCODE_ERRORS
+                        maximum number of errors in barcode [default: 1.5]
+  --phred_offset=PHRED_OFFSET
+                        the ascii offset to use when decoding phred scores -
+                        warning: in most cases you don't need to pass this
+                        value [default: determined automatically]
+
+  REQUIRED options:
+    The following options must be provided under all circumstances.
+
+    -i SEQUENCE_READ_FPS, --sequence_read_fps=SEQUENCE_READ_FPS
+                        the sequence read fastq files (comma-separated if more
+                        than one) [REQUIRED]
+    -o OUTPUT_DIR, --output_dir=OUTPUT_DIR
+                        directory to store output files [REQUIRED]
+    -m MAPPING_FPS, --mapping_fps=MAPPING_FPS
+                        metadata mapping files (comma-separated if more than
+                        one) [REQUIRED]
