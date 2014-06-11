@@ -89,7 +89,7 @@ class QIIMEProject extends DefaultProject {
 		$script = $scripts[$scriptId];
 
 		$script->acceptInput($allInput); // will throw an error if bad input
-		$result = "Script input is valid-";
+		$result = "Able to validate script input-";
 		$code = $script->renderCommand();
 
 		$runId = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);

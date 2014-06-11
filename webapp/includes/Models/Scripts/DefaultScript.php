@@ -21,7 +21,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			$versionParameter->getName() => $versionParameter,);
 	}
 	public function getParameters() {
-		if (empty($parameters)) {
+		if (empty($this->parameters)) {
 			$this->initializeParameters();
 		}
 		return $this->parameters;
