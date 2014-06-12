@@ -94,7 +94,7 @@ abstract class DefaultProject implements ProjectI {
 				"then echo 'The requested URL ({$url}) does not exist'",
 				"exit 1",
 			"fi",
-			"wget '{$url}' --limit-rate=1M"
+			"wget '{$url}' --limit-rate=1M &>/dev/null &"
 		);
 		$consoleOutput = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(),
 			$directory = "{$this->getProjectDir()}/uploads/", 
