@@ -39,7 +39,7 @@ class FilterAlignment extends DefaultScript {
 			$threshold,
 			new Label('Output Options'),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", ".")
+			new NewFileParameter("--output_dir", ".", $isDir = true)
 		);
 	}
 	public function getScriptName() {

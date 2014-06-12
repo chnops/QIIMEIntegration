@@ -73,7 +73,7 @@ class SplitLibraries extends DefaultScript {
 			$discardBadWindows,
 			new Label("Output Options"),
 			$verboseParameter,
-			new NewFileParameter("--dir-prefix", "."),
+			new NewFileParameter("--dir-prefix", ".", $isDir = true),
 			new TextArgumentParameter("--start-numbering-at", "1", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--retain_unassigned_reads"),
   			new TrueFalseParameter("--keep-primer"),

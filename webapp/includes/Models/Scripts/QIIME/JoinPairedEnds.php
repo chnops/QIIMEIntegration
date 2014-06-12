@@ -20,7 +20,7 @@ class JoinPairedEnds extends DefaultScript {
 		$forwardReadsFp->requireIf();
 		$reverseReadsFp = new OldFileParameter("--reverse_reads_fp", $this->project);
 		$reverseReadsFp->requireIf();
-		$outputDir = new NewFileParameter("--output_dir", "");
+		$outputDir = new NewFileParameter("--output_dir", "", $isDir = true);
 		$outputDir->requireIf();
 
 		$indexReadsFp = new OldFileParameter("--index_reads_fp", $this->project);

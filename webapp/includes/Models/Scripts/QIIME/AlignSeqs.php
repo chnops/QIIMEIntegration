@@ -46,7 +46,7 @@ class AlignSeqs extends DefaultScript {
 			$muscleMaxMemory,
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "_aligned") // TODO dynamic default
+			new NewFileParameter("--output_dir", "_aligned", $isDir = true) // TODO dynamic default
 		);
 	}
 	public function getScriptName() {

@@ -21,7 +21,7 @@ class SplitLibrariesFastq extends DefaultScript {
 		$sequenceReadFps->requireIf();
 		$mappingFps = new OldFileParameter("--mapping_fps", $this->project);
 		$mappingFps->requireIf();
-		$outputDir = new NewFileParameter("--output_dir", "");
+		$outputDir = new NewFileParameter("--output_dir", "", $isDir = true);
 		$outputDir->requireIf();
 
 		array_push($this->parameters,

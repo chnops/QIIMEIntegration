@@ -260,7 +260,7 @@ class PickOtus extends DefaultScript {
 
 			new Label("Ouput options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "uclust_picked_otus") // TODO dynamic default
+			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) // TODO dynamic default
 		);
 	}
 	public function getScriptName() {

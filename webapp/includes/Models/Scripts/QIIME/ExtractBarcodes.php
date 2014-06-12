@@ -63,7 +63,7 @@ class ExtractBarcodes extends DefaultScript {
 
 			new Label("Output options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "."),
+			new NewFileParameter("--output_dir", ".", $isDir = true),
 			new TrueFalseParameter("--rev_comp_bc1"),
 			$revCompBc1
 		);

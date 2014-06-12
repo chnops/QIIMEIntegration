@@ -80,6 +80,7 @@ class DefaultParameter implements ParameterI {
 
 	public function acceptInput(array $input) {
 		if (!isset($input[$this->name]) || !$input[$this->name]) {
+			$this->setValue(false);
 			if ($this->isAlwaysRequired) {
 				throw new ScriptException("A required parameter was not found: {$this->name}");
 			}

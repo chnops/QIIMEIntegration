@@ -37,7 +37,7 @@ class ValidateMappingFile extends DefaultScript {
 			 new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),// TODO same as split_libraries or run header 
 			 new Label("Output Options"),
 			 $verboseParameter,
-			 new NewFileParameter("--output_dir", ""),
+			 new NewFileParameter("--output_dir", "", $isDir = true),
 			 new TrueFalseParameter("--suppress_html"),
 			 new TextArgumentParameter("--char_replace", "_", "/^.$/")
 		);

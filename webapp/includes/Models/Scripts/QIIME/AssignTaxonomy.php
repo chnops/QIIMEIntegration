@@ -86,7 +86,7 @@ class AssignTaxonomy extends DefaultScript {
 				// TODO This option is overridden by the -t and -r options.
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "_assigned_taxonomy") // TODO dynamic default
+			new NewFileParameter("--output_dir", "_assigned_taxonomy", $isDir = true) // TODO dynamic default
 			);
 	}
 	public function getScriptName() {
