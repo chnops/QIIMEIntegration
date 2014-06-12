@@ -105,13 +105,14 @@ class MacOperatingSystem implements OperatingSystemI {
 			if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;
 			cd {$this->home}/{$runDirectory};
 			if [ $? -ne 0 ]; then echo 'Requested directory cannot be found: {$this->home}{$runDirectory}'; exit 1; fi;
-		   	{$script};";
+		   	{$script} 2>> error_log.txt;";
 
 		$returnValue = 0;
 		ob_start();
 		system($code, $returnValue);
 		if ($returnValue) {
-			$exception = new OperatingSystemException("An error occurred while executing script. Check the error log, or contact your system administrator.");
+			$exception = new OperatingSystemException("An error occurred while executing script." .
+				" An error_log.txt file should have been created, which you can acces on the View Results page.");
 			$exception->setConsoleOutput(ob_get_clean());
 			throw $exception;
 		}
