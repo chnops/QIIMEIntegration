@@ -81,6 +81,28 @@ abstract class DefaultProject implements ProjectI {
 		}
 		return NULL;
 	}
+	public function receiveDownloadedFile($url, $fileName, FileType $fileType) {
+		$this->database->startTakingRequests();
+		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
+		if (!$databaseSuccess) {
+			$this->database->forgetAllRequests();
+			throw new \Exception("There was a problem storing your new file in the database");
+		}
+
+		$scriptCommands = array("let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$url}`",
+			"if [ \$exists -lt 200 ] || [ \$exists -ge 400 ]",
+				"then echo 'The requested URL ({$url}) does not exist'",
+				"exit 1",
+			"fi",
+			"wget '{$url}' --limit-rate=1M"
+		);
+		$consoleOutput = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(),
+			$directory = "{$this->getProjectDir()}/uploads/", 
+			$this->operatingSystem->combineCommands($scriptCommands));
+
+		$this->confirmUploadedFile();
+		return $consoleOutput;
+	}
 	public function receiveUploadedFile($fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());

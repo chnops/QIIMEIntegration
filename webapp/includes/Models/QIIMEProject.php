@@ -114,10 +114,10 @@ class QIIMEProject extends DefaultProject {
 		try {
 			$this->operatingSystem->createDir($runDir);
 
-			$version = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
+			$version = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
 			$version = trim($version);
 
-			$codeOutput = $this->operatingSystem->executeArbitraryScript($this->workflow->getEnvironmentSource(), $runDir, $code);
+			$codeOutput = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(), $runDir, $code);
 
 			$result .= "<br/>Script run successful!";
 			$codeOutput = trim($codeOutput);

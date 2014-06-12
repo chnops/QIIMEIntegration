@@ -7,6 +7,7 @@ interface OperatingSystemI {
 	public function createDir($name);
 	public function removeDirIfExists($name);
 	public function getDirContents($name, $prependHome = true);
-	public function executeArbitraryScript($environmentSource, $projectDirectory, $script);
+	public function executeArbitraryCommand($environmentSource, $projectDirectory, $script);
+	public function combineCommands(array $commands);
 	public function isValidFileName($name);
 }

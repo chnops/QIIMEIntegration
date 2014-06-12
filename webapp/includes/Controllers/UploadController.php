@@ -7,6 +7,7 @@ class UploadController extends Controller {
 	protected $subTitle = "Upload Input Files";
 
 	private $fileType = NULL;
+	private $url = "";
 
 	public function retrievePastResults() {
 		$output = "";
@@ -52,15 +53,49 @@ class UploadController extends Controller {
 		}
 		
 		// TODO if is valid form
-		$pastUploads = $this->project->retrieveAllUploadedFiles();
-		foreach ($pastUploads as $extantFile) {
-			if ($extantFile['name'] == $_FILES['file']['name']) {
+
+		$isDownload = isset($_POST['url']);
+		if ($isDownload) {
+			$this->url = $_POST['url'];
+			$fileName = explode('/', $this->url);
+			$fileName = array_pop($fileName);
+		}
+		else {
+			$fileName = $_FILES['file']['name'];
+		}
+		$pastFiles = $this->project->retrieveAllUploadedFiles();
+		foreach ($pastFiles as $extantFile) {
+			if ($extantFile['name'] == $fileName) {
 				$this->isResultError = true;
 				$this->result .= "You have already uploaded a file with that file name. File names must be unique";
 				return;
 			}
 		}
-		$this->uploadFile($_FILES['file'], $this->fileType);
+		if ($isDownload) {
+			try {
+				$this->result = $this->downloadFile($this->url, $fileName, $this->fileType);
+			}
+			catch (\Exception $ex) {
+				if ($ex instanceof \Models\OperatingSystemException) {
+					error_log($ex->getConsoleOutput());
+				}
+				$this->project->forgetUploadedFile();
+				$this->isResultError = true;
+				$this->result = $ex->getMessage();
+			}
+		}
+		else {
+			$this->uploadFile($_FILES['file'], $this->fileType);
+		}
+	}
+
+	private function downloadFile($url, $fileName, \Models\FileType $fileType) {
+		$output = "File downloaded successfully.";
+		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $fileType);
+		if ($consoleOutput) {
+			$output .= "<br/>The console returned the following output:<br/>" . htmlentities($consoleOutput);
+		}
+		return $output;
 	}
 
 	private function uploadFile(array $file, \Models\FileType $fileType) {
@@ -131,9 +166,24 @@ class UploadController extends Controller {
 		}
 	
 		$output .= "</select></label>
+			<button type=\"submit\"{$this->disabled}>Upload</button>
+			</form>";
+
+		$output .= "<br/><strong>-OR-</strong><br/>";
+		$output .= "<form method=\"POST\" action\"index.php\">
+			<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
+			<label for=\"url\">Specify a url to download file from:
+			<input type=\"text\" name=\"url\" value=\"{$this->url}\" placeholder=\"http://seq.center/file/path\"{$this->disabled}>
+			<label for=\"type\">File type:
+			<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
+		foreach ($fileTypes as $fileType) {
+			$selected = ($fileType->getHtmlId() == $selectedFileType) ? " selected" : "";
+			$output .= "<option value=\"{$fileType->getHtmlId()}\"{$selected}>{$fileType->getName()}</option>";
+		}
+		$output .= "</select></label>
 			<script type=\"text/javascript\">
 			window.onload=function() {window.hideableFields = ['help'];displayHideables('{$selectedFileType}');};</script>
-			<button type=\"submit\"{$this->disabled}>Upload</button>
+			<button type=\"submit\"{$this->disabled}>Download</button>
 			</form>";
 		return $output;
 	}

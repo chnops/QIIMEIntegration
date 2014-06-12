@@ -100,10 +100,15 @@ class MacOperatingSystem implements OperatingSystemI {
 		return $output;
 	}
 
-	public function executeArbitraryScript($environmentSource, $runDirectory, $script) {
-		$code = "source {$environmentSource}; 
-			if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;
-			cd {$this->home}/{$runDirectory};
+	public function executeArbitraryCommand($environmentSource, $runDirectory, $script) {
+		if ($environmentSource) {
+			$code = "source {$environmentSource}; 
+				if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;";
+		}
+		else {
+			$code = "";
+		}
+		$code .= "cd {$this->home}/{$runDirectory};
 			if [ $? -ne 0 ]; then echo 'Requested directory cannot be found: {$this->home}{$runDirectory}'; exit 1; fi;
 		   	{$script} 2>> error_log.txt;";
 
@@ -117,6 +122,13 @@ class MacOperatingSystem implements OperatingSystemI {
 			throw $exception;
 		}
 		return ob_get_clean();
+	}
+	public function combineCommands(array $commands) {
+		$output = "";
+		foreach ($commands as $command) {
+			$output .= $command . " 2>> error_log.txt;";
+		}
+		return $output;
 	}
 	public function isValidFileName($name) {
 		$whitelist = array("uploads");
