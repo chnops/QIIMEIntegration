@@ -33,17 +33,18 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			$form .= $parameter->renderForForm($disabled) . "\n";
 		}
 
+		$form .= "<input type=\"hidden\" name=\"step\" value=\"run\"{$disabledString}/>
+			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"{$disabledString}/>
+			<button type=\"submit\"{$disabledString}>Run</button>\n</form>";
+
 		if (!$disabled) {
 			$formJsVar = "js_" . $this->getHtmlId();
 			$form .= "<script type=\"text/javascript\">\nvar {$formJsVar} = $('div#form_{$this->getHtmlId()} form');\n";
 			foreach ($this->getParameters() as $parameter) {
 				$form .= $parameter->renderFormScript($formJsVar, $disabled);
 			}
+			$form .= "</script>\n";
 		}
-
-		$form .= "</script>\n<input type=\"hidden\" name=\"step\" value=\"run\"{$disabledString}/>
-			<input type=\"hidden\" name=\"script\" value=\"{$this->getHtmlId()}\"{$disabledString}/>
-			<button type=\"submit\"{$disabledString}>Run</button>\n</form>";
 		return $form;
 	}
 

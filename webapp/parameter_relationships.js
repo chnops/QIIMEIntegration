@@ -111,3 +111,12 @@ function changeTrigger(jQueryObj) {
 		}
 	}
 }
+function makeEitherOr(jQueryObj) {
+	jQueryObj.change(function() {
+			if ($(this).is(':checked')) {
+				jQueryObj.parents('td').find('[name]').prop('disabled', true);
+				jQueryObj.prop('disabled', false);
+				$(this).parents('td').find('[name]').prop('disabled', false);
+				}
+			});
+}

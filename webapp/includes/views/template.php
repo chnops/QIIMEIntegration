@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title><?php echo $this->subTitle ?></title>
+	<meta charset="UTF-8">
 	<style>
 		body {padding:0px;margin:0px;background-color:#999966;color:#330000;}
 		div#banner,div#footer,div#navigation{background-color:#cc0000;width:97%;border:2.5px solid;float:left;margin:.25em .5em;padding:0em .5em;}
@@ -37,38 +38,36 @@
 		select[size]{padding:.5em .5em 1.5em .5em}
 		optgroup.big{font-size:1.25em;font-weight:bold}
 		p.conditional_requirement{text-decoration:underline;display:none}
+		label.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
+		label.either_or td{padding:.25em;text-align:center}
+		label.either_or table tbody tr:first-child td {border-bottom:1px solid #999966}
+		label.either_or td:not(:first-child) {border-left:1px solid #999966}
 	</style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">
-	function toggleInstruction() {
-		var control = document.getElementById('instruction_controller');
-		var body = document.getElementById('instructions');
-		if (control.innerHTML == "hide") {
-			control.innerHTML = "show";
-			body.style.display = "none";
-		}
-		else {
-			control.innerHTML = "hide";
-			body.style.display = "inline";
-		}
-	}	
-	var hideableFields = [];
-	var displayedHideableId = "";
-	function displayHideables(hideableToDisplayId) {
-		for (var i = 0; i < hideableFields.length; i++) {
-			var hideableToDisplay = document.getElementById(hideableFields[i] + "_" + hideableToDisplayId);
-			var displayedHideable = document.getElementById(hideableFields[i] + "_" + displayedHideableId);
-			if (displayedHideable) displayedHideable.style.display="none";
-			if (hideableToDisplay) hideableToDisplay.style.display="block";
-		}
-		displayedHideableId = hideableToDisplayId;
+function hideMe(trigger) {
+	var triggerObj = $(trigger);
+	var responseObj = triggerObj.parents('.hideme').find('.hideme');
+	if (triggerObj.html() == "hide") {
+		triggerObj.html("show");
+		responseObj.css('display', "none");
 	}
-	function disable(Object) {
-		Object.prop('disabled', true).parent('label').css('display', 'none');
+	else {
+		triggerObj.html("hide");
+		responseObj.css('display', "block");
 	}
-	function enable(Object) {
-		Object.prop('disabled', false).parent('label').css('display', 'block');
+}	
+var hideableFields = [];
+var displayedHideableId = "";
+function displayHideables(hideableToDisplayId) {
+	for (var i = 0; i < hideableFields.length; i++) {
+		var hideableToDisplay = document.getElementById(hideableFields[i] + "_" + hideableToDisplayId);
+		var displayedHideable = document.getElementById(hideableFields[i] + "_" + displayedHideableId);
+		if (displayedHideable) displayedHideable.style.display="none";
+		if (hideableToDisplay) hideableToDisplay.style.display="block";
 	}
+	displayedHideableId = hideableToDisplayId;
+}
 </script>
 </head>
 <body>
@@ -85,7 +84,7 @@ foreach ($steps as $key => $step) {
 ?>
 </tr></table></div>
 <div id="content"><?php echo $this->content ?></div>
-<div id="help"><?php echo $this->help ?></div>
+<div id="help" class="hideme"><em>Help (<a onclick="hideMe(this)">hide</a>)</em><div class="hideme"><?php echo $this->help ?></div></div>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
 </html>
