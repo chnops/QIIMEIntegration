@@ -38,12 +38,12 @@ class EitherOrParameter extends DefaultParameter {
 			$checkedArray[2] = " checked";
 		}
 
-		$output = "<label class=\"either_or\" for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}<table>";
-		$output .= "<tr style=\"border-bottom:1px\"><td colspan=\"2\"><input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</input></td></tr>";
+		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}<br/>";
+		$output .= "<input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</input></label></td></tr>";
 		$output .= "<tr>" . 
 			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$checkedArray[1]}{$disabledString}>{$this->default->renderForForm()}</input></td>" . 
 			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$checkedArray[2]}{$disabledString}>{$this->alternative->renderForForm()}</input></td>" . 
-			"</tr></table></label>";
+			"</tr></table>";
 		return $output;
 	}
 	public function renderFormScript($formJsVar, $disabled) {
