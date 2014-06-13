@@ -86,19 +86,19 @@ class QIIMEWorkflow implements WorkflowI {
 	public function getController($step) {
 			switch($step) {
 			case "test":
-				return new \Controllers\TestController($this->database, $this);
+				return new \Controllers\TestController($this);
 			case "login":
-				return new \Controllers\LoginController($this->database, $this);
+				return new \Controllers\LoginController($this);
 			case "select":
-				return new \Controllers\SelectProjectController($this->database, $this);
+				return new \Controllers\SelectProjectController($this);
 			case "upload":
-				return new \Controllers\UploadController($this->database, $this);
+				return new \Controllers\UploadController($this);
 			case "run":
-				return new \Controllers\RunScriptsController($this->database, $this);
+				return new \Controllers\RunScriptsController($this);
 			case "view":
-				return new \Controllers\ViewResultsController($this->database, $this);
+				return new \Controllers\ViewResultsController($this);
 			default:
-				return new \Controllers\LoginController($this->database, $this);
+				return new \Controllers\LoginController($this);
 			}
 	}
 

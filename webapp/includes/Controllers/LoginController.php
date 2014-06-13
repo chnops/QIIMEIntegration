@@ -5,6 +5,12 @@ namespace Controllers;
 class LoginController extends Controller {
 
 	protected $subTitle = "Login";
+	private $roster = NULL;
+
+	public function __construct(\Models\WorkflowI $workflow) {
+		parent::__construct($workflow);
+		$this->roster = \Utils\Roster::getDefaultRoster();
+	}
 
 	public function parseInput() {
 		if (isset($_POST['logout'])) {
@@ -15,7 +21,7 @@ class LoginController extends Controller {
 		}
 		$this->hasResult = true;
 		$username = $_POST['username'];
-		$userExists = $this->database->userExists($username);
+		$userExists = $this->roster->userExists($username);
 		
 		if ($_POST['create']) {
 			if ($userExists) {
@@ -23,7 +29,16 @@ class LoginController extends Controller {
 				$this->result = "That username is already taken.  Did you mean to log in?";
 			}
 			else {
-				$this->createUser($username);
+				try {
+					$this->createUser($username);
+					$this->login($username);
+					$this->result = "You have successfully created a new user.";
+				}
+				catch (\Exception $ex) {
+					error_log($ex->getMessage());
+					$this->isResultError = true;
+					$this->result = "We were unable to create a new user.  Please see the error log or contact your system administrator";
+				}
 			}
 		}
 		else {
@@ -49,15 +64,7 @@ class LoginController extends Controller {
 		$this->result = "You have successfully logged in.";
 	}
 	private function createUser($username) {
-		$createSuccess = $this->database->createUser($username);
-		if ($createSuccess) {
-			$this->login($username);
-			$this->result = "You have successfully created a new user.";
-		}
-		else {
-			$this->isResultError = true;
-			$this->result = "We were unable to create a new user.  Please see the error log or contact your system administrator";
-		}
+		$this->roster->createUser($username);
 	}
 
 	public function getInstructions() {

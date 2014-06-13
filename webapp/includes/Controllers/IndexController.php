@@ -12,10 +12,10 @@ class IndexController extends Controller {
 
 	public function parseInput() {
 		if (isset($_REQUEST['step'])) {
-			$this->subController = $this->workflow->getController($_REQUEST['step'], $this->database);
+			$this->subController = $this->workflow->getController($_REQUEST['step']);
 		}
 		else {
-			$this->subController = new LoginController($this->database, $this->workflow);
+			$this->subController = new LoginController($this->workflow);
 		}
 	}
 

@@ -5,5 +5,9 @@ require_once './includes/setup.php';
 $operatingSystem = new \Models\MacOperatingSystem();
 $database = new \Database\PDODatabase($operatingSystem);
 $workflow = new \Models\QIIMEWorkflow($database, $operatingSystem);
-$indexController = new \Controllers\IndexController($database, $workflow);
+
+$roster = new \Utils\Roster($database, $operatingSystem);
+\Utils\Roster::setDefaultRoster($roster);
+
+$indexController = new \Controllers\IndexController($workflow);
 $indexController->run();

@@ -5,14 +5,12 @@ namespace Database;
 class PDODatabase implements DatabaseI {
 	private static $dsn = "sqlite:./data/database.sqlite";
 
-	private $operatingSystem = NULL;
 	private $pdo = NULL;
 
-	public function __construct(\Models\OperatingSystemI $operatingSystem) {
+	public function __construct() {
 		$pdo = new \PDO(PDODatabase::$dsn);
 		$pdo->exec("PRAGMA foreign_keys=ON");
 		$this->pdo = $pdo;
-		$this->operatingSystem = $operatingSystem;
 	}
 
 	public function startTakingRequests() {
@@ -42,29 +40,21 @@ class PDODatabase implements DatabaseI {
 
 	public function createUser($username) {
 		try {
-			$this->pdo->beginTransaction();
 			$result = $this->pdo->query("SELECT root FROM users ORDER BY root DESC LIMIT 1");
 			$root = $result->fetchColumn(0);
 			$root += 1;
 
 			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (?, ?)");
 			if ($pdoStatement->execute(array($username, $root))) {
-
-				// TODO this functionality should be stored elsewhere, for example, the Roster object.
-				// Once this is accomplished, though, the controllers won't even need their DatabaseI object.
-				$this->operatingSystem->createDir('u' . $root);
-				$this->pdo->commit();
 				return $root;
 			}
 			else {
 				$errorInfo = $pdoStatement->errorInfo();
 				error_log("Unable to create user: " . $errorInfo[2]);
-				$this->pdo->rollBack();
 				return false;
 			}
 		}
 		catch (\Exception $ex) {
-			$this->pdo->rollBack();
 			error_log("Unable to create user ({$username}): " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions

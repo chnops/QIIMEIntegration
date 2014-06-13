@@ -4,7 +4,6 @@ namespace Controllers;
 
 abstract class Controller {
 
-	protected $database = NULL;
 	protected $workflow = NULL;
 
 	protected $title = "QIIME";
@@ -22,8 +21,7 @@ abstract class Controller {
 	protected $result = "Result not yet implemented!";
 	private $pastResults = "";
 
-	public function __construct(\Database\DatabaseI $database, \Models\WorkflowI $workflow) {
-		$this->database = $database;
+	public function __construct(\Models\WorkflowI $workflow) {
 		$this->workflow = $workflow;
 		$this->step = $this->workflow->getCurrentStep($this);
 	}
