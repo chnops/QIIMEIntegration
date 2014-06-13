@@ -38,6 +38,10 @@
 		select[size]{padding:.5em .5em 1.5em .5em}
 		optgroup.big{font-size:1.25em;font-weight:bold}
 		p.conditional_requirement{text-decoration:underline;display:none}
+		label.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
+		label.either_or td{padding:.25em;text-align:center}
+		label.either_or table tbody tr:first-child td {border-bottom:1px solid #999966}
+		label.either_or td:not(:first-child) {border-left:1px solid #999966}
 	</style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">

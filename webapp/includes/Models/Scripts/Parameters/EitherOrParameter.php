@@ -27,29 +27,32 @@ class EitherOrParameter extends DefaultParameter {
 
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
-		$output = "<label for=\"{$this->name}\">{$this->name}<table style=\"border-left:1px solid\">";
-		$tableRows = array(
-			array("value" => "", "checked" => false, "body" => "None"),
-			array("value" => $this->default->getName(), "checked" => false, "body" => $this->default->renderForForm($disabled)),
-			array("value" => $this->alternative->getName(), "checked" => false, "body" => $this->alternative->renderForForm($disabled)),
-
-		);
+		$checkedArray = array('','','');
 		if (!$this->value) {
-			$tableRows[0]['checked'] = true;
+			$checkedArray[0] = " checked";
 		}
 		else if ($this->value == $this->default->getName()) {
-			$tableRows[1]['checked'] = true;
+			$checkedArray[1] = " checked";
 		}
 		else if ($this->value == $this->alternative->getName()) {
-			$tableRows[2]['checked'] = true;
+			$checkedArray[2] = " checked";
 		}
-		foreach ($tableRows as $row) {
-			$output .= "<tr><td><input type=\"radio\" name=\"{$this->name}\" value=\"{$row['value']}\"{$disabledString}";
-			$output .= ($row['checked']) ? " checked" : "";
-			$output .= "/></td><td>{$row['body']}</td></tr>";
-		}
-		$output .= "</table></label>";
+
+		$output = "<label class=\"either_or\" for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}<table>";
+		$output .= "<tr style=\"border-bottom:1px\"><td colspan=\"2\"><input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</input></td></tr>";
+		$output .= "<tr>" . 
+			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$checkedArray[1]}{$disabledString}>{$this->default->renderForForm()}</input></td>" . 
+			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$checkedArray[2]}{$disabledString}>{$this->alternative->renderForForm()}</input></td>" . 
+			"</tr></table></label>";
 		return $output;
+	}
+	public function renderFormScript($formJsVar, $disabled) {
+		if ($disabled) {
+			return "";
+		}
+		$code = parent::renderFormScript($formJsVar, $disabled);
+		$jsVar = $this->getJsVar($formJsVar);
+		return $code . "\tmakeEitherOr({$jsVar});{$jsVar}.change();\n";
 	}
 	public function isValueValid($value) {
 		if (!$value) {
