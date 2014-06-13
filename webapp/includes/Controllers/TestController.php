@@ -13,10 +13,7 @@ class TestController extends Controller {
 		return;
 	}
 	private function clean() {
-		system("rm -rf ./projects/*;
-			rm ./data/database.sqlite;
-			sqlite3 ./data/database.sqlite < ./data/schema.sql;");
-		$_SESSION = array();
+		return;
 	}
 	public function getInstructions() {
 		ob_start();
