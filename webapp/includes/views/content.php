@@ -9,12 +9,12 @@ if ($this->hasResult()) {
 	echo "<hr/>";
 }
 
-echo "<p><em>Instructions (<a id=\"instruction_controller\" onclick=\"toggleInstruction();\">hide</a>):</em></p><span id=\"instructions\">" .
-   	$this->getInstructions() . "</span>\n";
+echo "<div class=\"hideme\"><em>Instructions (<a id=\"instruction_controller\" onclick=\"hideMe(this);\">hide</a>):</em><div class=\"hideme\" id=\"instructions\">" .
+   	$this->getInstructions() . "</div></div>\n";
 
 if ($this->hasPastResults()) {
 	echo "<hr/>";
-	echo "<div id=\"past_results\">{$this->renderPastResults()}</div>";
+	echo "<div id=\"past_results\" class=\"hideme\"><em>Past results (<a onclick=\"hideMe(this)\">hide</a>)</em><div class=\"hideme\">{$this->renderPastResults()}</div></div>";
 }
 
 $form = $this->getForm();
