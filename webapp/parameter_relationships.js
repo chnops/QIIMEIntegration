@@ -84,22 +84,18 @@ function makeDependent(depdnt) {
 		var excldVals = depdnt['_pot_exclds'][trgName];
 		var curExclds = depdnt['_cur_exclds'];
 		if (excldVals) {
-			console.log("has excludes");
 			var isExcld = false;
 			for (var i = 0; i<excldVals.length;i++) {
-				console.log(excldVals[i] + " vs. " + val + " vs. " + valAsBool);
 				if (excldVals[i] == val || excldVals[i] == valAsBool) {
 					isExcld = true;
 					break;
 				}
 			}
 			if (isExcld) {
-				console.log("pushing");
 				curExclds.push(trgName);
 				excludeParam(depdnt);
 			}
 			else {
-				console.log("pulling");
 				for(var i = curExclds.length - 1; i >= 0; i--) {
 					if (curExclds[i] == trgName) {
 						curExclds.splice(i,1);
