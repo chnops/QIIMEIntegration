@@ -42,8 +42,17 @@
 		table.either_or td{padding:.25em;text-align:center}
 		table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
 		table.either_or td:not(:first-child) {border-left:1px solid #999966}
+	
+		.accordion{margin:.75em;padding:0em}	
+		.accordion h3,.accordion h4,.accordion div {outline:none;padding:.25em .5em;}
+		.accordion h3,.accordion h4{background-color:#ffcc66;margin-bottom:0em;border-style:solid;border-width:1px 2px}
+		.accordion h3,.accordion h4:not(:first-child){margin-top:0em}
+		.accordion div{background-color:#ffffcc;margin:0em;border-style:solid;border-width:0px 2px}
+		.accordion h3,.accordion h4:first-child{border-width:2px 2px 1px 2px}
+		.accordion div:last-child{border-width:1px 2px 2px 2px}
 	</style>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 <script type="text/javascript">
 function hideMe(trigger) {
 	var triggerObj = $(trigger);
@@ -68,6 +77,11 @@ function displayHideables(hideableToDisplayId) {
 	}
 	displayedHideableId = hideableToDisplayId;
 }
+	$(function() {
+		$('.accordion').accordion({
+		collapsible: true,
+		}); 
+	})
 </script>
 </head>
 <body>

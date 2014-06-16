@@ -27,15 +27,16 @@ class ViewResultsController extends Controller {
 
 		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
 		if (!empty($uploadedFiles)) {
-			$output .= "<h3>Uploaded Files:</h3>\n";
+			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name'); 
 			foreach ($uploadedFilesFormatted as $fileType => $fileNames) {
-				$output .= "<h4>{$fileType} files</h4><ul>\n";
+				$output .= "<h4>{$fileType} files</h4><div><ul>\n";
 				foreach ($fileNames as $fileName) {
 					$output .= "<li>" . htmlentities($fileName) . "</li>\n";
 				}
-				$output .= "</ul><hr class=\"small\"/>\n";
+				$output .= "</ul></div>\n";
 			}
+			$output .= "</div>";
 		}
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
