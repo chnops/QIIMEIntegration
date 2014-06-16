@@ -48,6 +48,7 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--phred_offset", "", TextArgumentParameter::PATTERN_NUMBER),
 
 			new Label("Output options"),
+			new TrueFalseParameter("--store_demultiplexed_fastq"),
 			new TrueFalseParameter("--verbose"),
 			new TrueFalseParameter("--store_qual_scores"),
 			new TrueFalseParameter("--retain_unassigned_reads"),

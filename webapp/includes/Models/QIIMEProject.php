@@ -48,6 +48,10 @@ class QIIMEProject extends DefaultProject {
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Prepare libraries'][] = $script;
 
+		$script = new \Models\Scripts\QIIME\ConvertFastaQualFastq($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Prepare libraries'][] = $script;
+
 		$script = new \Models\Scripts\QIIME\PickOtus($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Organize into OTUs'][] = $script;

@@ -17,6 +17,13 @@ class  extends DefaultScript {
 	public function initializeParameters() {
 		parent::initializeParameters();
 		// TODO implement
+
+		array_push($this->parameters,
+			new Label("Required Parameters"),
+			new Label("Optional parameters"),
+			new Label("Output options"),
+			new TrueFalseParameter("--verbose")
+		)
 	}
 	public function getScriptName() {
 		return "Implement me!";

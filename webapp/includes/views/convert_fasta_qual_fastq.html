@@ -1,0 +1,26 @@
+<p>This script will convert a pair of fasta/qual files (format most frequently used by QIIME) to a single fastq file (or vica versa)</p>
+
+<p><strong>Here are scripts to execute before this one</strong>
+<ul>
+<li><a onclick="displayHideables('split_libraries');">Demultiplex libraries</a> - This script can also split your input into multiple output files, one per sample.  Doing so only makes sense after you have demultiplexed your library</li>
+<li><a onclick="displayHideables('split_libraries_fastq');">Demultiplex fastq</a></li>
+<li><a onclick="displayHideables('join_paired_ends');">Join paired ends</a> - This script only works on a single fasta/qual pair, or a single fastq file, so you may have to join your paired ends into one file before running this</li>
+</ul>
+</p>
+
+<p><strong>Here are the main decisions you should make before running this script</strong>
+<ol>
+<li>Are you converting from a fastq file, or to one? Pick --conversion_type</li>
+<li>Select an input sequence file, --fasta_file_path. Also pick a .qual file if converting to fastq</li>
+<li>Decide on a fastq encoding type (required for either --conversion_type), --ascii_increment</li>
+<li>Pick output options.<ul>
+	<li>--multiple_output_files splits the input into separate output files, one per de-multplexed sample</li>
+</ul></li>
+</ol>
+</p>
+
+<p><strong>Here are the scripts to run after this one</strong>
+<ul>
+<li><a onclick="displayHideables('split_libraries_fastq');">Demultiplex fastq</a> - Demultiplex fastq is one of the only QIIME script that takes a fastq input file</li>
+</ul>
+</p>
