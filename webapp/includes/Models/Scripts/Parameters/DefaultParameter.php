@@ -12,9 +12,9 @@ class DefaultParameter implements ParameterI {
 
 	private $isEverExcluded = false;
 	private $allowingTriggers = array();
+	private $excludingTriggers = array();
 
-	private $isARequiringTrigger = false;
-	private $isAnAllowingTrigger = false;
+	private $isATrigger = false;
 
 	public function __construct($name, $value) {
 		$this->name = $name;
@@ -42,10 +42,11 @@ class DefaultParameter implements ParameterI {
 		if ($this->isAlwaysRequired) {
 			$code .= "requireParam({$parameterJsVar});";
 		}
-		if ($this->isARequiringTrigger() || $this->isAnAllowingTrigger()) {
+		if ($this->isATrigger()) {
 			$code .= "makeTrigger({$parameterJsVar});";
 		}
-		if (!empty($this->allowingTriggers) || !empty($this->requiringTriggers)) {
+		if (!empty($this->allowingTriggers) || !empty($this->requiringTriggers) ||
+			!empty($this->excludingTriggers)) {
 			$code .= "makeDependent({$parameterJsVar});";
 		}
 		$triggersUnique = array();
@@ -59,7 +60,7 @@ class DefaultParameter implements ParameterI {
 			if ($triggerValue === false) {
 				$triggerValue = "false";
 			}
-			else if ($triggerValue == false) {
+			else if ($triggerValue === true) {
 				$triggerValue = "true";
 			}
 			else {
@@ -76,13 +77,30 @@ class DefaultParameter implements ParameterI {
 			if ($triggerValue === false) {
 				$triggerValue = 'false';
 			}
-			else if ($triggerValue == false) {
+			else if ($triggerValue === true) {
 				$triggerValue = 'true';
 			}
 			else {
 				$triggerValue = "'{$triggerValue}'";
 			}
 			$relationshipCode .= "{$parameterJsVar}.requireOn('{$triggerName}', {$triggerValue});";
+		}
+		foreach ($this->excludingTriggers as $excludingTrigger) {
+			$triggerJsVar = $excludingTrigger['parameter']->getJsVar($formJsVar);
+			$triggersUnique[] = $triggerJsVar;
+
+			$triggerName = $excludingTrigger['parameter']->getName();
+			$triggerValue = $excludingTrigger['value'];
+			if ($triggerValue === false) {
+				$triggerValue = 'false';
+			}
+			else if ($triggerValue === true) {
+				$triggerValue = 'true';
+			}
+			else {
+				$triggerValue = "'{$triggerValue}'";
+			}
+			$relationshipCode .= "{$parameterJsVar}.excludeOn('{$triggerName}', {$triggerValue});";
 		}
 		$triggersUnique = array_unique($triggersUnique);
 		foreach ($triggersUnique as $trigger) {
@@ -127,7 +145,7 @@ class DefaultParameter implements ParameterI {
 				if ($triggerValue === false) {
 					$isRequired = !isset($input[$invertedTrigger->getName()]);
 				}
-				else if ($triggerValue == false) {
+				else if ($triggerValue === true) {
 					$isRequired = isset($input[$triggerParam->getName()]);
 				}
 				else {
@@ -156,8 +174,8 @@ class DefaultParameter implements ParameterI {
 							$isAllowed = true;
 						}
 					}
-					else if($triggerValue == false) {
-						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set";
+					else if($triggerValue === true) {
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set to anything";
 						if (isset($input[$triggerParam->getName()]) && ($input[$triggerParam->getName()])) {
 							$isAllowed = true;
 						}
@@ -170,6 +188,31 @@ class DefaultParameter implements ParameterI {
 					}
 				}
 
+				$errorMessageExtended = "<br/>It is not allowed when:";
+				foreach ($this->excludingTriggers as $trigger) {
+					$triggerParam = $trigger['parameter'];
+					$triggerValue = $trigger['value'];
+
+					if ($triggerValue === false) {
+						$errorMessageExtended .= "<br/>&nbsp;{$triggerParam->getName()} is not set";
+						if (!isset($input[$triggerParam->getName()])) {
+							$isAllowed = false;
+						}
+					}
+					else if ($triggerValue === true) {
+						$errorMessageExtended .= "<br/>&nbsp;{$triggerParam->getName()} is set to anything";
+						if (isset($input[$triggerParam->getName()])) {
+							$isAllowed = false;
+						}
+					}
+					else {
+						$errorMessageExtended .= "<br/>&nbsp;{$triggerParam->getName()} is set to {$triggerValue}";
+						if ($triggerValue == $input[$triggerParam->getName()]) {
+							$isAllowed = false;
+						}
+					}
+				}
+
 				if (!$isAllowed) {
 					throw new ScriptException($errorMessage);
 				}
@@ -178,45 +221,39 @@ class DefaultParameter implements ParameterI {
 		}
 	}
 
-	public function requireIf(ParameterI $trigger = NULL, $value = "") {
+	public function requireIf(ParameterI $trigger = NULL, $value = true) {
 		if (!$trigger) {
 			$this->isAlwaysRequired = true;
 			return;
 		}
 		$this->requiringTriggers[] = array ("parameter" => $trigger, "value" => $value);
-		$trigger->isARequiringTrigger(true);
+		$trigger->isATrigger(true);
 	}
-	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = "") {
+	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = true) {
 		$this->isEverExcluded = true;
 		if ($trigger) {
 			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);
-			$trigger->isAnAllowingTrigger(true);
+			$trigger->isATrigger(true);
 		}
+	}
+	public function excludeIf(ParameterI $trigger = NULL, $value = true) {
+		$this->isEverExcluded = true;
+		$trigger->isATrigger(true);
+		$this->excludingTriggers[] = array("parameter" => $trigger, "value" => $value);
 	}
 	public function linkTo(ParameterI $parameter) {
 		$eitherOr = new EitherOrParameter($this, $parameter);
 		return $eitherOr;
 	}
-	public function isARequiringTrigger($isIt = -1) {
+	public function isATrigger($isIt = -1) {
 		if ($isIt === -1) {
-			return $this->isARequiringTrigger;
+			return $this->isATrigger;
 		}
 		if ($isIt) {
-			$this->isARequiringTrigger = true;
+			$this->isATrigger = true;
 		}
 		else {
-			$this->isARequiringTrigger = false;
-		}
-	}
-	public function isAnAllowingTrigger($isIt = -1) {
-		if ($isIt === -1) {
-			return $this->isAnAllowingTrigger;
-		}
-		if ($isIt) {
-			$this->isAnAllowingTrigger = true;
-		}
-		else {
-			$this->isAnAllowingTrigger = false;
+			$this->isATrigger = false;
 		}
 	}
 }

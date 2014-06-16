@@ -39,10 +39,10 @@ class EitherOrParameter extends DefaultParameter {
 		}
 
 		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}<br/>";
-		$output .= "<input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</input></label></td></tr>";
+		$output .= "<input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</label></td></tr>";
 		$output .= "<tr>" . 
-			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$checkedArray[1]}{$disabledString}>{$this->default->renderForForm()}</input></td>" . 
-			"<td><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$checkedArray[2]}{$disabledString}>{$this->alternative->renderForForm()}</input></td>" . 
+			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$checkedArray[1]}{$disabledString}>{$this->default->renderForForm()}</label></td>" . 
+			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternative->getName()}\"{$checkedArray[2]}{$disabledString}>{$this->alternative->renderForForm()}</label></td>" . 
 			"</tr></table>";
 		return $output;
 	}

@@ -18,7 +18,7 @@ interface ParameterI {
 
 	public function requireIf(ParameterI $trigger = NULL, $value = "");
 	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = "");
+	public function excludeIf(ParameterI $trigger, $value = "");
 	public function linkTo(ParameterI $parameter);
-	public function isARequiringTrigger($isIt = -1);
-	public function isAnAllowingTrigger($isIt = -1);
+	public function isATrigger($isIt = -1);
 }

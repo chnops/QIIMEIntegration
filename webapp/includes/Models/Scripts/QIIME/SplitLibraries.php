@@ -43,7 +43,7 @@ class SplitLibraries extends DefaultScript {
 		$qualScoreWindow = new TextArgumentParameter("--qual_score_window", "0", TextArgumentParameter::PATTERN_DIGIT);
 		$discardBadWindows = new TrueFalseParameter("--discard_bad_windows");
 		$qualScoreWindow->excludeButAllowIf($qual);
-		$discardBadWindows->excludeButAllowIf($qualScoreWindow);
+		$discardBadWindows->excludeIf($qualScoreWindow, 0);
 
 		array_push($this->parameters,
 			new Label("Required Parameters"),

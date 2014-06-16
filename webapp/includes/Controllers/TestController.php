@@ -18,22 +18,23 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<label for=\"trigger1\">Hi there, I'm trigger 1: <input name=\"trigger1\" type=\"checkbox\"></label>";
-		echo "<label for=\"trigger2\">Hi there, I'm trigger 2: <input name=\"trigger2\" type=\"checkbox\"></label>";
-		echo "<label for=\"dependent\">Hi there, I'm a dependent: <input type=\"text\" name=\"dependent\"/></label>";
+		$trigger1 = new \Models\Scripts\Parameters\TrueFalseParameter("--trigger1");
+
+		$param1 = new \Models\Scripts\Parameters\TextArgumentParameter("--param1", "val1", "/.*/");
+		$param2 = new \Models\Scripts\Parameters\TextArgumentParameter("--param2", "val2", "/.*/");
+		$dependents = $param1->linkTo($param2);
+		$dependents->requireIf($trigger1);
+		
+		echo "<form id=\"form_test_form\">";
+		echo $trigger1->renderForForm($disabled = false);
+		echo $dependents->renderForForm($disabled = false);
+		echo "</form>";
+
 		echo "<script type=\"text/javascript\" src=\"parameter_relationships.js\"></script>";
-		echo "<script type=\"text/javascript\">
-var dependent = $('input[name=\"dependent\"]');
-makeDependent(dependent);
-dependent.allowOn('trigger1', false);
-dependent.allowOn('trigger2', true);
-var trigger1 = $('[name=\"trigger1\"]');
-makeTrigger(trigger1);
-var trigger2 = $('[name=\"trigger2\"]');
-makeTrigger(trigger2);
-dependent.listenTo(trigger1);
-dependent.listenTo(trigger2);
-			</script>";
+		echo "<script type=\"text/javascript\">var test_form = $('form#form_test_form');";
+		echo $trigger1->renderFormScript($formJsVar = "test_form", $disabled = false);
+		echo $dependents->renderFormScript($formJsVar = "test_form", $disabled = false);
+		echo "</script>";
 
 		return ob_get_clean();
 	}
