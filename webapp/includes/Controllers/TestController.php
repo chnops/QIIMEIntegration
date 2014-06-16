@@ -18,21 +18,14 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing regular expression for TextArgumentParameter<p>";
+		echo "<p>Testing some UI widgets</p>";
+		$script = "<script type=\"text/javascript\">$(function() { $('.accordion').accordion({collapsible: true}); });</script>";
+		echo $script;
+		echo htmlentities($script);
 
-		if (!empty($_POST)) {
-			echo "Results: ";
-			echo "preg_match({$_POST['regex']}, {$_POST['input']}): ";
-			echo preg_match($_POST['regex'], $_POST['input']);
-			echo "!<hr/>";
-		}
-
-		echo "<form method=\"POST\">";
-		echo "<input type=\"hidden\" name=\"step\" value=\"test\">";
-		echo "<label for=\"regex\">Regex: <input name=\"regex\" value=\"{$_POST['regex']}\"></label><br/>";
-		echo "<label for=\"input\">Input: <input name=\"input\" value=\"{$_POST['input']}\"></label><br/>";
-		echo "<button type=\"submit\">Submit</button>";
-		echo "</form>";
+		$html = "<div class=\"accordion\"><h3>Opt 1</h3><div>Content 1</div><h3>Opt 2</h3><div>Content 3</div><h3>Opt 3</h3><div>Content 2</div></div>";
+		echo $html;
+		echo htmlentities($html);
 
 		return ob_get_clean();
 	}

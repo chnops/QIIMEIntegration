@@ -16,18 +16,18 @@ class UploadController extends Controller {
 			return $output;
 		}
 
-		$output .= "<h3>Previously Uploaded files:</h3>\n";
+		$output .= "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n";
 		$helper = \Utils\Helper::getHelper();
 		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type', 'name');
 
 		foreach ($previousFilesFormatted as $fileType => $fileNames) {
-			$output .= "<h4>{$fileType} files</h4><ul>\n";
+			$output .= "<h4>{$fileType} files</h4><div><ul>\n";
 			foreach ($fileNames as $fileName) {
 				$output .= "<li>" . htmlentities($fileName) . "</li>\n";
 			}
-			$output .= "</ul><hr class=\"small\"/>\n";
+			$output .= "</ul></div>\n";
 		}
-		return $output;
+		return $output . "</div>";
 	}
 
 	public function parseInput() {
