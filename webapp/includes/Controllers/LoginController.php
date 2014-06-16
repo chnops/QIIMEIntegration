@@ -4,7 +4,6 @@ namespace Controllers;
 
 class LoginController extends Controller {
 
-	protected $subTitle = "Login";
 	private $roster = NULL;
 
 	public function __construct(\Models\WorkflowI $workflow) {
@@ -12,14 +11,17 @@ class LoginController extends Controller {
 		$this->roster = \Utils\Roster::getDefaultRoster();
 	}
 
+	public function getSubTitle() {
+		return "Login";
+	}
 	public function parseInput() {
 		if (isset($_POST['logout'])) {
 			$this->logout();
+			$this->result = "Logout successful";
 		}
 		if (!isset($_POST['username'])) {
 			return;
 		}
-		$this->hasResult = true;
 		$username = $_POST['username'];
 		$userExists = $this->roster->userExists($username);
 		
@@ -67,11 +69,10 @@ class LoginController extends Controller {
 		$this->roster->createUser($username);
 	}
 
-	public function getInstructions() {
-		return "<p>You don't actually need credentials to log in. By entering your name here, you are simply keeping track of your projects.
-			We expect everyone on this system to play nicely, and work only on their own projects. We recognize this assumption is naive.</p>";
+	public function renderInstructions() {
+		return "";
 	}
-	public function getForm() {
+	public function renderForm() {
 		$loginForm = "
 			<form method=\"POST\">
 			<p>Log in (existing user)<br/>
@@ -96,5 +97,13 @@ class LoginController extends Controller {
 			<button type=\"submit\" name=\"logout\" value=\"1\">Log out</button>
 			</form>";
 		return $loginForm . "<strong>-OR-</strong><br/>" . $createForm . "<strong>-OR-</strong><br/>" . $logoutForm;
+	}
+
+	public function retrievePastResults() {
+		return "";
+	}
+	public function renderHelp() {
+		return "<p>You don't actually need credentials to log in. By entering your name here, you are simply keeping track of your projects.
+			We expect everyone on this system to play nicely, and work only on their own projects. We recognize this assumption is naive.</p>";
 	}
 }

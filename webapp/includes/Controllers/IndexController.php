@@ -19,12 +19,11 @@ class IndexController extends Controller {
 		}
 	}
 
-	public function hasResult() {return false;}
-	public function getResult() {return;}
-	public function hasSessionData() {return false;}
-	public function getSessionData() {return;}
-	public function getInstructions() {return "";}
-	public function getForm() {return "";}
+	public function retrievePastResults() { return ""; }
+	public function renderInstructions() { return ""; }
+	public function renderForm() { return ""; }
+	public function renderHelp() { return ""; }
+	public function getSubTitle() { return ""; }
 
 	public function renderOutput() {
 		if ($this->subController) {
