@@ -40,10 +40,14 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		if (!$disabled) {
 			$formJsVar = "js_" . $this->getHtmlId();
 			$form .= "<script type=\"text/javascript\">\nvar {$formJsVar} = $('div#form_{$this->getHtmlId()} form');\n";
+			$triggerScript = "";
 			foreach ($this->getParameters() as $parameter) {
 				$form .= $parameter->renderFormScript($formJsVar, $disabled);
+				if ($parameter->isARequiringTrigger() || $parameter->isAnAllowingTrigger()) {
+					$triggerScript .= "{$parameter->getJsVar($formJsVar)}.change();";
+				}
 			}
-			$form .= "</script>\n";
+			$form .= $triggerScript . "</script>\n";
 		}
 		return $form;
 	}

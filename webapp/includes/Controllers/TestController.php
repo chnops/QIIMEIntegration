@@ -18,21 +18,22 @@ class TestController extends Controller {
 	public function getInstructions() {
 		ob_start();
 
-		echo "<p>Testing regular expression for TextArgumentParameter<p>";
-
-		if (!empty($_POST)) {
-			echo "Results: ";
-			echo "preg_match({$_POST['regex']}, {$_POST['input']}): ";
-			echo preg_match($_POST['regex'], $_POST['input']);
-			echo "!<hr/>";
-		}
-
-		echo "<form method=\"POST\">";
-		echo "<input type=\"hidden\" name=\"step\" value=\"test\">";
-		echo "<label for=\"regex\">Regex: <input name=\"regex\" value=\"{$_POST['regex']}\"></label><br/>";
-		echo "<label for=\"input\">Input: <input name=\"input\" value=\"{$_POST['input']}\"></label><br/>";
-		echo "<button type=\"submit\">Submit</button>";
-		echo "</form>";
+		echo "<label for=\"trigger1\">Hi there, I'm trigger 1: <input name=\"trigger1\" type=\"checkbox\"></label>";
+		echo "<label for=\"trigger2\">Hi there, I'm trigger 2: <input name=\"trigger2\" type=\"checkbox\"></label>";
+		echo "<label for=\"dependent\">Hi there, I'm a dependent: <input type=\"text\" name=\"dependent\"/></label>";
+		echo "<script type=\"text/javascript\" src=\"parameter_relationships.js\"></script>";
+		echo "<script type=\"text/javascript\">
+var dependent = $('input[name=\"dependent\"]');
+makeDependent(dependent);
+dependent.allowOn('trigger1', false);
+dependent.allowOn('trigger2', true);
+var trigger1 = $('[name=\"trigger1\"]');
+makeTrigger(trigger1);
+var trigger2 = $('[name=\"trigger2\"]');
+makeTrigger(trigger2);
+dependent.listenTo(trigger1);
+dependent.listenTo(trigger2);
+			</script>";
 
 		return ob_get_clean();
 	}

@@ -43,18 +43,53 @@ class DefaultParameter implements ParameterI {
 			$code .= "requireParam({$parameterJsVar});";
 		}
 		if ($this->isARequiringTrigger() || $this->isAnAllowingTrigger()) {
-			$code .= "{$parameterJsVar}.change(function() {changeTrigger({$parameterJsVar});});";
+			$code .= "makeTrigger({$parameterJsVar});";
 		}
+		if (!empty($this->allowingTriggers) || !empty($this->requiringTriggers)) {
+			$code .= "makeDependent({$parameterJsVar});";
+		}
+		$triggersUnique = array();
+		$relationshipCode = "";
 		foreach ($this->allowingTriggers as $allowingTrigger) {
 			$triggerJsVar = $allowingTrigger['parameter']->getJsVar($formJsVar);
-			$code .= "makeAllowingRelationship({$parameterJsVar}, {$triggerJsVar}, '{$allowingTrigger['value']}');";
+			$triggersUnique[] = $triggerJsVar;
+
+			$triggerName = $allowingTrigger['parameter']->getName();
+			$triggerValue = $allowingTrigger['value'];
+			if ($triggerValue === false) {
+				$triggerValue = "false";
+			}
+			else if ($triggerValue == false) {
+				$triggerValue = "true";
+			}
+			else {
+				$triggerValue = "'{$triggerValue}'";
+			}
+			$relationshipCode .= "{$parameterJsVar}.allowOn('{$triggerName}', {$triggerValue});";
 		}
-		foreach ($this->requiringTriggers as $allowingTrigger) {
-			$triggerJsVar = $allowingTrigger['parameter']->getJsVar($formJsVar);
-			$code .= "makeRequiringRelationship({$parameterJsVar}, {$triggerJsVar}, '{$allowingTrigger['value']}');";
+		foreach ($this->requiringTriggers as $requiringTrigger) {
+			$triggerJsVar = $requiringTrigger['parameter']->getJsVar($formJsVar);
+			$triggersUnique[] = $triggerJsVar;
+
+			$triggerName = $requiringTrigger['parameter']->getName();
+			$triggerValue = $requiringTrigger['value'];
+			if ($triggerValue === false) {
+				$triggerValue = 'false';
+			}
+			else if ($triggerValue == false) {
+				$triggerValue = 'true';
+			}
+			else {
+				$triggerValue = "'{$triggerValue}'";
+			}
+			$relationshipCode .= "{$parameterJsVar}.requireOn('{$triggerName}', {$triggerValue});";
+		}
+		$triggersUnique = array_unique($triggersUnique);
+		foreach ($triggersUnique as $trigger) {
+			$code .= "{$parameterJsVar}.listenTo({$trigger});";
 		}
 
-		return $code . "\n";
+		return $code . $relationshipCode . "\n";
 	}
 	public function getJsVar($formJsVar) {
 		return $formJsVar . "_" . preg_replace("/-/", "_", preg_replace("/--/", "", $this->name));
@@ -88,12 +123,17 @@ class DefaultParameter implements ParameterI {
 			foreach ($this->requiringTriggers as $trigger) {
 				$triggerParam = $trigger['parameter'];
 				$triggerValue = $trigger['value'];
-				if (!$triggerValue) {
+				
+				if ($triggerValue === false) {
+					$isRequired = !isset($input[$invertedTrigger->getName()]);
+				}
+				else if ($triggerValue == false) {
 					$isRequired = isset($input[$triggerParam->getName()]);
 				}
 				else {
-					$isRequired = $input[$triggerParam->getName()] == $triggerValue;
+					$isRequired = ($input[$triggerParam->getName()] == $triggerValue);
 				}
+
 				if ($isRequired) {
 					throw new ScriptException("A required parameter was not found: {$this->name} (required by {$triggerParam->getName()})");	
 				}
@@ -101,7 +141,7 @@ class DefaultParameter implements ParameterI {
 		}
 		else {
 			if ($this->isEverExcluded) {
-				$allowed = false;
+				$isAllowed = false;
 				$errorMessage = (empty($this->allowingTriggers)) ? 
 					"The parameter {$this->name} is not allowed" :
 					"The parameter {$this->name} is only allowed when:";
@@ -109,21 +149,28 @@ class DefaultParameter implements ParameterI {
 				foreach ($this->allowingTriggers as $trigger) {
 					$triggerParam = $trigger['parameter'];
 					$triggerValue = $trigger['value'];
-					if ($triggerValue) {
-						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set to {$triggerValue}";
-						if ($triggerValue == $input[$triggerParam->getName()]) {
-							$allowed = true;
+
+					if ($triggerValue === false) {
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is not set";
+						if (!isset($input[$triggerParam->getName()])) {
+							$isAllowed = true;
+						}
+					}
+					else if($triggerValue == false) {
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set";
+						if (isset($input[$triggerParam->getName()]) && ($input[$triggerParam->getName()])) {
+							$isAllowed = true;
 						}
 					}
 					else {
-						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set";
-						if (isset($input[$triggerParam->getName()]) && ($input[$triggerParam->getName()])) {
-							$allowed = true;
+						$errorMessage .= "<br/>&nbsp;{$triggerParam->getName()} is set to {$triggerValue}";
+						if ($triggerValue == $input[$triggerParam->getName()]) {
+							$isAllowed = true;
 						}
 					}
 				}
 
-				if (!$allowed) {
+				if (!$isAllowed) {
 					throw new ScriptException($errorMessage);
 				}
 			}

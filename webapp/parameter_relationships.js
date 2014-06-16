@@ -1,114 +1,101 @@
-function requireParam(jQueryObj) {
-	jQueryObj.parents('label').css('color', '#cc0000').css('font-weight', 'bold');
-}
-
-function makeAllowingRelationship(dependent, trigger, value) {
-	if (!trigger['allowed']) {
-		trigger['allowed'] = {};
-	}
-	if (value) {
-		if (!trigger['allowed'][value]) {
-			trigger['allowed'][value] = [];
+function makeTrigger(trg) {
+	trg['_lstnrs'] = [];
+	trg.change(function() {
+		var val = trg.val();
+		if (!val) {
+			val = false;
 		}
-		trigger['allowed'][value].push(dependent);
-	}
-	else {
-		if (!trigger['allow_on_any']) {
-			trigger['allow_on_any'] = [];
+		else if (val == "on") {
+			val = trg.is(':checked');
 		}
-		trigger['allow_on_any'].push(dependent);
-	}
-	trigger.change();
-}
-
-function makeRequiringRelationship(dependent, trigger, value) {
-	if (!trigger['required']) {
-		trigger['required'] = {};
-	}
-	if (value) {
-		if (!trigger['required'][value]) {
-			trigger['required'][value] = [];
-		}
-		trigger['required'][value].push(dependent);
-	}
-	else {
-		if (!trigger['require_on_any']) {
-			trigger['require_on_any'] = [];
-		}
-		trigger['require_on_any'].push(dependent);
-	}
-	trigger.change();
-}
-
-function changeTrigger(jQueryObj) {
-	var value = jQueryObj.val();
-	if (value == "on") {
-		value = jQueryObj.is(':checked');
-	}
-	if (value) {
-		if (jQueryObj['allowed']) {
-			var elemsToAllow = null;
-			jQuery.each(jQueryObj['allowed'], function (index, Element) {
-				if (index  == value) {
-					elemsToAllow = Element;
-				}
-				else {
-					jQuery.each(Element, function (arrayIndex, arrayElement) {arrayElement.prop('disabled', true).parents('label').css('display', 'none').change()});	
-				}
+		jQuery.each(trg['_lstnrs'], function(i, lstnr) {
+				lstnr.respondTo(trg, val);
 			});
-			if (elemsToAllow) {
-				jQuery.each(elemsToAllow, function (arrayIndex, arrayElement) {arrayElement.prop('disabled', false).parents('label').css('display', 'block').change()});	
+		});
+}
+function requireParam(param) {
+	param.parents('label').css('color', '#cc0000').css('font-weight', 'bold');
+	param.change();
+}
+function unRequireParam(param) {
+	param.parents('label').css('color', '#330000').css('font-weight', 'normal');
+	param.change();
+}
+function unExcludeParam(param) {
+	param.prop('disabled', false).change().parents('label').css('display', 'block');
+	param.change();
+}
+function excludeParam(param) {
+	param.prop('disabled', true).change().parents('label').css('display', 'none');
+	param.change();
+}
+function makeDependent(depdnt) {
+	depdnt['_pot_reqs'] = {};
+	depdnt['_cur_reqs'] = [];
+	depdnt['_pot_allws'] = {};
+	depdnt['_cur_allws'] = [];
+	depdnt['respondTo'] = function(trg, val) {
+		var trgName = trg.attr('name');
+		var reqVals = depdnt['_pot_reqs'][trgName];
+		if (reqVals) {
+			var curReqs = depdnt['_cur_reqs'];
+			var isReqd = (-1 != reqVals.indexOf(val));
+			if (isReqd) {
+				curReqs.push(trgName);
+				requireParam(depdnt);
+			}
+			else {
+				for (var i = curReqs.length - 1; i >= 0; i--) {
+					if (curReqs[i] == trgName) {
+						curReqs.splice(i, 1);
+					}
+				}
+				if (curReqs.length == 0) {
+					unRequireParam(depdnt);
+				}
 			}
 		}
-
-		if (jQueryObj['required']) {
-			var elemsToRequire = null;
-			jQuery.each(jQueryObj['required'], function (index, Element) {
-				if (index  == value) {
-					elemsToRequire = Element;
+		var allwVals = depdnt['_pot_allws'][trgName];
+		if (!allwVals) {
+			return;
+		}
+		var curAllws = depdnt['_cur_allws'];
+		var isAllwd = (-1 != allwVals.indexOf(val));
+		if (isAllwd) {
+			curAllws.push(trgName);
+			unExcludeParam(depdnt);
+		}
+		else {
+			for (var i = curAllws.length - 1; i >= 0; i--) {
+				if (curAllws[i] == trgName) {
+					curAllws.splice(i, 1);
 				}
-				else {
-					jQuery.each(Element, function (arrayIndex, arrayElement) {arrayElement.parents('label').css('color', '#330000').css('font-weight', 'normal').change()});	
-				}
-			});
-			if (elemsToRequire) {
-				jQuery.each(elemsToRequire, function (arrayIndex, arrayElement) {requireParam(arrayElement);arrayElement.change();});	
+			}
+			if (curAllws == 0) {
+				excludeParam(depdnt);
 			}
 		}
-
-		if (jQueryObj['allow_on_any']) {
-			jQuery.each(jQueryObj['allow_on_any'], function (index, Element) {
-				Element.prop('disabled', false).parents('label').css('display', 'block').change();	
-			});
+	}
+	depdnt['requireOn'] = function(trgName, val) {
+		var reqs = depdnt['_pot_reqs'];
+		if (reqs[trgName]) {
+			reqs[trgName].push(val);
 		}
-		if (jQueryObj['require_on_any']) {
-			jQuery.each(jQueryObj['require_on_any'], function (index, Element) {
-				requireParam(Element);
-				Element.change();
-			});
+		else {
+			reqs[trgName] = [val];
 		}
 	}
-	else {
-		if (jQueryObj['allowed']) {
-			jQuery.each(jQueryObj['allowed'], function (index, Element) {
-				jQuery.each(Element, function (arrayIndex, arrayElement) {arrayElement.prop('disabled', true).parents('label').css('display', 'none').change()});	
-			});
+	depdnt['allowOn'] = function(trgName, val) {
+		var allowers = depdnt['_pot_allws'];
+		if (allowers[trgName]) {
+			allowers[trgName].push(val);
 		}
-		if (jQueryObj['allow_on_any']) {
-			jQuery.each(jQueryObj['allow_on_any'], function (index, Element) {
-				Element.prop('disabled', true).parents('label').css('display', 'none').change();	
-			});
+		else {
+			allowers[trgName] = [val];
 		}
-		if (jQueryObj['required']) {
-			jQuery.each(jQueryObj['required'], function (index, Element) {
-				jQuery.each(Element, function (arrayIndex, arrayElement) {arrayElement.parents('label').css('color', '#330000').css('font-weight', 'normal').change()});	
-			});
-		}
-		if (jQueryObj['require_on_any']) {
-			jQuery.each(jQueryObj['require_on_any'], function (index, Element) {
-				Element.css('color', '#330000').css('font-weight', 'normal').change();	
-			});
-		}
+	}
+	depdnt['listenTo'] = function(trg) {
+		trg['_lstnrs'].push(depdnt);
 	}
 }
 function makeEitherOr(jQueryObj) {
