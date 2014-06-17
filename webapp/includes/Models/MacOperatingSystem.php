@@ -141,4 +141,28 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return $matchesRegex;
 	}
+	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId) {
+		$dir = $this->home . $project->getProjectDir();
+		if ($isUploaded) {
+			$dir .= "/uploads/";
+		}
+		else {
+			$dir .= "/r{$runId}/";
+		}
+		$code = "cd " . escapeshellarg($dir) . ";
+			touch " . escapeshellarg($fileName) . ";
+			rm " . escapeshellarg($fileName) . ";";
+
+		$exitStatus = 0;
+		ob_start();
+		system($code, $exitStatus);
+		if ($exitStatus) {
+			$ex = new OperatingSystemException("Unable to remove file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		else {
+			return ob_get_clean();
+		}
+	}
 }

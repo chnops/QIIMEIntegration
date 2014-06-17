@@ -182,6 +182,19 @@ class PDODatabase implements DatabaseI {
 	
 	}
 
+	public function removeUploadedFile($username, $projectId, $fileName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("DELETE FROM uploaded_files WHERE project_id = :id AND project_owner = :owner AND name = :name");
+			return $pdoStatement->execute(array("id" => $projectId, "owner" => $username, "name" => $fileName));
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to delete file: " . $ex->getMessage());
+			// TODO error handling
+			// TODO transactions
+			return false;
+		}
+	}
+
 	public function saveRun($username, $projectId, $scriptName, $scriptText) {
 		try {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO script_runs (project_owner, project_id, script_name, script_string)

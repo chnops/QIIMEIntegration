@@ -16,6 +16,7 @@ interface DatabaseI {
 
 	public function createUploadedFile($username, $projectId, $fileName, $fileType);
 	public function getAllUploadedFiles($username, $projectId);
+	public function removeUploadedFile($username, $projectId, $fileName);
 
 	public function saveRun($username, $projectId, $sriptName, $scriptText);
 	public function addRunResults($runId, $consoleOutput, $version);

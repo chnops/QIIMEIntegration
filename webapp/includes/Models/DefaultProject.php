@@ -103,6 +103,9 @@ abstract class DefaultProject implements ProjectI {
 		$this->confirmUploadedFile();
 		return $consoleOutput;
 	}
+	public function deleteGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
+	}
 	public function receiveUploadedFile($fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
@@ -112,6 +115,23 @@ abstract class DefaultProject implements ProjectI {
 		}
 		$fullFileName = $this->operatingSystem->getHome() . $this->getProjectDir() . "/uploads/" . $fileName;
 		return $fullFileName;
+	}
+	public function deleteUploadedFile($fileName) {
+		$this->database->startTakingRequests();
+		$dbResult = $this->database->removeUploadedFile($this->owner, $this->id, $fileName);
+		if (!$dbResult) {
+			$this->database->forgetAllRequests();
+			throw new \Exception("Unable to remove record of file from the database");
+		}
+		
+		try {
+			$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = true, $runId = -1);
+			$this->database->executeAllRequests();
+		}
+		catch(OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
 	}
 	public function confirmUploadedFile() {
 		$this->uploadedFiles = array();

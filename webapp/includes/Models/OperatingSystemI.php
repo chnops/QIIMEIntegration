@@ -10,4 +10,6 @@ interface OperatingSystemI {
 	public function executeArbitraryCommand($environmentSource, $projectDirectory, $script);
 	public function combineCommands(array $commands);
 	public function isValidFileName($name);
+
+	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 }
