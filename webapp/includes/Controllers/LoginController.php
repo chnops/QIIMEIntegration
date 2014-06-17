@@ -106,4 +106,13 @@ class LoginController extends Controller {
 		return "<p>You don't actually need credentials to log in. By entering your name here, you are simply keeping track of your projects.
 			We expect everyone on this system to play nicely, and work only on their own projects. We recognize this assumption is naive.</p>";
 	}
+	public function renderSpecificStyle() {
+		return "";
+	}
+	public function renderSpecificScript() {
+		return "";
+	}
+	public function getScriptLibraries() {
+		return array();
+	}
 }

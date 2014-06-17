@@ -54,12 +54,8 @@ $link = '#003366'; // bluish
 		select[size]{padding:.5em .5em 1.5em .5em}
 		optgroup.big{font-size:1.25em;font-weight:bold}
 
-		div.script_form input[type="text"],div.script_form input[type="file"],select{display:block}
-		table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
-		table.either_or td{padding:.25em;text-align:center}
-		table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
-		table.either_or td:not(:first-child) {border-left:1px solid #999966}
-	
+		<?php echo $this->renderSpecificStyle()?>
+
 		.accordion{margin:.75em;padding:0em}	
 		.accordion h3,.accordion h4,.accordion div {outline:none;padding:.25em .5em;}
 		.accordion h3,.accordion h4{background-color:#ffcc66;margin-bottom:0em;border-style:solid;border-width:1px 2px}
@@ -106,7 +102,11 @@ function paramHelp(text) {
 			scroll: false
 		});
 	})
+<?php echo $this->renderSpecificScript()?>
 </script>
+<?php foreach ($this->getScriptLibraries() as $lib):?>
+<script type="text/javascript" src="<?php echo $lib?>"></script>
+<?php endforeach?>
 </head>
 <body>
 <div id="banner"><h1><?php echo $this->title  ?></h1><h2><?php echo $this->getSubTitle() ?></h2></div>

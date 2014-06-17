@@ -10,6 +10,22 @@ class UploadController extends Controller {
 	private $fileType = NULL;
 	private $url = "";
 
+	private function getFileType() {
+		if (!$this->project) {
+			return "";
+		}
+		if (!$this->fileType) {
+			if (isset($_POST['type'])) {
+				$this->fileType = $this->project->getFileTypeFromHtmlId($_POST['type']);
+			}
+			else {
+				$fileTypes = $this->project->getFileTypes();
+				$this->fileType = $fileTypes[0];
+			}
+		}
+		return $this->fileType;
+	}
+
 	public function retrievePastResults() {
 		if (!$this->project) {
 			return "";
@@ -47,8 +63,7 @@ class UploadController extends Controller {
 		}
 		$this->hasResult = true;
 
-		$this->fileType = $this->project->getFileTypeFromHtmlId($_POST['type']);
-		if (!$this->fileType) {
+		if (!$this->getFileType()) {
 			$this->isResultError = true;
 			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
 		}
@@ -77,7 +92,7 @@ class UploadController extends Controller {
 		}
 		if ($isDownload) {
 			try {
-				$this->result = $this->downloadFile($this->url, $fileName, $this->fileType);
+				$this->result = $this->downloadFile($this->url, $fileName, $this->getFileType());
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -89,7 +104,7 @@ class UploadController extends Controller {
 			}
 		}
 		else {
-			$this->uploadFile($_FILES['file'], $this->fileType);
+			$this->uploadFile($_FILES['file'], $this->getFileType());
 		}
 	}
 
@@ -146,10 +161,8 @@ class UploadController extends Controller {
 
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 		$fileTypes = $project->getFileTypes();
-		$defaultFileType = $fileTypes[0];
-		$selectedFileType = ($this->fileType) ? $this->fileType->getHtmlId() : $defaultFileType->getHtmlId();
 		foreach ($fileTypes as $fileType) {
-			$selected = ($fileType->getHtmlId() == $selectedFileType) ? " selected" : "";
+			$selected = ($fileType->getHtmlId() == $this->getFileType()->getHtmlId()) ? " selected" : "";
 			$output .= "<option value=\"{$fileType->getHtmlId()}\"{$selected}>{$fileType->getName()}</option>";
 		}
 	
@@ -165,12 +178,10 @@ class UploadController extends Controller {
 			<label for=\"type\">File type:
 			<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
 		foreach ($fileTypes as $fileType) {
-			$selected = ($fileType->getHtmlId() == $selectedFileType) ? " selected" : "";
+			$selected = ($fileType->getHtmlId() == $this->getFileType()->getHtmlId()) ? " selected" : "";
 			$output .= "<option value=\"{$fileType->getHtmlId()}\"{$selected}>{$fileType->getName()}</option>";
 		}
 		$output .= "</select></label>
-			<script type=\"text/javascript\">
-			window.onload=function() {window.hideableFields = ['help'];displayHideables('{$selectedFileType}');};</script>
 			<button type=\"submit\"{$this->disabled}>Download</button>
 			</form>";
 		return $output;
@@ -184,14 +195,20 @@ class UploadController extends Controller {
 			</ol></p>";
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 		$fileTypes = $project->getFileTypes();
-		if (!$this->fileType) {
-			$this->fileType = $fileTypes[0];
-		}
 		foreach ($fileTypes as $fileType) {
 			$help .= "<div class=\"hideable\" id=\"help_{$fileType->getHtmlId()}\">\n";
 			$help .= $fileType->renderHelp();
 			$help .= "</div>\n";
 		}
 		return $help;
+	}
+	public function renderSpecificStyle() {
+		return "";
+	}
+	public function renderSpecificScript() {
+		return "window.onload=function() {window.hideableFields = ['help'];displayHideables('{$this->getFileType()->getHtmlId()}');};";
+	}
+	public function getScriptLibraries() {
+		return array();
 	}
 }

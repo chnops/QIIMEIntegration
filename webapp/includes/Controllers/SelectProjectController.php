@@ -109,7 +109,7 @@ class SelectProjectController extends Controller {
 				$checkedName = ($this->project) ? $this->project->getName() : "";
 				$checked = ($checkedName == $project->getName()) ? " checked" : "";
 				$projectName = htmlentities($project->getName());
-				$selectForm .= "<label style=\"display:block;\" for=\"project\">
+				$selectForm .= "<label class=\"radio\" for=\"project\">
 					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$this->disabled}{$checked}>{$projectName}</label>";
 			}
 
@@ -130,5 +130,14 @@ class SelectProjectController extends Controller {
 			When you run analyses on your data, the result files are stored, along with metadata concerning all the scripts and command line arguments you used.
 			Any work you do on a project is saved, and can be accessed at a later date. Usually there is no harm in walking away from or even logging off your computer while
 			longer analysis are running. No need to sit around and wait for your program to run. We'll take care of it.";
+	}
+	public function renderSpecificStyle() {
+		return "label.radio{display:block}";
+	}
+	public function renderSpecificScript() {
+		return "";
+	}
+	public function getScriptLibraries() {
+		return array();
 	}
 }

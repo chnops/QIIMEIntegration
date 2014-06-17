@@ -86,7 +86,6 @@ class RunScriptsController extends Controller {
 			although it is possible that you will run them in a totally different order (see the help bar on the right for rules and requirements for specific scripts)</p>\n";
 
 		$instructions .= $project->renderOverview();
-		$instructions .= "\n<script type=\"text/javascript\" src=\"parameter_relationships.js\"></script>\n";
 		return $instructions;
 	}
 
@@ -104,11 +103,6 @@ class RunScriptsController extends Controller {
 		foreach ($scripts as $script) {
 			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm($shouldBeDisabled)}</div>\n";
 		}
-		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
-		if ($this->scriptId) {
-			$onLoadJavascript .= "displayHideables('{$this->scriptId}');";
-		}
-		$form .= "<script type=\"text/javascript\">window.onload=function(){{$onLoadJavascript}};</script>\n";
 		
 		return "<span id=\"parameter_help\" class=\"draggable hideme\">Parameter help</span>" . $form;
 	}
@@ -125,5 +119,22 @@ class RunScriptsController extends Controller {
 			}
 		}
 		return $help;
+	}
+	public function renderSpecificStyle() {
+		return "div.script_form input[type=\"text\"],div.script_form input[type=\"file\"],select{display:block}
+		table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
+		table.either_or td{padding:.25em;text-align:center}
+		table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
+		table.either_or td:not(:first-child) {border-left:1px solid #999966}";
+	}
+	public function renderSpecificScript() {
+		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
+		if ($this->scriptId) {
+			$onLoadJavascript .= "displayHideables('{$this->scriptId}');";
+		}
+		return "window.onload=function(){{$onLoadJavascript}};";
+	}
+	public function getScriptLibraries() {
+		return array("parameter_relationships.js");
 	}
 }

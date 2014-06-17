@@ -41,4 +41,13 @@ class TestController extends Controller {
 	public function retrievePastResults() {
 		return "";
 	}
+	public function renderSpecificStyle() {
+		return "";
+	}
+	public function renderSpecificScript() {
+		return "";
+	}
+	public function getScriptLibraries() {
+		return array();
+	}
 }

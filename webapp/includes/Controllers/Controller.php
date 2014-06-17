@@ -67,6 +67,9 @@ abstract class Controller {
 	public abstract function renderForm();
 	public abstract function renderHelp();
 	public abstract function getSubTitle();
+	public abstract function renderSpecificStyle();
+	public abstract function renderSpecificScript();
+	public abstract function getScriptLibraries();
 	public function getWorkflow() {
 		return $this->workflow;
 	}

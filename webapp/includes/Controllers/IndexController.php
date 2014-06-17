@@ -24,6 +24,9 @@ class IndexController extends Controller {
 	public function renderForm() { return ""; }
 	public function renderHelp() { return ""; }
 	public function getSubTitle() { return ""; }
+	public function renderSpecificStyle() { return ""; }
+	public function renderSpecificScript() { return ""; }
+	public function getScriptLibraries() { return array(); }
 
 	public function renderOutput() {
 		if ($this->subController) {
