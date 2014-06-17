@@ -32,27 +32,28 @@ $link = '#003366'; // bluish
 		div#content,div#help{background-color:<?php echo $neutral?>;border-width:1.5px;margin:.25em .5em;padding:1em;}
 		div#content{width:65%;float:left;display:inline;margin-left:1.5em}
 		div#help{width:25%;float:left;display:inline}
-		div#session_data{border-width:0px 0px 1px 1px;border-color<?php echo $internalBorder?>;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
+		div#session_data{border-width:0px 0px 1px 1px;border-color:<?php echo $internalBorder?>;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#content h2{margin-bottom:.5em}
 		div#instructions {margin-bottom:1em}
 		div#content div.form,div#result,div#past_results{border-width:1px;border-color:<?php echo $internalBorder?>;display:inline-block;margin-left:2.5em;padding:1em;overflow:auto;max-width:90%}
 		div#result{background-color:<?php echo $neutralPale?>}
 		div#result.error{background-color:<?php echo $error?>}
 
-		div.file_example{border-width:1px;background-color:<?php echo $darkBackground?>;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.5em;margin:.5em;}
-		div.hideable{display:none;}
 		a{color:<?php echo $link?>;cursor:pointer;}
 		a:link {color:<?php echo $link?>;text-decoration:none;font-style:italic;}
 		a:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
-		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;}
+		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;white-space:nowrap;margin:.25em}
 		a.button:active {border:2px <?php echo $internalBorder?> inset;}
-		label{display:block;margin:.5em 0em;}
 		button{background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset}
 		button:active{border:2px <?php echo $internalBorder?> inset}
-		input,select{background-color:<?php echo $neutralPale?>;}
-		input[disabled]{background-color:<?php echo $darkBackground?>;}
-		select[size]{padding:.5em .5em 1.5em .5em}
+		label{display:block;margin:.5em 0em;}
+		input,select{background-color:<?php echo $neutralPale?>}
+		input[type="text"],input[type="file"],select{border-width:1px;border-color:<?php echo $internalBorder?>}
+		input[disabled],select[disabled]{background-color:<?php echo $darkBackground?>;}
 		optgroup.big{font-size:1.25em;font-weight:bold}
+
+		div.hideable{display:none;}
+		div.file_example{border-width:1px;background-color:<?php echo $darkBackground?>;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.5em;margin:.5em;}
 
 		<?php echo $this->renderSpecificStyle()?>
 
@@ -114,7 +115,7 @@ function paramHelp(text) {
 <?php
 $steps = $this->getWorkflow()->getSteps();
 if (isset($steps[$this->step])) {
-	$steps[$this->step] = "<strong>" . $steps[$this->step] . "</strong>";
+	$steps[$this->step] = "<strong>--" . $steps[$this->step] . "--</strong>";
 }
 foreach ($steps as $key => $step) {
 	echo "<td><a href=\"index.php?step=$key\">{$step}</a></td>";

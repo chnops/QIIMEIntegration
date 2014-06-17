@@ -122,10 +122,14 @@ class RunScriptsController extends Controller {
 	}
 	public function renderSpecificStyle() {
 		return "div.script_form input[type=\"text\"],div.script_form input[type=\"file\"],select{display:block}
-		table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
-		table.either_or td{padding:.25em;text-align:center}
-		table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
-		table.either_or td:not(:first-child) {border-left:1px solid #999966}";
+			div#project_overview{border-width:1px;padding:.5em;overflow:auto}
+			div#project_overview div{margin:1em 0em 1.5em 0em;white-space:nowrap}
+			div#project_overview span{margin:0em 1em}
+			select[size]{padding:.5em .5em 1.5em .5em}
+			table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
+			table.either_or td{padding:.25em;text-align:center}
+			table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
+			table.either_or td:not(:first-child) {border-left:1px solid #999966}";
 	}
 	public function renderSpecificScript() {
 		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";

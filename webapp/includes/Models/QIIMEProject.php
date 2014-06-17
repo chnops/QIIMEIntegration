@@ -149,20 +149,19 @@ class QIIMEProject extends DefaultProject {
 	}
 
 	public function renderOverview() {
-		$overview = "<style>div#project_overview{border:2px #999966 ridge;padding:.5em .5em 1.5em .5em;overflow:auto}div#project_overview td{padding:.5em .25em;white-space:nowrap}div#project_overview a.button{min-width:100%}</style>\n";
-		$overview .= "<div id=\"project_overview\">\n<table>\n";
+		$overview = "<div id=\"project_overview\">\n";
 
 		if (!$this->scriptsFormatted) {
 			$this->initializeScripts();
 		}
 		foreach ($this->scriptsFormatted as $category => $scriptArray) {
-			$overview .= "<tr><td>{$category}</td>";
+			$overview .= "<div><span>{$category}</span>";
 			foreach ($scriptArray as $script) {
-				$overview .= "<td><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></td>";
+				$overview .= "<span><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></span>";
 			}
-			$overview .= "</tr>\n";
+			$overview .= "</div>\n";
 		}
-		$overview .= "</table>\n</div>\n";
+		$overview .= "</div>\n";
 		return $overview;
 	}
 
