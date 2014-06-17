@@ -35,6 +35,5 @@ interface ProjectI {
 	public function beginProject();
 	public function receiveDownloadedFile($url, $fileName, FileType $fileType);
 	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType);
-	public function forgetUploadedFile();
 	public function runScript(array $allInput);
 }

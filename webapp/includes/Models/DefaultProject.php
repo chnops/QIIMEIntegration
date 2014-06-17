@@ -138,13 +138,6 @@ abstract class DefaultProject implements ProjectI {
 			throw $ex;
 		}
 	}
-	public function confirmUploadedFile() {
-		$this->uploadedFiles = array();
-		$this->database->executeAllRequests();
-	}
-	public function forgetUploadedFile() {
-		$this->database->forgetAllRequests();
-	}
 	public function retrieveAllUploadedFiles() {
 		if (empty($this->uploadedFiles)) {
 			$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);

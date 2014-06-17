@@ -163,7 +163,7 @@ class MacOperatingSystem implements OperatingSystemI {
 			fi;
 			which wget &> /dev/null;
 			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
-			wget " . escapeshellarg($url) . " --limit-rate=1M &> /dev/null;";
+			(wget " . escapeshellarg($url) . " --limit-rate=1M &> /dev/null;) &";
 		$returnCode = 0;
 		system($scriptCommand, $returnCode);
 		if ($returnCode) {
