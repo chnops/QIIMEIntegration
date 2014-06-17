@@ -13,6 +13,7 @@ interface ProjectI {
 	public function setName($name);
 	public function getDatabase();
 	public function getOperatingSystem();
+	public function getEnvironmentSource();
 
 	// Lazy load getters (and dependents)
 	public function getScripts();

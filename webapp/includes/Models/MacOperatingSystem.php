@@ -153,10 +153,12 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 	public function downloadFile(ProjectI $project, $url) {
 		ob_start();
-		$scriptCommand = "cd {$this->home}{$project->getProjectDir()}/uploads;
-			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$url}`;
+		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
+			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
+			cd {$this->home}{$project->getProjectDir()}/uploads;
+			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' " . escapeshellarg($url) . "`;
 			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
-				then echo 'The requested URL ({$url}) does not exist';
+				then echo 'The requested URL does not exist';
 				exit 1;
 			fi;
 			which wget &> /dev/null;

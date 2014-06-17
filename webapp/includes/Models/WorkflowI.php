@@ -13,6 +13,4 @@ interface WorkflowI {
 	public function getNewProject();
 	public function findProject($username, $projectId);
 	public function getAllProjects($username);
-
-	public function getEnvironmentSource();
 }

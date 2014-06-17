@@ -206,4 +206,5 @@ abstract class DefaultProject implements ProjectI {
 	public abstract function runScript(array $allInput);
 	public abstract function renderOverview();
 	public abstract function retrieveAllBuiltInFiles();
+	public abstract function getEnvironmentSource();
 }
