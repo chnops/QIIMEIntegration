@@ -13,7 +13,7 @@ class ChoiceParameter extends DefaultParameter {
 
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
-		$output = "<label for=\"{$this->name}\">{$this->name}<select name=\"{$this->name}\"{$disabledString}>\n";
+		$output = "<label for=\"{$this->name}\">{$this->name} <a onclick=\"paramHelp('{$this->name}')\">&amp;</a><select name=\"{$this->name}\"{$disabledString}>\n";
 		foreach ($this->options as $option) {
 			$selected = ($this->value == $option) ? " selected" : "";
 			$output .= "<option value=\"{$option}\"{$selected}>{$option}</option>\n";

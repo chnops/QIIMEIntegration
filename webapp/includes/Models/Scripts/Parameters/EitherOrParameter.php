@@ -38,7 +38,7 @@ class EitherOrParameter extends DefaultParameter {
 			$checkedArray[2] = " checked";
 		}
 
-		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}<br/>";
+		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()} <a onclick=\"paramHelp('{$this->name}');\">&amp;</a><br/>";
 		$output .= "<input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</label></td></tr>";
 		$output .= "<tr>" . 
 			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->default->getName()}\"{$checkedArray[1]}{$disabledString}>{$this->default->renderForForm()}</label></td>" . 

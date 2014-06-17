@@ -118,6 +118,7 @@ class RunScriptsController extends Controller {
 			$onLoadJavascript .= "displayHideables('{$this->scriptId}');";
 		}
 		$form .= "<script type=\"text/javascript\">window.onload=function(){{$onLoadJavascript}};</script>\n";
-		return $form;
+		
+		return "<span id=\"parameter_help\" class=\"draggable hideme\">Parameter help</span>" . $form;
 	}
 }

@@ -18,7 +18,7 @@ class TrueFalseParameter extends DefaultParameter {
 	public function renderForForm($disabled) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$checked = ($this->value) ? " checked" : "";
-		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name}</label>";
+		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name} <a onclick=\"paramHelp('{$this->name}')\">&amp;</a></label>";
 	}
 
 	public function acceptInput(array $input) {

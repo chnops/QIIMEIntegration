@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html ondblclick="
+var anchor_pos = $('div.form').position();
+event = jQuery.event.fix(event);
+$('#parameter_help').css('left', event.pageX - anchor_pos.left).css('top',event.pageY - anchor_pos.top);
+">
 <head>
 	<title><?php echo $this->subTitle ?></title>
 	<meta charset="UTF-8">
@@ -50,6 +54,8 @@
 		.accordion div{background-color:#ffffcc;margin:0em;border-style:solid;border-width:0px 2px}
 		.accordion h3,.accordion h4:first-child{border-width:2px 2px 1px 2px}
 		.accordion div:last-child{border-width:1px 2px 2px 2px}
+
+		.draggable{padding:.5em;background-color:#ffffcc;border:1px solid}
 	</style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
@@ -77,10 +83,16 @@ function displayHideables(hideableToDisplayId) {
 	}
 	displayedHideableId = hideableToDisplayId;
 }
+function paramHelp(text) {
+	$('#parameter_help').html("Parameter help: " + text);
+}
 	$(function() {
 		$('.accordion').accordion({
 		collapsible: true,
 		}); 
+		$('.draggable').draggable({
+			scroll: false
+		});
 	})
 </script>
 </head>
