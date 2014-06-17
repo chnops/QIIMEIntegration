@@ -11,11 +11,14 @@ class UploadController extends Controller {
 	private $url = "";
 
 	public function retrievePastResults() {
-		$output = "";
+		if (!$this->project) {
+			return "";
+		}
 		$previousFiles = $this->project->retrieveAllUploadedFiles();
 		if (empty($previousFiles)) {
-			return $output;
+			return "";
 		}
+		$output = "";
 
 		$output .= "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n";
 		$helper = \Utils\Helper::getHelper();

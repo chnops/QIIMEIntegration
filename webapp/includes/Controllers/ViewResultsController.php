@@ -25,7 +25,7 @@ class ViewResultsController extends Controller {
 		$output .= "<ul>
 			<li>Owner: {$this->project->getOwner()}</li>
 			<li>Unique id: {$this->project->getId()}</li>
-			</ul><hr/>";
+			</ul>";
 
 		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
 		if (!empty($uploadedFiles)) {
@@ -42,7 +42,7 @@ class ViewResultsController extends Controller {
 		}
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
-			$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
+			$output .= "You can see a preview of the file you wish to download here:<br/>
 				<div class=\"file_example\" id=\"file_preview\" style=\"margin:.75em;display:none\"></div>";
 		}
 

@@ -83,8 +83,7 @@ class RunScriptsController extends Controller {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();	
 
 		$instructions = "<p>From here, you can run any of the scripts that make up your workflow.  They are listed below in the order they are likely to be run,
-			although it is possible that you will run them in a totally different order (see the help bar on the right for rules and requirements for specific scripts)</p>
-			<hr class=\"small\"/>\n";
+			although it is possible that you will run them in a totally different order (see the help bar on the right for rules and requirements for specific scripts)</p>\n";
 
 		$instructions .= $project->renderOverview();
 		$instructions .= "\n<script type=\"text/javascript\" src=\"parameter_relationships.js\"></script>\n";
