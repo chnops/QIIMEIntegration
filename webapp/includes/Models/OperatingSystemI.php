@@ -11,5 +11,8 @@ interface OperatingSystemI {
 	public function combineCommands(array $commands);
 	public function isValidFileName($name);
 
+	// TODO refactor
+	public function uploadFile(ProjectI $project, $givenName, $tmpName);
+	public function downloadFile(ProjectI $project, $url);
 	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 }

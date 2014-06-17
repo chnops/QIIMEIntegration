@@ -89,32 +89,37 @@ abstract class DefaultProject implements ProjectI {
 			throw new \Exception("There was a problem storing your new file in the database");
 		}
 
-		$scriptCommands = array("let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$url}`",
-			"if [ \$exists -lt 200 ] || [ \$exists -ge 400 ]",
-				"then echo 'The requested URL ({$url}) does not exist'",
-				"exit 1",
-			"fi",
-			"wget '{$url}' --limit-rate=1M &>/dev/null &"
-		);
-		$consoleOutput = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(),
-			$directory = "{$this->getProjectDir()}/uploads/", 
-			$this->operatingSystem->combineCommands($scriptCommands));
-
-		$this->confirmUploadedFile();
-		return $consoleOutput;
+		try {	
+			$consoleOutput = $this->operatingSystem->downloadFile($this, $url);
+			$this->database->executeAllRequests();
+			$this->uploadedFiles = array();
+			return $consoleOutput;
+		}
+		catch (OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
 	}
 	public function deleteGeneratedFile($fileName, $runId) {
 		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
 	}
-	public function receiveUploadedFile($fileName, FileType $fileType) {
+	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType) {
 		$this->database->startTakingRequests();
-		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
+		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId());
 		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
-			return false;
+			throw new \Exception("Unable to create file in database");
 		}
-		$fullFileName = $this->operatingSystem->getHome() . $this->getProjectDir() . "/uploads/" . $fileName;
-		return $fullFileName;
+		try {
+			$this->operatingSystem->uploadFile($this, $givenName, $tmpName);
+			$this->database->executeAllRequests();
+			$this->uploadedFiles = array();
+			return true;
+		}
+		catch(OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
 	}
 	public function deleteUploadedFile($fileName) {
 		$this->database->startTakingRequests();

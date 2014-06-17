@@ -79,7 +79,6 @@ class UploadController extends Controller {
 				if ($ex instanceof \Models\OperatingSystemException) {
 					error_log($ex->getConsoleOutput());
 				}
-				$this->project->forgetUploadedFile();
 				$this->isResultError = true;
 				$this->result = $ex->getMessage();
 			}
@@ -107,24 +106,15 @@ class UploadController extends Controller {
 		}
 		// TODO if size/type are valid
 
-		$fileName = $file['name'];
-		$systemFileName = $this->project->receiveUploadedFile($fileName, $fileType);
-		// TODO replace nasty nested ifs with try{}catch{}
-		if (!$systemFileName) {
-			$this->isResultError = true;
-			$this->result = "There was an error adding your file to the project.";
+		$givenName = $file['name'];
+		$tmpName = $file['tmp_name'];
+		try {
+			$this->project->receiveUploadedFile($givenName, $tmpName, $fileType);
+			$this->result = "File " . htmlentities($givenName) . " successfully uploaded!";
 		}
-		else {
-			$moveResult = move_uploaded_file($file['tmp_name'], $systemFileName);
-			if ($moveResult) {
-				$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
-				$this->project->confirmUploadedFile();	
-			}
-			if (!$moveResult) {
-				$this->isResultError = true;
-				$this->result = "There was an error moving your file on to the system.";
-				$this->project->forgetUploadedFile();
-			}
+		catch (\Exception $ex) {
+			$this->isResultError = true;
+			$this->result = $ex->getMessage();
 		}
 	}
 

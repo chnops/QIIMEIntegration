@@ -141,6 +141,36 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return $matchesRegex;
 	}
+
+
+	public function uploadFile(ProjectI $project, $givenName, $tmpName) {
+			$targetName = $this->home . $project->getProjectDir() . "/uploads/" . $givenName;
+			$result = move_uploaded_file($tmpName, $targetName);
+			if (!$result) {
+				throw new OperatingSystemException("Unable to move file from temporary upload to operating system");
+			}
+			return true;
+	}
+	public function downloadFile(ProjectI $project, $url) {
+		ob_start();
+		$scriptCommand = "cd {$this->home}{$project->getProjectDir()}/uploads;
+			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$url}`;
+			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
+				then echo 'The requested URL ({$url}) does not exist';
+				exit 1;
+			fi;
+			which wget &> /dev/null;
+			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
+			wget " . escapeshellarg($url) . " --limit-rate=1M &> /dev/null;";
+		$returnCode = 0;
+		system($scriptCommand, $returnCode);
+		if ($returnCode) {
+			$ex = new OperatingSystemException("Unable to download file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		return ob_get_clean();
+	}
 	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId) {
 		$dir = $this->home . $project->getProjectDir();
 		if ($isUploaded) {

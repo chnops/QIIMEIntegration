@@ -32,8 +32,8 @@ interface ProjectI {
 
 	// complex mutators
 	public function beginProject();
-	public function receiveUploadedFile($fileName, FileType $fileType);
-	public function confirmUploadedFile();
+	public function receiveDownloadedFile($url, $fileName, FileType $fileType);
+	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType);
 	public function forgetUploadedFile();
 	public function runScript(array $allInput);
 }
