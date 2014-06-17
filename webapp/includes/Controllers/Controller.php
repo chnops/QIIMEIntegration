@@ -7,18 +7,14 @@ abstract class Controller {
 	protected $workflow = NULL;
 
 	protected $title = "QIIME";
-	protected $subTitle = "";
-	protected $help = "";
 	protected $step;
-	private $content = "";
 
 	protected $username = "";
 	protected $project = NULL;
 	protected $disabled = "";
 
 	protected $isResultError = false;
-	protected $hasResult = false;
-	protected $result = "Result not yet implemented!";
+	protected $result = "";
 	private $pastResults = "";
 
 	public function __construct(\Models\WorkflowI $workflow) {
@@ -39,20 +35,15 @@ abstract class Controller {
 		$this->project = $this->workflow->findProject($this->username, $_SESSION['project_id']);
 	}
 
-	public function retrievePastResults() {
-		return "";
-	}
+	public abstract function retrievePastResults();
 
 	public function isResultError() {
 		return $this->isResultError;
 	}
-	public function hasResult() {
-		return $this->hasResult;
-	}
 	public function getResult() {
 		return $this->result;
 	}
-	public function getSessionData() {
+	public function renderSessionData() {
 		if (!$this->username) {
 			return "You are not logged on.";
 		}
@@ -66,36 +57,26 @@ abstract class Controller {
 		}
 		return $output;
 	}
-	public function hasPastResults() {
-		if (!$this->project) {
-			return false;
-		}
-		$this->pastResults = $this->retrievePastResults();
-		if ($this->pastResults) {
-			return true;
-		}
-		return false;
-	}
 	public function renderPastResults() {
+		if (!$this->pastResults) {
+			$this->retrievePastResults();
+		}
 		return $this->pastResults;
 	}
-	public function getInstructions() {
-		return "<div class=\"error\">Instructions not yet implemented!</div>";
-	}
-	public function getForm() {
-		return "<div class=\"error\">Form not yet implemented!</div>";
-	}
+	public abstract function renderInstructions();
+	public abstract function renderForm();
+	public abstract function renderHelp();
+	public abstract function getSubTitle();
 	public function getWorkflow() {
 		return $this->workflow;
 	}
-	public function getSubTitle() {
-		return $this->subTitle;
-	}
 	public function renderOutput() {
+		include 'views/template.php';
+	}
+	public function getContent() {
 		ob_start();
 		include 'views/content.php';
-		$this->content = ob_get_clean();
-		include 'views/template.php';
+		return ob_get_clean();
 	}
 	public function run() {
 		$this->parseSession();
