@@ -4,8 +4,12 @@ namespace Controllers;
 
 class SelectProjectController extends Controller {
 
-	protected $subTitle = "Select a Project";
-
+	public function getSubtitle() {
+		return "Select a Project";
+	}
+	public function retrievePastResults() {
+		return "";
+	}
 	private $projects = array();
 	
 	public function parseSession() {
@@ -89,14 +93,11 @@ class SelectProjectController extends Controller {
 		return false;
 	}
 
-	public function getInstructions() {
-		return "It is helpful to organize your files into projects. Each project starts with uploaded input files, for example, a .fasta sequence file, or a map file.
-			When you run analyses on your data, the result files are stored, along with metadata concerning all the scripts and command line arguments you used.
-			Any work you do on a project is saved, and can be accessed at a later date. Usually there is no harm in walking away from or even logging off your computer while
-			longer analysis are running. No need to sit around and wait for your program to run. We'll take care of it.";
+	public function renderInstructions() {
+		return "";
 	}
 
-	public function getForm() {
+	public function renderForm() {
 		$selectForm = "";
 		if (!empty($this->projects)) {
 			$selectForm = "
@@ -123,5 +124,11 @@ class SelectProjectController extends Controller {
 			<button type=\"submit\"{$this->disabled}>Create</button>
 			</form>";
 		return $selectForm . $createForm;
+	}
+	public function renderHelp() {
+		return "It is helpful to organize your files into projects. Each project starts with uploaded input files, for example, a .fasta sequence file, or a map file.
+			When you run analyses on your data, the result files are stored, along with metadata concerning all the scripts and command line arguments you used.
+			Any work you do on a project is saved, and can be accessed at a later date. Usually there is no harm in walking away from or even logging off your computer while
+			longer analysis are running. No need to sit around and wait for your program to run. We'll take care of it.";
 	}
 }

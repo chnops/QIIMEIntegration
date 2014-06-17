@@ -59,7 +59,7 @@ abstract class Controller {
 	}
 	public function renderPastResults() {
 		if (!$this->pastResults) {
-			$this->retrievePastResults();
+			$this->pastResults = $this->retrievePastResults();
 		}
 		return $this->pastResults;
 	}

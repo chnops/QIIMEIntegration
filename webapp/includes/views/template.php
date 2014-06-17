@@ -34,7 +34,7 @@ $link = '#003366'; // bluish
 		div#content div.form{margin-left:2.5em;border-width:1px;border-color:<?php echo $internalBorder?>;padding:1em;display:inline-block}
 		div#session_data{margin-left:0px;margin-right:auto;border-width:0px 0px 1px 1px;border-color<?php echo $internalBorder?>;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#result{border-width:1px;border-color:<?php echo $internalBorder?>;display:inline-block;margin-left:2.5em;padding:.25em;background-color:<?php echo $neutralPale?>}
-		div.error{background-color:<?php echo $error?>}
+		div#result.error{background-color:<?php echo $error?>}
 		div#past_results{display:inline-block;padding:0em .5em;border-width:1px}
 		div#past_results,div#result{overflow:auto;max-width:90%}
 		div.file_example{border-width:1px;background-color:<?php echo $darkBackground?>;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.5em;margin:.5em;}
@@ -43,7 +43,7 @@ $link = '#003366'; // bluish
 		a{color:<?php echo $link?>;cursor:pointer;}
 		a:link {color:<?php echo $link?>;text-decoration:none;font-style:italic;}
 		a:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
-		a.button{font-style:normal;background-color:<?php echo $neutral?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;}
+		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;}
 		a.button:active {border:2px <?php echo $internalBorder?> inset;}
 		label{display:block;margin:.5em 0em;}
 		button{background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset}
@@ -122,7 +122,10 @@ foreach ($steps as $key => $step) {
 ?>
 </tr></table></div>
 <div id="content"><?php echo $this->getContent() ?></div>
-<div id="help" class="hideme"><em>Help (<a onclick="hideMe(this)">hide</a>)</em><div class="hideme"><?php echo $this->renderHelp() ?></div></div>
+<?php $help = $this->renderHelp();
+if ($help):?>
+<div id="help" class="hideme"><em>Help (<a onclick="hideMe(this)">hide</a>)</em><div class="hideme"><?php echo $help;?></div></div>
+<?php endif; ?>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
 </html>

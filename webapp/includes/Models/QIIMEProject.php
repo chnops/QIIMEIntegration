@@ -152,6 +152,9 @@ class QIIMEProject extends DefaultProject {
 		$overview = "<style>div#project_overview{border:2px #999966 ridge;padding:.5em .5em 1.5em .5em;overflow:auto}div#project_overview td{padding:.5em .25em;white-space:nowrap}div#project_overview a.button{min-width:100%}</style>\n";
 		$overview .= "<div id=\"project_overview\">\n<table>\n";
 
+		if (!$this->scriptsFormatted) {
+			$this->initializeScripts();
+		}
 		foreach ($this->scriptsFormatted as $category => $scriptArray) {
 			$overview .= "<tr><td>{$category}</td>";
 			foreach ($scriptArray as $script) {

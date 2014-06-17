@@ -4,8 +4,9 @@ namespace Controllers;
 
 class UploadController extends Controller {
 
-	protected $subTitle = "Upload Input Files";
-
+	public function getSubTitle() {
+		return "Upload Input Files";
+	}
 	private $fileType = NULL;
 	private $url = "";
 
@@ -128,26 +129,10 @@ class UploadController extends Controller {
 		}
 	}
 
-	public function getInstructions() {
-		$this->help .= "<p>There are three types of files QIIME uses:
-			<ol>
-			<li>A map file</li>
-			<li>A fasta formatted sequence file</li>
-			<li>A sequence quality file</li>
-			</ol></p>";
-		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
-		$fileTypes = $project->getFileTypes();
-		if (!$this->fileType) {
-			$this->fileType = $fileTypes[0];
-		}
-		foreach ($fileTypes as $fileType) {
-			$this->help .= "<div class=\"hideable\" id=\"help_{$fileType->getHtmlId()}\">\n";
-			$this->help .= $fileType->renderHelp();
-			$this->help .= "</div>\n";
-		}
-		return "<p>The first step to any project is to upload your files.</p>";
+	public function renderInstructions() {
+		return "";
 	}
-	public function getForm() {
+	public function renderForm() {
 		$output = "
 			<form method=\"POST\" action=\"index.php\" enctype=\"multipart/form-data\">
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
@@ -159,7 +144,7 @@ class UploadController extends Controller {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 		$fileTypes = $project->getFileTypes();
 		$defaultFileType = $fileTypes[0];
-		$selectedFileType = ($this->fileType) ? $this->fileType->getHtmlId() : $defaultFiletypes->getHtmlId();
+		$selectedFileType = ($this->fileType) ? $this->fileType->getHtmlId() : $defaultFileType->getHtmlId();
 		foreach ($fileTypes as $fileType) {
 			$selected = ($fileType->getHtmlId() == $selectedFileType) ? " selected" : "";
 			$output .= "<option value=\"{$fileType->getHtmlId()}\"{$selected}>{$fileType->getName()}</option>";
@@ -186,5 +171,24 @@ class UploadController extends Controller {
 			<button type=\"submit\"{$this->disabled}>Download</button>
 			</form>";
 		return $output;
+	}
+	public function renderHelp() {
+		$help = "<p>There are three types of files QIIME uses:
+			<ol>
+			<li>A map file</li>
+			<li>A fasta formatted sequence file</li>
+			<li>A sequence quality file</li>
+			</ol></p>";
+		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+		$fileTypes = $project->getFileTypes();
+		if (!$this->fileType) {
+			$this->fileType = $fileTypes[0];
+		}
+		foreach ($fileTypes as $fileType) {
+			$help .= "<div class=\"hideable\" id=\"help_{$fileType->getHtmlId()}\">\n";
+			$help .= $fileType->renderHelp();
+			$help .= "</div>\n";
+		}
+		return $help;
 	}
 }

@@ -15,7 +15,7 @@ class TestController extends Controller {
 	private function clean() {
 		return;
 	}
-	public function getInstructions() {
+	public function renderInstructions() {
 		ob_start();
 
 		echo "<p>Testing some UI widgets</p>";
@@ -28,5 +28,17 @@ class TestController extends Controller {
 		echo htmlentities($html);
 
 		return ob_get_clean();
+	}
+	public function renderForm() {
+		return "";
+	}
+	public function renderHelp() {
+		return "";
+	}
+	public function getSubTitle() {
+		return "Test";
+	}
+	public function retrievePastResults() {
+		return "";
 	}
 }
