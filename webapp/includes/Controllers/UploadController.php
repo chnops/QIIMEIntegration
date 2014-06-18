@@ -66,6 +66,7 @@ class UploadController extends Controller {
 		if (!$this->getFileType()) {
 			$this->isResultError = true;
 			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
+			return;
 		}
 		else {
 			$this->result = "";
@@ -76,8 +77,16 @@ class UploadController extends Controller {
 		$isDownload = isset($_POST['url']);
 		if ($isDownload) {
 			$this->url = $_POST['url'];
-			$fileName = explode('/', $this->url);
-			$fileName = array_pop($fileName);
+			$urlParts = explode('/', $this->url);
+			$fileName = "";
+			while (!$fileName && $urlParts) {
+				$fileName = array_pop($urlParts);
+			}
+			if (!$fileName) {
+				$this->isResultError = true;
+				$this->result = "Unable to determine file name from given url";
+				return;
+			}
 		}
 		else {
 			$fileName = $_FILES['file']['name'];
