@@ -60,7 +60,7 @@ $link = '#003366'; // bluish
 		.accordion > div h4,.accordion > div {outline:none;padding:.25em .5em;margin:0em}
 		.accordion > div h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
 		.accordion > div h4:active {border-style:inset}
-		.accordion > div div{background-color:<?php echo $darkBackground?>;margin:0em;border-width:1px;padding:.25em}
+		.accordion > div div{background-color:<?php echo $neutralPale?>;margin:0em 0em 0em .5em;border-width:1px;padding:0em}
 		.draggable{padding:.5em;background-color:#ffffcc;border-width:1px}
 	</style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -95,8 +95,9 @@ function paramHelp(text) {
 	$(function() {
 		$('.accordion > div').accordion({
 			collapsible: true,
-			active: false,
-		}); 
+		});
+		var accordionContainer = $('.accordion').parent();
+		accordionContainer.width(accordionContainer.width());
 		$('.draggable').draggable({
 			scroll: false
 		});

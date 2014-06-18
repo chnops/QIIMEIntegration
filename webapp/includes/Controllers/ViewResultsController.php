@@ -54,7 +54,7 @@ class ViewResultsController extends Controller {
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($uploadedFiles) || !empty($generatedFiles)) {
 			$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
-				<div class=\"file_example\" id=\"file_preview\" style=\"margin:.75em;display:none\"></div>";
+				<div class=\"file_example\" id=\"file_preview\"></div>";
 		}
 
 		return $output;
@@ -75,7 +75,7 @@ class ViewResultsController extends Controller {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
-				$output .= "<div><h4>uploaded files of type {$fileType}</h4><table>\n";
+				$output .= "<div><h4>{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
 					$output .= "<tr><td>" . htmlentities($file['name']) . " ({$file['status']})</td>
 						<td><a class=\"button\" onclick=\"previewFile('download.php?uploaded=true&file_name={$file['name']}&as_text=true')\">Preview</a></td>
@@ -83,7 +83,7 @@ class ViewResultsController extends Controller {
 						<td><form method=\"POST\" onsubmit=\"return confirm('Are you sure you want to delete this file?  Action cannot be undone.')\"><input type=\"hidden\" name=\"uploaded\" value=\"true\">
 							<button type=\"submit\" name=\"delete\" value=\"{$file['name']}\">Delete</button></form></td></tr>";
 				}
-				$output .= "</table></div>\n";
+				$output .= "</table></div></div>\n";
 			}
 			$output .= "</div>";
 		}
@@ -111,7 +111,12 @@ class ViewResultsController extends Controller {
 		return "";
 	}
 	public function renderSpecificStyle() {
-		return "div.file_examples{margin:.75em;display:none}div.form td{padding:.5em;border-bottom-width:1px}";
+		return "div#file_preview{margin:.75em;display:none}
+			div.form table{border-collapse:collapse;margin:0px;width:100%}
+			div.form td{padding:.5em;white-space:nowrap}
+			div.form tr:nth-child(even){background-color:#FFFFE0}
+			div.form tr:nth-child(odd){background-color:#FFF6B2}
+			";
 	}
 	public function renderSpecificScript() {
 		return "function previewFile(url){
