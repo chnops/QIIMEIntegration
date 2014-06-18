@@ -75,7 +75,7 @@ class ViewResultsController extends Controller {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
-				$output .= "<h4>uploaded files of type {$fileType}</h4><table>\n";
+				$output .= "<div><h4>uploaded files of type {$fileType}</h4><table>\n";
 				foreach ($files as $file) {
 					$output .= "<tr><td>" . htmlentities($file['name']) . " ({$file['status']})</td>
 						<td><a class=\"button\" onclick=\"previewFile('download.php?uploaded=true&file_name={$file['name']}&as_text=true')\">Preview</a></td>
@@ -83,7 +83,7 @@ class ViewResultsController extends Controller {
 						<td><form method=\"POST\" onsubmit=\"return confirm('Are you sure you want to delete this file?  Action cannot be undone.')\"><input type=\"hidden\" name=\"uploaded\" value=\"true\">
 							<button type=\"submit\" name=\"delete\" value=\"{$file['name']}\">Delete</button></form></td></tr>";
 				}
-				$output .= "</table>\n";
+				$output .= "</table></div>\n";
 			}
 			$output .= "</div>";
 		}

@@ -41,11 +41,11 @@ class UploadController extends Controller {
 		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
 
 		foreach ($previousFilesFormatted as $fileType => $files) {
-			$output .= "<h4>{$fileType} files</h4><div><ul>\n";
+			$output .= "<div><h4>{$fileType} files</h4><div><ul>\n";
 			foreach ($files as $file) {
 				$output .= "<li>" . htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
-			$output .= "</ul></div>\n";
+			$output .= "</ul></div></div>\n";
 		}
 		return $output . "</div>";
 	}

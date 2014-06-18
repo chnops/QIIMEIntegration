@@ -57,14 +57,11 @@ $link = '#003366'; // bluish
 
 		<?php echo $this->renderSpecificStyle()?>
 
-		.accordion{margin:.75em;padding:0em}	
-		.accordion h3,.accordion h4,.accordion div {outline:none;padding:.25em .5em;}
-		.accordion h3,.accordion h4{background-color:#ffcc66;margin-bottom:0em;border-style:solid;border-width:1px 2px}
-		.accordion h3,.accordion h4:not(:first-child){margin-top:0em}
-		.accordion div{background-color:#ffffcc;margin:0em;border-style:solid;border-width:0px 2px}
-		.accordion h3,.accordion h4:first-child{border-width:2px 2px 1px 2px}
-		.accordion div:last-child{border-width:1px 2px 2px 2px}
-		.draggable{padding:.5em;background-color:#ffffcc;border:1px solid}
+		.accordion > div h4,.accordion > div {outline:none;padding:.25em .5em;margin:0em}
+		.accordion > div h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
+		.accordion > div h4:active {border-style:inset}
+		.accordion > div div{background-color:<?php echo $darkBackground?>;margin:0em;border-width:1px;padding:.25em}
+		.draggable{padding:.5em;background-color:#ffffcc;border-width:1px}
 	</style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
@@ -96,8 +93,9 @@ function paramHelp(text) {
 	$('#parameter_help').html("Parameter help: " + text);
 }
 	$(function() {
-		$('.accordion').accordion({
-		collapsible: true,
+		$('.accordion > div').accordion({
+			collapsible: true,
+			active: false,
 		}); 
 		$('.draggable').draggable({
 			scroll: false
