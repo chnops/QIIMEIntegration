@@ -3,12 +3,15 @@
 namespace Database;
 
 class PDODatabase implements DatabaseI {
-	private static $dsn = "sqlite:./data/database.sqlite";
+	private static $dbProgram = "sqlite3";
+	private static $dbDriver = "sqlite";
+	private static $dbFile = "./data/database.sqlite";
 
 	private $pdo = NULL;
 
 	public function __construct() {
-		$pdo = new \PDO(PDODatabase::$dsn);
+		$dsn = PDODatabase::$dbDriver . ":" . PDODatabase::$dbFile;
+		$pdo = new \PDO($dsn);
 		$pdo->exec("PRAGMA foreign_keys=ON");
 		$this->pdo = $pdo;
 	}
@@ -147,11 +150,13 @@ class PDODatabase implements DatabaseI {
 		}
 	}
 
-	public function createUploadedFile($username, $projectId, $fileName, $fileType) {
+	public function createUploadedFile($username, $projectId, $fileName, $fileType, $isDownload = false) {
 		try {
-			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type)
-				VALUES (:id, :owner, :name, :fileType)");
-			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName, "fileType" => $fileType));
+			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type, status)
+				VALUES (:id, :owner, :name, :fileType, :status)");
+			$status = ($isDownload) ? 1 : 0;
+			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName,
+				"fileType" => $fileType, "status" => $status));
 			if (!$insertSuccess) {
 				$errorInfo = $pdoStatement->errorInfo();
 				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
@@ -169,7 +174,9 @@ class PDODatabase implements DatabaseI {
 	public function getAllUploadedFiles($username, $projectId) {
 		$files = array();
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT * FROM uploaded_files WHERE project_id = :id AND project_owner = :owner");
+			$pdoStatement = $this->pdo->prepare("SELECT name, file_type, description FROM uploaded_files
+				INNER JOIN file_statuses ON uploaded_files.status = file_statuses.status
+				WHERE project_id = :id AND project_owner = :owner");
 			$pdoStatement->execute(array("id" => $projectId, "owner" => $username));
 			$files = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
 		}
@@ -180,6 +187,19 @@ class PDODatabase implements DatabaseI {
 		}
 		return $files;
 	
+	}
+
+	public function removeUploadedFile($username, $projectId, $fileName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("DELETE FROM uploaded_files WHERE project_id = :id AND project_owner = :owner AND name = :name");
+			return $pdoStatement->execute(array("id" => $projectId, "owner" => $username, "name" => $fileName));
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to delete file: " . $ex->getMessage());
+			// TODO error handling
+			// TODO transactions
+			return false;
+		}
 	}
 
 	public function saveRun($username, $projectId, $scriptName, $scriptText) {
@@ -234,7 +254,41 @@ class PDODatabase implements DatabaseI {
 			return array();
 		}
 	}
-	
+
+	public function renderCommandUploadSuccess($username, $projectId, $fileName) {
+		if (!$this->uploadExists($username, $projectId, $fileName)) {
+			throw new \Exception("File not found");
+		}
+		return $this->renderCommandSetUploadStatus($username, $projectId, $fileName, 0);
+	}
+	public function renderCommandUploadFailure($username, $projectId, $fileName) {
+		if (!$this->uploadExists($username, $projectId, $fileName)) {
+			throw new \Exception("File not found");
+		}
+		return $this->renderCommandSetUploadStatus($username, $projectId, $fileName, 2);
+	}
+	private function renderCommandSetUploadStatus($username, $projectId, $fileName, $status) {
+		$sql = "UPDATE uploaded_files SET status = {$status} WHERE project_owner = " . $this->pdo->quote($username) . 
+			" AND project_id = " . $this->pdo->quote($projectId) . 
+			" AND name = " . $this->pdo->quote($fileName) . ";";
+		$command = PDODatabase::$dbProgram. " " . PDODatabase::$dbFile . " " . escapeshellarg($sql);
+		return $command;		
+	}
+	public function uploadExists($username, $projectId, $fileName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM uploaded_files WHERE
+				project_owner = :owner AND project_id = :id AND name = :fileName");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId, "fileName" => $fileName));
+			$fileCount = $pdoStatement->fetchColumn(0);
+			$pdoStatement->closeCursor();
+			return $fileCount == 1;
+		}
+		catch (\PDOException $ex) {
+			error_log($ex->getMessage());
+			return false;
+		}
+	}
+
 	/*Try catch block commong to all functions
 		try {
 		}

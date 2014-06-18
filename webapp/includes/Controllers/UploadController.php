@@ -38,12 +38,12 @@ class UploadController extends Controller {
 
 		$output .= "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n";
 		$helper = \Utils\Helper::getHelper();
-		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type', 'name');
+		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
 
-		foreach ($previousFilesFormatted as $fileType => $fileNames) {
+		foreach ($previousFilesFormatted as $fileType => $files) {
 			$output .= "<h4>{$fileType} files</h4><div><ul>\n";
-			foreach ($fileNames as $fileName) {
-				$output .= "<li>" . htmlentities($fileName) . "</li>\n";
+			foreach ($files as $file) {
+				$output .= "<li>" . htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
 			$output .= "</ul></div>\n";
 		}
@@ -98,7 +98,6 @@ class UploadController extends Controller {
 				if ($ex instanceof \Models\OperatingSystemException) {
 					error_log($ex->getConsoleOutput());
 				}
-				$this->project->forgetUploadedFile();
 				$this->isResultError = true;
 				$this->result = $ex->getMessage();
 			}
@@ -126,24 +125,15 @@ class UploadController extends Controller {
 		}
 		// TODO if size/type are valid
 
-		$fileName = $file['name'];
-		$systemFileName = $this->project->receiveUploadedFile($fileName, $fileType);
-		// TODO replace nasty nested ifs with try{}catch{}
-		if (!$systemFileName) {
-			$this->isResultError = true;
-			$this->result = "There was an error adding your file to the project.";
+		$givenName = $file['name'];
+		$tmpName = $file['tmp_name'];
+		try {
+			$this->project->receiveUploadedFile($givenName, $tmpName, $fileType);
+			$this->result = "File " . htmlentities($givenName) . " successfully uploaded!";
 		}
-		else {
-			$moveResult = move_uploaded_file($file['tmp_name'], $systemFileName);
-			if ($moveResult) {
-				$this->result = "File " . htmlentities($fileName) . " successfully uploaded!";
-				$this->project->confirmUploadedFile();	
-			}
-			if (!$moveResult) {
-				$this->isResultError = true;
-				$this->result = "There was an error moving your file on to the system.";
-				$this->project->forgetUploadedFile();
-			}
+		catch (\Exception $ex) {
+			$this->isResultError = true;
+			$this->result = $ex->getMessage();
 		}
 	}
 

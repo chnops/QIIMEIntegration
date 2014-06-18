@@ -13,6 +13,7 @@ interface ProjectI {
 	public function setName($name);
 	public function getDatabase();
 	public function getOperatingSystem();
+	public function getEnvironmentSource();
 
 	// Lazy load getters (and dependents)
 	public function getScripts();
@@ -32,8 +33,7 @@ interface ProjectI {
 
 	// complex mutators
 	public function beginProject();
-	public function receiveUploadedFile($fileName, FileType $fileType);
-	public function confirmUploadedFile();
-	public function forgetUploadedFile();
+	public function receiveDownloadedFile($url, $fileName, FileType $fileType);
+	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType);
 	public function runScript(array $allInput);
 }

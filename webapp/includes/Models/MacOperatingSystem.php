@@ -141,4 +141,63 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return $matchesRegex;
 	}
+
+
+	public function uploadFile(ProjectI $project, $givenName, $tmpName) {
+			$targetName = $this->home . $project->getProjectDir() . "/uploads/" . $givenName;
+			$result = move_uploaded_file($tmpName, $targetName);
+			if (!$result) {
+				throw new OperatingSystemException("Unable to move file from temporary upload to operating system");
+			}
+			return true;
+	}
+	public function downloadFile(ProjectI $project, $url, $onSuccess, $onFail) {
+		ob_start();
+		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
+			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
+			cd {$this->home}{$project->getProjectDir()}/uploads;
+			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' " . escapeshellarg($url) . "`;
+			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
+				then echo 'The requested URL does not exist';
+				exit 1;
+			fi;
+			which wget &> /dev/null;
+			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
+			(wget " . escapeshellarg($url) . " --limit-rate=1M --quiet;
+				let wget_success=$?;
+				cd \$OLDPWD;
+				if [ \$wget_success -eq 0 ]; then {$onSuccess}; else {$onFail}; fi;) &> /dev/null &";
+		$returnCode = 0;
+		system($scriptCommand, $returnCode);
+		if ($returnCode) {
+			$ex = new OperatingSystemException("Unable to download file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		return ob_get_clean();
+	}
+	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId) {
+		$dir = $this->home . $project->getProjectDir();
+		if ($isUploaded) {
+			$dir .= "/uploads/";
+		}
+		else {
+			$dir .= "/r{$runId}/";
+		}
+		$code = "cd " . escapeshellarg($dir) . ";
+			touch " . escapeshellarg($fileName) . ";
+			rm " . escapeshellarg($fileName) . ";";
+
+		$exitStatus = 0;
+		ob_start();
+		system($code, $exitStatus);
+		if ($exitStatus) {
+			$ex = new OperatingSystemException("Unable to remove file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		else {
+			return ob_get_clean();
+		}
+	}
 }

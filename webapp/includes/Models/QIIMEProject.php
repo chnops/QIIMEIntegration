@@ -118,10 +118,10 @@ class QIIMEProject extends DefaultProject {
 		try {
 			$this->operatingSystem->createDir($runDir);
 
-			$version = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
+			$version = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
 			$version = trim($version);
 
-			$codeOutput = $this->operatingSystem->executeArbitraryCommand($this->workflow->getEnvironmentSource(), $runDir, $code);
+			$codeOutput = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $code);
 
 			$result .= "<br/>Script run successful!";
 			$codeOutput = trim($codeOutput);
@@ -183,6 +183,10 @@ class QIIMEProject extends DefaultProject {
 			}
 		}
 		return $this->builtInFiles;
+	}
+
+	public function getEnvironmentSource() {
+		return "/macqiime/configs/bash_profile.txt";
 	}
 
 }

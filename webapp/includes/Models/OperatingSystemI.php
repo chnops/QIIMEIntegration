@@ -10,4 +10,9 @@ interface OperatingSystemI {
 	public function executeArbitraryCommand($environmentSource, $projectDirectory, $script);
 	public function combineCommands(array $commands);
 	public function isValidFileName($name);
+
+	// TODO refactor
+	public function uploadFile(ProjectI $project, $givenName, $tmpName);
+	public function downloadFile(ProjectI $project, $url, $onSuccess, $onFail);
+	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 }

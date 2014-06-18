@@ -128,8 +128,4 @@ class QIIMEWorkflow implements WorkflowI {
 		}
 		return $projects;
 	}
-
-	public function getEnvironmentSource() {
-		return "/macqiime/configs/bash_profile.txt";
-	}
 }

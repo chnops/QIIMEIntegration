@@ -8,14 +8,20 @@ if (!isset($_SESSION['username']) || !isset($_SESSION['project_id'])) {
 	echo "<p>You must <a href=\"index.php\">login</a> and select a project</p>";
 	exit;
 }
-if (!isset($_GET['run']) || !isset($_GET['file_name'])) {
+if ((!isset($_GET['run']) && !isset($_GET['uploaded'])) || !isset($_GET['file_name'])) {
 	header('HTTP/1.1 400 Bad request');
 	echo "<p>You must provide a run id and file name to download (url)</p>";
 	exit;
 }
 $operatingSystem = new \Models\MacOperatingSystem();
 $database = new \Database\PDODatabase($operatingSystem);
-$actualPath = "./projects/u" . $database->getUserRoot($_SESSION['username']) . "/p" . $_SESSION['project_id'] . "/r" . $_GET['run'] . "/" . $_GET['file_name'];
+$actualPath = "./projects/u" . $database->getUserRoot($_SESSION['username']) . "/p" . $_SESSION['project_id'];
+if (isset($_GET['uploaded']) && $_GET['uploaded']) {
+	$actualPath .= "/uploads/" . $_GET['file_name'];
+}
+else {
+	$actualPath .= "/r" . $_GET['run'] . "/" . $_GET['file_name'];
+}
 
 if ($_GET['as_text']) {
 	$maxLen = 2000;

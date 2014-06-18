@@ -13,6 +13,30 @@ class ViewResultsController extends Controller {
 			$this->isResultError = true;
 			$this->hasResult = true;
 			$this->result = "You have not selected a project, therefore there are no results to view.";
+			return;
+		}
+		if (isset($_POST['delete'])) {
+			$this->hasResult = true;
+			try {
+				$isUploaded = (isset($_POST['uploaded']) && $_POST['uploaded']);
+				if ($isUploaded) {
+					$this->project->deleteUploadedFile($_POST['delete']);
+				}
+				else {
+					if (!isset($_POST['run'])) {
+						throw new \Exception("You must provide either a run id, or specify that the file is uploaded.");
+					}
+					if (!is_numeric($_POST['run'])) {
+						throw new \Exception("Run id must be numeric");
+					}
+					$this->project->deleteGeneratedFile($_POST['delete'], $_POST['run']);
+				}
+				$this->result = "File deleted: " . htmlentities($_POST['delete']);
+			}
+			catch (\Exception $ex) {
+				$this->isResultError = true;
+				$this->result = $ex->getMessage();
+			}
 		}
 	}
 	public function retrievePastResults() {
@@ -20,7 +44,6 @@ class ViewResultsController extends Controller {
 			return "<p>In order to view results, you much <a href=\"\">log ing</a> and <a href=\"\">select a project</a></p>";
 		}
 
-		$helper = \Utils\Helper::getHelper();
 		$output = "<h3>{$this->project->getName()}</h3>";
 		$output .= "<ul>
 			<li>Owner: {$this->project->getOwner()}</li>
@@ -28,22 +51,10 @@ class ViewResultsController extends Controller {
 			</ul>";
 
 		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
-		if (!empty($uploadedFiles)) {
-			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
-			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name'); 
-			foreach ($uploadedFilesFormatted as $fileType => $fileNames) {
-				$output .= "<h4>{$fileType} files</h4><div><ul>\n";
-				foreach ($fileNames as $fileName) {
-					$output .= "<li>" . htmlentities($fileName) . "</li>\n";
-				}
-				$output .= "</ul></div>\n";
-			}
-			$output .= "</div>";
-		}
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
-		if (!empty($generatedFiles)) {
-			$output .= "You can see a preview of the file you wish to download here:<br/>
-				<div class=\"file_example\" id=\"file_preview\"></div>";
+		if (!empty($uploadedFiles) || !empty($generatedFiles)) {
+			$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
+				<div class=\"file_example\" id=\"file_preview\" style=\"margin:.75em;display:none\"></div>";
 		}
 
 		return $output;
@@ -56,9 +67,27 @@ class ViewResultsController extends Controller {
 		if (!$this->project) {
 			return "";
 		}
-		$helper = \Utils\Helper::getHelper();
-
 		$output = "";	
+
+		$helper = \Utils\Helper::getHelper();
+		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
+		if (!empty($uploadedFiles)) {
+			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
+			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
+			foreach ($uploadedFilesFormatted as $fileType => $files) {
+				$output .= "<h4>uploaded files of type {$fileType}</h4><table>\n";
+				foreach ($files as $file) {
+					$output .= "<tr><td>" . htmlentities($file['name']) . " ({$file['status']})</td>
+						<td><a class=\"button\" onclick=\"previewFile('download.php?uploaded=true&file_name={$file['name']}&as_text=true')\">Preview</a></td>
+						<td><a class=\"button\" onclick=\"window.location='download.php?uploaded=true&file_name={$file['name']}'\">Download</a></td>
+						<td><form method=\"POST\" onsubmit=\"return confirm('Are you sure you want to delete this file?  Action cannot be undone.')\"><input type=\"hidden\" name=\"uploaded\" value=\"true\">
+							<button type=\"submit\" name=\"delete\" value=\"{$file['name']}\">Delete</button></form></td></tr>";
+				}
+				$output .= "</table>\n";
+			}
+			$output .= "</div>";
+		}
+		
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
 			$output .= "<h3>Generated Files:</h3>\n";
@@ -68,7 +97,9 @@ class ViewResultsController extends Controller {
 				foreach ($files as $file) {
 					$output .= "<tr><td>" . htmlentities($file['name']) . "</td>
 						<td><a class=\"button\" onclick=\"previewFile('download.php?run={$file['run_id']}&file_name={$file['name']}&as_text=true')\">Preview</a></td>
-						<td><a class=\"button\" onclick=\"window.location='download.php?run={$file['run_id']}&file_name={$file['name']}'\">Download</a></td></tr>";
+						<td><a class=\"button\" onclick=\"window.location='download.php?run={$file['run_id']}&file_name={$file['name']}'\">Download</a></td>
+						<td><form method=\"POST\" onsubmit=\"return confirm('Are you sure you want to delete this file?  Action cannot be undone.')\"><input type=\"hidden\" name=\"run\" value=\"{$file['run_id']}\">
+							<button type=\"submit\" name=\"delete\" value=\"{$file['name']}\">Delete</button></form></td></tr>";
 				}
 				$output .= "</table>\n";
 			}
