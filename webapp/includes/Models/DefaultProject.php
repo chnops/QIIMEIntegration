@@ -83,7 +83,7 @@ abstract class DefaultProject implements ProjectI {
 	}
 	public function receiveDownloadedFile($url, $fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
-		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId());
+		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId(), $isDownload = true);
 		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
 			throw new \Exception("There was a problem storing your new file in the database");
@@ -143,7 +143,8 @@ abstract class DefaultProject implements ProjectI {
 			$rawFiles = $this->database->getAllUploadedFiles($this->owner, $this->id);
 			foreach ($rawFiles as $fileArray) {
 				$this->uploadedFiles[] = array("name" => $fileArray['name'], 
-					"type" => $fileArray['file_type'], "uploaded" => "true");
+					"type" => $fileArray['file_type'], "uploaded" => "true",
+					"status" => $fileArray['description']);
 			}
 		}
 		return $this->uploadedFiles;

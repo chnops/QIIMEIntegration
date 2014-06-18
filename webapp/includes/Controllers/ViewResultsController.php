@@ -78,15 +78,15 @@ class ViewResultsController extends Controller {
 		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
 		if (!empty($uploadedFiles)) {
 			$output .= "<h3>Uploaded Files:</h3>\n";
-			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type', 'name'); 
+			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4>uploaded files of type {$fileType}</h4><table>\n";
-				foreach ($files as $fileName) {
-					$output .= "<tr><td>" . htmlentities($fileName) . "</td>
-						<td><a class=\"button\" onclick=\"previewFile('download.php?uploaded=true&file_name={$fileName}&as_text=true')\">Preview</a></td>
-						<td><a class=\"button\" onclick=\"window.location='download.php?uploaded=true&file_name={$fileName}'\">Download</a></td>
+				foreach ($files as $file) {
+					$output .= "<tr><td>" . htmlentities($file['name']) . " ({$file['status']})</td>
+						<td><a class=\"button\" onclick=\"previewFile('download.php?uploaded=true&file_name={$file['name']}&as_text=true')\">Preview</a></td>
+						<td><a class=\"button\" onclick=\"window.location='download.php?uploaded=true&file_name={$file['name']}'\">Download</a></td>
 						<td><form method=\"POST\" onsubmit=\"return confirm('Are you sure you want to delete this file?  Action cannot be undone.')\"><input type=\"hidden\" name=\"uploaded\" value=\"true\">
-							<button type=\"submit\" name=\"delete\" value=\"{$fileName}\">Delete</button></form></td></tr>";
+							<button type=\"submit\" name=\"delete\" value=\"{$file['name']}\">Delete</button></form></td></tr>";
 				}
 				$output .= "</table>\n";
 			}

@@ -18,12 +18,12 @@ class UploadController extends Controller {
 
 		$output .= "<h3>Previously Uploaded files:</h3>\n";
 		$helper = \Utils\Helper::getHelper();
-		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type', 'name');
+		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
 
-		foreach ($previousFilesFormatted as $fileType => $fileNames) {
+		foreach ($previousFilesFormatted as $fileType => $files) {
 			$output .= "<h4>{$fileType} files</h4><ul>\n";
-			foreach ($fileNames as $fileName) {
-				$output .= "<li>" . htmlentities($fileName) . "</li>\n";
+			foreach ($files as $file) {
+				$output .= "<li>" . htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
 			$output .= "</ul><hr class=\"small\"/>\n";
 		}
