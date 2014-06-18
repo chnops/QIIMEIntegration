@@ -18,14 +18,23 @@ class TestController extends Controller {
 	public function renderInstructions() {
 		ob_start();
 
-		echo "<p>Testing some UI widgets</p>";
-		$script = "<script type=\"text/javascript\">$(function() { $('.accordion').accordion({collapsible: true}); });</script>";
-		echo $script;
-		echo htmlentities($script);
+		echo "<p>Testing table row selectors</p>";
 
-		$html = "<div class=\"accordion\"><h3>Opt 1</h3><div>Content 1</div><h3>Opt 2</h3><div>Content 3</div><h3>Opt 3</h3><div>Content 2</div></div>";
-		echo $html;
-		echo htmlentities($html);
+		echo "<style>
+			div.form table{border-collapse:collapse;margin:0px;width:100%}
+			div.form td{padding:.5em;white-space:nowrap}
+			div.form tr:nth-child(4n+1){background-color:#FFFFE0}
+			div.form tr:nth-child(4n+2){background-color:#FFFFE0}
+			</style>";
+		echo "<div class=\"form\" style=\"width:100%\"><table>";
+
+		for ($i = 0 ; $i < 100; $i++) {
+			$display = $i + 1;
+			echo "<tr><td>{$display}</td></tr>";
+		}
+
+		echo "</table></div>";
+
 
 		return ob_get_clean();
 	}

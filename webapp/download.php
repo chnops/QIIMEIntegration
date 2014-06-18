@@ -30,7 +30,7 @@ if ($_GET['as_text']) {
 		echo htmlentities($contents) . "...";
 	}
 	else {
-		echo $contents;
+		echo htmlentities($contents);
 	}
 }
 else {
