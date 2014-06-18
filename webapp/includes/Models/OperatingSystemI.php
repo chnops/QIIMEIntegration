@@ -13,6 +13,6 @@ interface OperatingSystemI {
 
 	// TODO refactor
 	public function uploadFile(ProjectI $project, $givenName, $tmpName);
-	public function downloadFile(ProjectI $project, $url);
+	public function downloadFile(ProjectI $project, $url, $onSuccess, $onFail);
 	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 }

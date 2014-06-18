@@ -151,7 +151,7 @@ class MacOperatingSystem implements OperatingSystemI {
 			}
 			return true;
 	}
-	public function downloadFile(ProjectI $project, $url) {
+	public function downloadFile(ProjectI $project, $url, $onSuccess, $onFail) {
 		ob_start();
 		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
 			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
@@ -163,7 +163,10 @@ class MacOperatingSystem implements OperatingSystemI {
 			fi;
 			which wget &> /dev/null;
 			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
-			(wget " . escapeshellarg($url) . " --limit-rate=1M &> /dev/null;) &";
+			(wget " . escapeshellarg($url) . " --limit-rate=1M --quiet;
+				let wget_success=$?;
+				cd \$OLDPWD;
+				if [ \$wget_success -eq 0 ]; then {$onSuccess}; else {$onFail}; fi;) &> /dev/null &";
 		$returnCode = 0;
 		system($scriptCommand, $returnCode);
 		if ($returnCode) {

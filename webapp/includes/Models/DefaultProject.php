@@ -83,14 +83,17 @@ abstract class DefaultProject implements ProjectI {
 	}
 	public function receiveDownloadedFile($url, $fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
-		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $fileName, $fileType->getHtmlId(), $isDownload = true);
+		$databaseSuccess = $this->database->createUploadedFile(
+			$this->owner, $this->id, $fileName, $fileType->getHtmlId(), $isDownload = true);
 		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
 			throw new \Exception("There was a problem storing your new file in the database");
 		}
 
 		try {	
-			$consoleOutput = $this->operatingSystem->downloadFile($this, $url);
+			$consoleOutput = $this->operatingSystem->downloadFile($this, $url,
+				$onSuccess = $this->database->renderCommandUploadSuccess($this->owner, $this->id, $fileName),
+				$onFail = $this->database->renderCommandUploadFailure($this->owner, $this->id, $fileName));
 			$this->database->executeAllRequests();
 			$this->uploadedFiles = array();
 			return $consoleOutput;
