@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<html ondblclick="
-var anchor_pos = $('div.form').position();
-event = jQuery.event.fix(event);
-$('#parameter_help').css('left', event.pageX - anchor_pos.left).css('top',event.pageY - anchor_pos.top);
-">
+<html>
 <head>
 	<title><?php echo $this->getSubTitle() ?></title>
 	<meta charset="UTF-8">
@@ -99,7 +95,9 @@ function paramHelp(text) {
 		var accordionContainer = $('.accordion').parent();
 		accordionContainer.width(accordionContainer.width());
 		$('.draggable').draggable({
-			scroll: false
+			scroll: false,
+			axis: "y",
+			containment: "parent",
 		});
 	})
 <?php echo $this->renderSpecificScript()?>

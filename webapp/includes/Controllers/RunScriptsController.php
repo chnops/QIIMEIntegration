@@ -9,6 +9,15 @@ class RunScriptsController extends Controller {
 	}
 	private $scriptId = "";
 
+	public function getContent() {
+		ob_start();
+		include 'views/content.php';
+		$output = ob_get_clean();
+		return $output;// . "<div id=\"parameter_help_tracks\" style=\"display:inline-block;border-width:0px 1px;height:100px;margin-left:1em\"
+//			ondblclick=\"var anchor_pos=$('#parameter_help_tracks').position();event=jQuery.event.fix(event);$('#parameter_help').css('top',event.pageY - anchor_pos.top);\">
+//			<div id=\"parameter_help\" class=\"draggable\" style=\"margin:.5em -.75em;white-space:nowrap;cursor:pointer\">Parameter help</div></div>";
+//		TODO re-implement
+	}
 	public function retrievePastResults() {
 		if (!$this->project) {
 			return "";
@@ -104,7 +113,7 @@ class RunScriptsController extends Controller {
 			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm($shouldBeDisabled)}</div>\n";
 		}
 		
-		return "<span id=\"parameter_help\" class=\"draggable hideme\">Parameter help</span>" . $form;
+		return $form;
 	}
 
 	public function renderHelp() {
