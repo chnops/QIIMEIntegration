@@ -109,6 +109,9 @@ abstract class DefaultProject implements ProjectI {
 	public function unzipGeneratedFile($fileName, $runId) {
 		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
 	}
+	public function compressGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->compressFile($this, $fileName, $isUploaded = false, $runId);
+	}
 	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId());
@@ -166,6 +169,13 @@ abstract class DefaultProject implements ProjectI {
 		catch (OperatingSystemException $ex) {
 			$this->database->forgetAllRequests();
 			throw $ex;
+		}
+	}
+	public function compressUploadedFile($fileName) {
+		$newFileName = $this->operatingSystem->compressFile($this, $fileName, $isUploaded = true, $runId = -1);
+		$nameChangeResult = $this->database->changeFileName($this->owner, $this->id, $fileName, $newFileName);
+		if (!$nameChangeResult) {
+			throw new \Exception("Unable to change file name, compression failed.");
 		}
 	}
 	public function retrieveAllUploadedFiles() {

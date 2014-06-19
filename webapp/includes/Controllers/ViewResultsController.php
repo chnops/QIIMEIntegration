@@ -16,7 +16,7 @@ class ViewResultsController extends Controller {
 		}
 
 		// TODO add action input
-		if (!isset($_POST['delete']) && !isset($_POST['unzip'])) {
+		if (!isset($_POST['delete']) && !isset($_POST['unzip']) && !isset($_POST['gzip'])) {
 			return;
 		}
 
@@ -56,6 +56,24 @@ class ViewResultsController extends Controller {
 					$this->project->unzipGeneratedFile($_POST['unzip'], $_POST['run']);
 				}
 				$this->result = "Successfully unzipped file: " . htmlentities($_POST['unzip']);
+			}
+			catch (\Exception $ex) {
+				if ($ex instanceof \Models\OperatingSystemException) {
+					error_log($ex->getConsoleOutput());
+				}
+				$this->isResultError = true;
+				$this->result = $ex->getMessage();
+			}
+		}
+		else if (isset($_POST['gzip'])) {
+			try {
+				if ($isUploaded) {
+					$this->project->compressUploadedFile($_POST['gzip']);
+				}
+				else {
+					$this->project->compressGeneratedFile($_POST['gzip'], $_POST['run']);
+				}
+				$this->result = "Successfully compressed file: " . htmlentities($_POST['gzip']);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -145,8 +163,9 @@ class ViewResultsController extends Controller {
 		$row .= "<tr style=\"display:none\"><td>&nbsp;</td>";
 		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
 			$extraInput = "", $action = "delete", $label = "Delete");
+		$row .= $compressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gzip", $label = "Compress");
 		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip", $label = "Unzip");
-		$row .= "<td></td></tr>\n";
+		$row .= "</tr>\n";
 
 		return $row;
 	}

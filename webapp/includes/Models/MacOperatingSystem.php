@@ -236,4 +236,26 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return $nonDirFiles;
 	}
+	public function compressFile(ProjectI $project, $fileName, $isUploaded, $runId) {
+		$dir = $this->home . $project->getProjectDir();
+		if ($isUploaded) {
+			$dir .= "/uploads/";
+		}
+		else {
+			$dir .= "/r{$runId}/";
+		}
+
+		ob_start();
+		$exitCode = 0;
+		$code = "cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
+			gzip " . escapeshellarg($fileName) . " 2>&1;";
+		system($code, $exitCode);
+
+		if ($exitCode) {
+			$ex = new OperatingSystemException("Unable to compress file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		return "{$fileName}.gz";
+	}
 }

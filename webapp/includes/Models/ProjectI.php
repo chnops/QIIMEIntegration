@@ -40,4 +40,6 @@ interface ProjectI {
 	public function deleteGeneratedFile($fileName, $runId);
 	public function unzipUploadedFile($fileName);
 	public function unzipGeneratedFile($fileName, $runId);
+	public function compressUploadedFile($fileName);
+	public function compressGeneratedFile($fileName, $runId);
 }
