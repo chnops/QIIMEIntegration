@@ -97,13 +97,15 @@ class ViewResultsController extends Controller {
 
 		$helper = \Utils\Helper::getHelper();
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
+		$rowHtmlId = 0;
 		if (!empty($uploadedFiles)) {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
-					$output .= $this->renderFileMenu($file['name'], $file['status'], $isUploaded = true);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], $file['status'], $isUploaded = true);
+					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
 			}
@@ -118,7 +120,8 @@ class ViewResultsController extends Controller {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
 					// TODO status not set if coming from generated files
-					$output .= $this->renderFileMenu($file['name'], 'generated', $isUploaded = false, $file['run_id']);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', $isUploaded = false, $file['run_id']);
+					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
 			}
@@ -127,16 +130,17 @@ class ViewResultsController extends Controller {
 
 		return $output;
 	}
-	private function renderFileMenu($fileName, $fileStatus, $isUploaded = true, $runId = -1) {
+	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $isUploaded = true, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&" . (($isUploaded) ? "uploaded=true" : "run={$runId}");
 
-		$row = "<tr class=\"{$fileStatus}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
+		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
 			<td><a class=\"button\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500)\">More...</a></td></tr>";
 
+		$targetHtmlRow = "result_file_" . (($rowHtmlId == 0) ? 0 : $rowHtmlId - 1);
 		$fileTypeInput = ($isUploaded) ? "<input type=\"hidden\" name=\"uploaded\" value=\"true\">" : "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
-		$genericForm = "<td><form method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
+		$genericForm = "<td><form action=\"#{$targetHtmlRow}\" method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
 
 		$row .= "<tr style=\"display:none\"><td>&nbsp;</td>";
 		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",

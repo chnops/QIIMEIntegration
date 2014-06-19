@@ -153,17 +153,18 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 	public function downloadFile(ProjectI $project, $url, $outputName, $onSuccess, $onFail) {
 		ob_start();
+		$urlEsc = escapeshellarg($url);
 		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
 			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
 			cd {$this->home}{$project->getProjectDir()}/uploads;
-			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' " . escapeshellarg($url) . "`;
+			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
 			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
 				then echo 'The requested URL does not exist';
 				exit 1;
 			fi;
 			which wget &> /dev/null;
 			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
-			(wget " . escapeshellarg($url) . " --limit-rate=1M --quiet --output-document=" . escapeshellarg($outputName) . ";
+			(wget {$urlEsc} --limit-rate=1M --quiet --output-document=" . escapeshellarg($outputName) . ";
 				let wget_success=$?;
 				cd \$OLDPWD;
 				if [ \$wget_success -eq 0 ]; then {$onSuccess}; else {$onFail}; fi;) &> /dev/null &";
@@ -184,10 +185,11 @@ class MacOperatingSystem implements OperatingSystemI {
 		else {
 			$dir .= "/r{$runId}/";
 		}
-		
+
+		$fileNameEsc = escapeshellarg($fileName);
 		$code = "cd " . escapeshellarg($dir) . ";
-			touch " . escapeshellarg($fileName) . ";
-			rm " . escapeshellarg($fileName) . ";";
+			touch {$fileNameEsc};
+			rm {$fileNameEsc};";
 
 		$exitStatus = 0;
 		ob_start();
@@ -213,11 +215,11 @@ class MacOperatingSystem implements OperatingSystemI {
 		ob_start();
 		$returnCode = 0;
 
-		// TODO here and elsewhere perform escapeshellarg only once: more cohesive strings
+		$fileNameEsc = escapeshellarg($fileName);
 		system("cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
-			zipinfo -1 " . escapeshellarg($fileName) . "2> /dev/null;
-			unzip -qq " . escapeshellarg($fileName) . " &> /dev/null;
-			if [ $? -eq 0 ]; then rm " . escapeshellarg($fileName) . ";
+			zipinfo -1 {$fileNameEsc} 2> /dev/null;
+			unzip -qq {$fileNameEsc} &> /dev/null;
+			if [ $? -eq 0 ]; then rm {$fileNameEsc};
 			else echo 'Unable to unzip file'; exit 1; fi;", $returnCode);
 
 		if ($returnCode) {
