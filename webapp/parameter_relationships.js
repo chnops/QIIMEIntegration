@@ -147,9 +147,13 @@ function makeDependent(depdnt) {
 	}
 }
 function makeEitherOr(jQueryObj) {
+	jQueryObj.each(function() {
+		var contentLabel = $(this).next();
+		contentLabel.find('[type="checkbox"]').prop('checked', true);
+	});
 	jQueryObj.change(function() {
-			jQueryObj.each(function() {
-				var contentLabel = $(this).next();
-				contentLabel.find('[name]').prop('disabled', !($(this).is(':checked')))
-			})});
+		jQueryObj.each(function() {
+			var contentLabel = $(this).next();
+			contentLabel.find('[name]').prop('disabled', !($(this).is(':checked')))
+		})});
 }

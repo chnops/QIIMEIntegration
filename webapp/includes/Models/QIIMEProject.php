@@ -122,8 +122,14 @@ class QIIMEProject extends DefaultProject {
 		try {
 			$this->operatingSystem->createDir($runDir);
 
-			$version = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
-			$version = trim($version);
+			// TODO this whole fix is a bit tacky.  Get version should be the responsibility of the sciprt, not project	
+			try {
+				$version = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
+				$version = trim($version);
+			}
+			catch (OperatingSystemException $ex) {
+				// do nothing; error was logged already
+			}
 
 			$codeOutput = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $code);
 

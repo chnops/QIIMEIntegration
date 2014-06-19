@@ -23,14 +23,14 @@ class ManipulateOtuTable extends DefaultScript {
 		$outputFp->requireIf();
 
 		// action
-		$action = new ChoiceParameter("action", "summarize", 
-			array("summarize", "convert"));
+		$action = new ChoiceParameter("action", "summarize-table", 
+			array("summarize-table", "convert"));
 
-		// summarize
+		// summarize-table
 		$qualitative = new TrueFalseParameter("--qualitative");
-		$qualitative->excludeButAllowIf($action, "summarize");
+		$qualitative->excludeButAllowIf($action, "summarize-table");
 		$suppressMd5 = new TrueFalseParameter("--suppress-md5");
-		$suppressMd5->excludeButAllowIf($action, "summarize");
+		$suppressMd5->excludeButAllowIf($action, "summarize-table");
 
 		//convert
 		$sparseToDense = new TrueFalseParameter("--sparse-biom-to-dense-biom");
@@ -62,7 +62,7 @@ class ManipulateOtuTable extends DefaultScript {
 		$processObsMetadata->excludeIf($conversionType);
 		$tableType->excludeIf($conversionType);
 		$tableType->requireIf($conversionType, false);
-
+		$tableType->dismissIf($action, "summarize-table");
 
 		array_push($this->parameters,
 			new Label("Required Parameters"),
@@ -80,12 +80,26 @@ class ManipulateOtuTable extends DefaultScript {
 			$tableType,
 
 			new Label("Output options"),
-			// summarize
+			// summarize-table
 			$qualitative,
-			$suppressMd5,
-			new TrueFalseParameter("--verbose")
+			$suppressMd5
 		);
 	}
+
+	public function renderCommand() {
+		$args = "";
+		$command = $this->getScriptName() . " ";
+		foreach ($this->getParameters() as $parameter) {
+			if ($parameter->getName() != "action") {
+				$args .= $parameter->renderForOperatingSystem() . " ";
+			}
+			else {
+				$command .= $parameter->getValue() . " ";
+			}
+		}
+		return $command . $args;
+	}
+
 	public function getScriptName() {
 		return "biom";
 	}

@@ -9,6 +9,7 @@ class DefaultParameter implements ParameterI {
 
 	private $isAlwaysRequired = false;
 	private $requiringTriggers = array();
+	private $dismissingTriggers = array();
 
 	private $isEverExcluded = false;
 	private $allowingTriggers = array();
@@ -134,26 +135,57 @@ class DefaultParameter implements ParameterI {
 	public function acceptInput(array $input) {
 		if (!isset($input[$this->name]) || !$input[$this->name]) {
 			$this->setValue(false);
+
+			$errorMessage = "";
 			if ($this->isAlwaysRequired) {
-				throw new ScriptException("A required parameter was not found: {$this->name}");
+				$errorMessage = "A required parameter was not found: {$this->name}";
 			}
+			else {
+				foreach ($this->requiringTriggers as $trigger) {
+					$triggerParam = $trigger['parameter'];
+					$triggerValue = $trigger['value'];
 
-			foreach ($this->requiringTriggers as $trigger) {
-				$triggerParam = $trigger['parameter'];
-				$triggerValue = $trigger['value'];
-				
-				if ($triggerValue === false) {
-					$isRequired = !isset($input[$invertedTrigger->getName()]);
+					if ($triggerValue === false) {
+						$isRequired = !isset($input[$triggerParam->getName()]);
+					}
+					else if ($triggerValue === true) {
+						$isRequired = isset($input[$triggerParam->getName()]);
+					}
+					else {
+						$isRequired = ($input[$triggerParam->getName()] == $triggerValue);
+					}
+	
+					if ($isRequired) {
+						$errorMessage = ((!$errorMessage) ? "A required parameter was not found: {$this->name}" : "") .
+						   	"<br/>&nbsp;- required by {$triggerParam->getName()}";
+					}
 				}
-				else if ($triggerValue === true) {
-					$isRequired = isset($input[$triggerParam->getName()]);
-				}
-				else {
-					$isRequired = ($input[$triggerParam->getName()] == $triggerValue);
-				}
+			}
+			if ($errorMessage) {
+				$isDismissed = false;
+				foreach ($this->dismissingTriggers as $trigger) {
+					$triggerParam = $trigger['parameter'];
+					$triggerValue = $trigger['value'];
+					error_log("value: " . $triggerValue);
 
-				if ($isRequired) {
-					throw new ScriptException("A required parameter was not found: {$this->name} (required by {$triggerParam->getName()})");	
+					if ($triggerValue === false) {
+						if (!isset($input[$triggerParam->getName()])) {
+							$isDismissed = true;
+						}
+					}
+					else if ($triggerValue === true) {
+						if (isset($input[$triggerParam->getName()])) {
+							$isDismissed = true;
+						}
+					}
+					else {
+						if ($input[$triggerParam->getName()] == $triggerValue) {
+							$isDismissed = true;
+						}
+					}
+				}
+				if (!$isDismissed) {
+					throw new ScriptException($errorMessage);
 				}
 			}
 		}
@@ -228,6 +260,10 @@ class DefaultParameter implements ParameterI {
 		}
 		$this->requiringTriggers[] = array ("parameter" => $trigger, "value" => $value);
 		$trigger->isATrigger(true);
+	}
+	public function dismissIf(ParameterI $trigger, $value = true) {
+		$trigger->isATrigger(true);
+		$this->dismissingTriggers[] = array("parameter" => $trigger, "value" => $value);
 	}
 	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = true) {
 		$this->isEverExcluded = true;
