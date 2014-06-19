@@ -68,6 +68,10 @@ class QIIMEProject extends DefaultProject {
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
 
+		$script = new \Models\Scripts\QIIME\ManipulateOtuTable($this);
+		$this->scripts[$script->getHtmlId()] = $script;
+		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
+
 		$script = new \Models\Scripts\QIIME\AlignSeqs($this);
 		$this->scripts[$script->getHtmlId()] = $script;
 		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;

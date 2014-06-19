@@ -23,13 +23,13 @@ class  extends DefaultScript {
 			new Label("Optional parameters"),
 			new Label("Output options"),
 			new TrueFalseParameter("--verbose")
-		)
+		);
 	}
 	public function getScriptName() {
-		return "Implement me!";
+		return "dummy_script.py";
 	}
 	public function getScriptTitle() {
-		return "dummy_script.py";
+		return "Implement me!";
 	}
 	public function getHtmlId() {
 		return "";

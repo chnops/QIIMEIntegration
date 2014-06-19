@@ -1,0 +1,260 @@
+	~ ~summarize-table	Summarize sample or observation data in a BIOM table~ ~
+===================================================================================================
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Provides details on the observation counts per sample, including summary statistics, as well as metadata categories associated with samples and observations.
+| 
+| Example usage: 
+| Print help message and exit
+|  biom summarize-table -h
+| 
+| Basic script usage: Write a summary of table.biom to table_summary.txt
+|  biom summarize-table -i table.biom -o table_summary.txt
+| 
+| Options:
+|   --version             show program's version number and exit
+|   -h, --help            show this help message and exit
+|   --qualitative         Present counts as number of unique observation ids per
+|                         sample, rather than counts of observations per sample.
+|                         [default: False]
+|   --suppress-md5        Do not compute md5sum of table. Useful if you're
+|                         concerned about runtime. [default: False]
+| 
+|   REQUIRED options:
+|     The following options must be provided under all circumstances.
+| 
+|     -i INPUT_FP, --input-fp=INPUT_FP
+|                         the input BIOM table [REQUIRED]
+|     -o OUTPUT_FP, --output-fp=OUTPUT_FP
+|                         the output filepath [REQUIRED]
+===================================================================================================
+
+	~ ~convert	Convert to/from the BIOM table format~ ~
+===================================================================================================
+| Usage: biom convert [options] {-i/--input-fp INPUT-FP -o/--output-fp OUTPUT-FP}
+| 
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Convert between BIOM and 'classic' (tab-delimited) table formats. Detailed usage examples can be found here: http://biom-format.org/documentation/biom_conversion.html
+| 
+| Example usage: 
+| Print help message and exit
+|  biom convert -h
+| 
+| Converting from classic to BIOM format: Convert the classic file table.txt to a sparse BIOM format OTU table
+|  biom convert -i table.txt -o table.biom --table-type "otu table"
+| 
+| Options:
+|   --version             show program's version number and exit
+|   -h, --help            show this help message and exit
+|   -t MATRIX_TYPE, --matrix-type=MATRIX_TYPE
+|                         the type of BIOM file to create (dense or sparse) when
+|                         a classic table is supplied [default: sparse]
+|   -b, --biom-to-classic-table
+|                         convert BIOM table file to classic table file
+|                         [default: convert classic table file to BIOM table
+|                         file]
+|   --sparse-biom-to-dense-biom
+|                         convert sparse BIOM table file to a dense BIOM table
+|                         file [default: convert classic table file to BIOM
+|                         table file]
+|   --dense-biom-to-sparse-biom
+|                         convert dense BIOM table file to a sparse BIOM table
+|                         file [default: convert classic table file to BIOM
+|                         table file]
+|   -m SAMPLE_METADATA_FP, --sample-metadata-fp=SAMPLE_METADATA_FP
+|                         the sample metadata map (will add sample metadata to
+|                         the BIOM table, if provided). Only applies when
+|                         converting from classic table file to BIOM table file
+|                         [default: none]
+|   --observation-metadata-fp=OBSERVATION_METADATA_FP
+|                         the observation metadata map (will add observation
+|                         metadata to the BIOM table, if provided). Only applies
+|                         when converting from classic table file to BIOM table
+|                         file [default: none]
+|   --header-key=HEADER_KEY
+|                         pull this key from observation metadata within a BIOM
+|                         table file when creating a classic table file
+|                         [default: no observation metadata will be included]
+|   --output-metadata-id=OUTPUT_METADATA_ID
+|                         the name to be given to the observation metadata
+|                         column when creating a classic table from a BIOM-
+|                         formatted table [default: same name as in the BIOM-
+|                         formatted table]
+|   --process-obs-metadata=PROCESS_OBS_METADATA
+|                         process metadata associated with observations when
+|                         converting from a classic table. Must be one of:
+|                         taxonomy, naive, sc_separated [default: naive]
+|   --table-type=TABLE_TYPE
+|                         the BIOM table type to get converted into. Required
+|                         when converting a classic table file to a BIOM table
+|                         file. Must be one of: metabolite table, gene table,
+|                         otu table, pathway table, function table, ortholog
+|                         table, taxon table [default: none]
+| 
+|   REQUIRED options:
+|     The following options must be provided under all circumstances.
+| 
+|     -i INPUT_FP, --input-fp=INPUT_FP
+|                         the input table filepath, either in BIOM or classic
+|                         format [REQUIRED]
+|     -o OUTPUT_FP, --output-fp=OUTPUT_FP
+|                         the output filepath [REQUIRED]
+===================================================================================================
+
+   ~ ~validate-table      Validate a BIOM-formatted file~ ~
+===================================================================================================
+| Usage: biom validate-table [options] {-i/--input-fp INPUT-FP}
+| 
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Test a file for adherence to the Biological Observation Matrix (BIOM) format specification. This specification is defined at http://biom-format.org
+| 
+| Example usage: 
+| Print help message and exit
+|  biom validate-table -h
+| 
+| Validating a BIOM file: Validate the contents of table.biom for adherence to the BIOM format specification
+|  biom validate-table -i table.biom
+| 
+| Options:
+|   --version             show program's version number and exit
+|   -h, --help            show this help message and exit
+|   -f FORMAT_VERSION, --format-version=FORMAT_VERSION
+|                         the specific format version to validate against
+|                         [default: Biological Observation Matrix 1.0.0]
+|   --detailed-report     include more details in the output report [default:
+|                         False]
+| 
+|   REQUIRED options:
+|     The following options must be provided under all circumstances.
+| 
+|     -i INPUT_FP, --input-fp=INPUT_FP
+|                         the input filepath to validate against the BIOM format
+|                         specification [REQUIRED]
+===================================================================================================
+
+
+   ~ ~add-metadata        Add metadata to a BIOM table~ ~
+===================================================================================================
+| Usage: biom add-metadata [options] {-i/--input-fp INPUT-FP -o/--output-fp OUTPUT-FP}
+| 
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Add sample and/or observation metadata to BIOM-formatted files. Detailed usage examples can be found here: http://biom-format.org/documentation/adding_metadata.html
+| 
+| Example usage: 
+| Print help message and exit
+|  biom add-metadata -h
+| 
+| Adding sample metadata: Add sample metadata to a BIOM table
+|  biom add-metadata -i otu_table.biom -o table_with_sample_metadata.biom -m sample_metadata.txt
+| 
+| Options:
+|   --version             show program's version number and exit
+|   -h, --help            show this help message and exit
+|   -m SAMPLE_METADATA_FP, --sample-metadata-fp=SAMPLE_METADATA_FP
+|                         the sample metadata map (will add sample metadata to
+|                         the input BIOM table, if provided) [default: none]
+|   --observation-metadata-fp=OBSERVATION_METADATA_FP
+|                         the observation metadata map (will add observation
+|                         metadata to the input BIOM table, if provided)
+|                         [default: none]
+|   --sc-separated=SC_SEPARATED
+|                         comma-separated list of the metadata fields to split
+|                         on semicolons. This is useful for hierarchical data
+|                         such as taxonomy or functional categories [default:
+|                         none]
+|   --sc-pipe-separated=SC_PIPE_SEPARATED
+|                         comma-separated list of the metadata fields to split
+|                         on semicolons and pipes ("|"). This is useful for
+|                         hierarchical data such as functional categories with
+|                         one-to-many mappings (e.g. x;y;z|x;y;w) [default:
+|                         none]
+|   --int-fields=INT_FIELDS
+|                         comma-separated list of the metadata fields to cast to
+|                         integers. This is useful for integer data such as
+|                         "DaysSinceStart" [default: none]
+|   --float-fields=FLOAT_FIELDS
+|                         comma-separated list of the metadata fields to cast to
+|                         floating point numbers. This is useful for real number
+|                         data such as "pH" [default: none]
+|   --sample-header=SAMPLE_HEADER
+|                         comma-separated list of the sample metadata field
+|                         names. This is useful if a header line is not provided
+|                         with the metadata, if you want to rename the fields,
+|                         or if you want to include only the first n fields
+|                         where n is the number of entries provided here
+|                         [default: use header from sample metadata map]
+|   --observation-header=OBSERVATION_HEADER
+|                         comma-separated list of the observation metadata field
+|                         names. This is useful if a header line is not provided
+|                         with the metadata, if you want to rename the fields,
+|                         or if you want to include only the first n fields
+|                         where n is the number of entries provided here
+|                         [default: use header from observation metadata map]
+| 
+|   REQUIRED options:
+|     The following options must be provided under all circumstances.
+| 
+|     -i INPUT_FP, --input-fp=INPUT_FP
+|                         the input BIOM table [REQUIRED]
+|     -o OUTPUT_FP, --output-fp=OUTPUT_FP
+|                         the output BIOM table [REQUIRED]
+====================================================================================================
+
+   ~ ~subset-table        Subset a BIOM table~ ~
+====================================================================================================
+| Usage: biom subset-table [options] {-i/--input-fp INPUT-FP -a/--axis AXIS -s/--ids IDS -o/--output-fp OUTPUT-FP}
+| 
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Subset a BIOM table, over either observations or samples, without fully parsing it. This command is intended to assist in working with very large tables when tight on memory, or as a lightweight way to subset a full table. Currently, it is possible to produce tables with rows or columns (observations or samples) that are fully zeroed.
+| 
+| Example usage: 
+| Print help message and exit
+|  biom subset-table -h
+| 
+| Subsetting a BIOM table: Choose a subset of the observations in table.biom and write them to subset.biom
+|  biom subset-table -i table.biom -a observations -s observation_ids.txt -o subset.biom
+| 
+| Options:
+|   --version             show program's version number and exit
+|   -h, --help            show this help message and exit
+| 
+|   REQUIRED options:
+|     The following options must be provided under all circumstances.
+| 
+|     -i INPUT_FP, --input-fp=INPUT_FP
+|                         the input BIOM table filepath to subset [REQUIRED]
+|     -a AXIS, --axis=AXIS
+|                         the axis to subset over, either samples or
+|                         observations [REQUIRED]
+|     -s IDS, --ids=IDS   a file containing a single column of IDs to retain
+|                         (either sample IDs or observation IDs, depending on
+|                         the axis) [REQUIRED]
+|     -o OUTPUT_FP, --output-fp=OUTPUT_FP
+|                         the output BIOM table filepath [REQUIRED]
+====================================================================================================
+
+   ~ ~show-install-info   Provide information about the biom-format installation~ ~
+====================================================================================================
+| Usage: biom show-install-info [options] {}
+| 
+| [] indicates optional input (order unimportant)
+| {} indicates required input (order unimportant)
+| 
+| Provide information about the biom-format installation, including settings pulled from the configuration file. For more details, see http://biom-format.org
+| 
+| Example usage: 
+| Print help message and exit
+|  biom show-install-info -h
+| 
+| Displaying installation info: Display biom-format installation information
+|  biom show-install-info
+====================================================================================================

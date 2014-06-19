@@ -52,7 +52,10 @@ class EitherOrParameter extends DefaultParameter {
 		}
 		$code = parent::renderFormScript($formJsVar, $disabled);
 		$jsVar = $this->getJsVar($formJsVar);
-		return $code . "\tmakeEitherOr({$jsVar});{$jsVar}.change();\n";
+		$code .= "\tmakeEitherOr({$jsVar});{$jsVar}.change();\n";
+		$code .= $this->default->renderFormScript($formJsVar, $disabled);
+		$code .= $this->alternative->renderFormScript($formJsVar, $disabled);
+		return $code;
 	}
 	public function isValueValid($value) {
 		if (!$value) {

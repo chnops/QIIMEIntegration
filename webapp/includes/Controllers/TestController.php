@@ -18,14 +18,25 @@ class TestController extends Controller {
 	public function renderInstructions() {
 		ob_start();
 
-		echo "<p>Testing some UI widgets</p>";
-		$script = "<script type=\"text/javascript\">$(function() { $('.accordion').accordion({collapsible: true}); });</script>";
+		echo "<p>Testing radio buttons w/jQuery<p>";
+		$script = "<script type=\"text/javascript\">$(function() {
+			$('[name=\"rad\"]').change(function() {
+				var val = $(this).val();
+				$('#click_result').html(\"we are here, we are here!! \" + val);
+			});
+		})</script>";
 		echo $script;
+		echo "<pre>";
 		echo htmlentities($script);
+		echo "</pre>";
 
-		$html = "<div class=\"accordion\"><h3>Opt 1</h3><div>Content 1</div><h3>Opt 2</h3><div>Content 3</div><h3>Opt 3</h3><div>Content 2</div></div>";
+		$html = "<form action=\"#\">
+			<label for=\"rad\">Option 1<input type=\"radio\" name=\"rad\" value=\"1\"></label>
+			<label for=\"rad\">Option 2<input type=\"radio\" name=\"rad\" value=\"2\"></label>
+			<label for=\"rad\">Option 3<input type=\"radio\" name=\"rad\" value=\"3\"></label>
+			</form>
+			<div id=\"click_result\" style=\"border-width:1px\"><div>";
 		echo $html;
-		echo htmlentities($html);
 
 		return ob_get_clean();
 	}

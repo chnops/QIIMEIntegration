@@ -1,8 +1,11 @@
 function makeTrigger(trg) {
 	trg['_lstnrs'] = [];
 	trg.change(function() {
-		var val = trg.val();
-		if (!val) {
+		var val = $(this).val();
+		if('radio' == trg.attr('type') && !($(this).is(':checked'))) {
+			return;
+		}
+		else if (!val) {
 			val = false;
 		}
 		else if (val == "on") {
@@ -145,10 +148,8 @@ function makeDependent(depdnt) {
 }
 function makeEitherOr(jQueryObj) {
 	jQueryObj.change(function() {
-			if ($(this).is(':checked')) {
-				jQueryObj.parents('td').find('[name]').prop('disabled', true);
-				jQueryObj.prop('disabled', false);
-				$(this).parents('td').find('[name]').prop('disabled', false);
-				}
-			});
+			jQueryObj.each(function() {
+				var contentLabel = $(this).next();
+				contentLabel.find('[name]').prop('disabled', !($(this).is(':checked')))
+			})});
 }

@@ -10,7 +10,7 @@ class VersionParameter extends DefaultParameter {
 		$this->name = "--version";
 		ob_start();
 		include "public/versions/{$script->getHtmlId()}.txt";
-		$this->versionString = trim(ob_get_clean());
+		$this->versionString = preg_replace("/\n+/", "\\n", trim(ob_get_clean()));
 	}
 
 	public function renderForOperatingSystem() {
@@ -18,7 +18,6 @@ class VersionParameter extends DefaultParameter {
 	}
 
 	public function renderForForm($disabled) {
-		// TODO get actual version info
 		return "<a class=\"button\" onclick=\"alert('{$this->versionString}');\">Version</a>";
 	}
 
