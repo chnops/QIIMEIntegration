@@ -26,11 +26,14 @@ else {
 if ($_GET['as_text']) {
 	$maxLen = 2000;
 	$contents = file_get_contents($actualPath, $useIncludePath = false, $context = NULL, $offset = -1, $maxLen);
-	if (strlen($contents) == $maxLen) {
-		echo htmlentities($contents) . "...";
+	if (defined('ENT_SUBSTITUE')) {
+		echo htmlentities($contents, ENT_COMPAT | ENT_HTML5 | ENT_SUBSTITUTE);
 	}
 	else {
-		echo $contents;
+		echo htmlentities($contents, ENT_IGNORE);
+	}
+	if (strlen($contents) == $maxLen) {
+		echo "...";
 	}
 }
 else {
