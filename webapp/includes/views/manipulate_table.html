@@ -2,18 +2,23 @@
 
 <p><strong>Here are scripts to execute before this one</strong>
 <ul>
-<li><a onclick="displayHideables('');"></a> - </li>
+<li><a onclick="displayHideables('make_otu_table');">Make OTU table</a> - The main input for this script is the .biom formatted table that QIIME generates</li>
 </ul>
 </p>
 
 <p><strong>Here are the main decisions you should make before running this script</strong>
 <ol>
+<li>Pick an input file, and a name for your output</li>
+<li>Pick a command<ul>
+	<li>summarize-table: provide OTU count and other statistics</li>
+	<li>convert: change file format from biom to classic (tab-delimited)</li>
+</ul></li>
 <li>Pick output options.</li>
 </ol>
 </p>
 
 <p><strong>Here are the scripts to run after this one</strong>
 <ul>
-<li><a onclick="displayHideables('');"></a> - </li>
+<li><a onclick="displayHideables('align_seqs')">Sequence alignment</a> - Now you may want to go on to perform phylgeny analysis </li>
 </ul>
 </p>
