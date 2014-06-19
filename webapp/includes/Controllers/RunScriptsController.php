@@ -66,7 +66,6 @@ class RunScriptsController extends Controller {
 		if (!$this->username || !$this->project) {
 			$this->disabled = " disabled";
 			$this->isResultError = true;
-			$this->hasResult = true;
 			$this->result = "In order to run scripts, you must be logged in and have a project selected.";
 			return;
 		}
@@ -76,7 +75,6 @@ class RunScriptsController extends Controller {
 		$_GET['step'] = $_POST['step'];
 		unset($_POST['step']);
 
-		$this->hasResult = true;
 		$this->scriptId = $_POST['script'];
 
 		try {

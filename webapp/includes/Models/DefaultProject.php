@@ -106,6 +106,9 @@ abstract class DefaultProject implements ProjectI {
 	public function deleteGeneratedFile($fileName, $runId) {
 		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
 	}
+	public function unzipGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
+	}
 	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId());
@@ -137,6 +140,30 @@ abstract class DefaultProject implements ProjectI {
 			$this->database->executeAllRequests();
 		}
 		catch(OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
+	}
+	public function unzipUploadedFile($fileName) {
+		$this->database->startTakingRequests();
+		$removeResult = $this->database->removeUploadedFile($this->owner, $this->id, $fileName);
+		if (!$removeResult) {
+			$this->database->forgetAllReqeusts();
+			throw new \Exception("Unable to find/remove .zip file from the database");
+		}
+
+		try {	
+			// TODO this one will be difficult to do parallel
+			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $isUploaded = true, $runId = -1);
+			foreach ($newFileNames as $newFileName) {
+				if(!$this->database->createuploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
+					throw new \Exception("Unable to add unzipped file to database");
+				}
+			}
+			$this->database->executeAllRequests();
+			return true;
+		}
+		catch (OperatingSystemException $ex) {
 			$this->database->forgetAllRequests();
 			throw $ex;
 		}

@@ -11,29 +11,56 @@ class ViewResultsController extends Controller {
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
 			$this->isResultError = true;
-			$this->hasResult = true;
 			$this->result = "You have not selected a project, therefore there are no results to view.";
 			return;
 		}
+
+		// TODO add action input
+		if (!isset($_POST['delete']) && !isset($_POST['unzip'])) {
+			return;
+		}
+
+		$isUploaded = (isset($_POST['uploaded']) && $_POST['uploaded']);
+		if (!$isUploaded) {
+			if (!isset($_POST['run'])) {
+				$this->isResultError = true;
+				$this->result = "You must provide either a run id, or specify that the file is uploaded.";
+			}
+			if (!is_numeric($_POST['run'])) {
+				$this->isResulsError = true;
+				$this->result = "Run id must be numeric";
+			}
+		}
+
 		if (isset($_POST['delete'])) {
-			$this->hasResult = true;
 			try {
-				$isUploaded = (isset($_POST['uploaded']) && $_POST['uploaded']);
 				if ($isUploaded) {
 					$this->project->deleteUploadedFile($_POST['delete']);
 				}
 				else {
-					if (!isset($_POST['run'])) {
-						throw new \Exception("You must provide either a run id, or specify that the file is uploaded.");
-					}
-					if (!is_numeric($_POST['run'])) {
-						throw new \Exception("Run id must be numeric");
-					}
 					$this->project->deleteGeneratedFile($_POST['delete'], $_POST['run']);
 				}
 				$this->result = "File deleted: " . htmlentities($_POST['delete']);
 			}
 			catch (\Exception $ex) {
+				$this->isResultError = true;
+				$this->result = $ex->getMessage();
+			}
+		}
+		else if (isset($_POST['unzip'])) {
+			try {
+				if ($isUploaded) {
+					$this->project->unzipUploadedFile($_POST['unzip']);
+				}
+				else {
+					$this->project->unzipGeneratedFile($_POST['unzip'], $_POST['run']);
+				}
+				$this->result = "Successfully unzipped file: " . htmlentities($_POST['unzip']);
+			}
+			catch (\Exception $ex) {
+				if ($ex instanceof \Models\OperatingSystemException) {
+					error_log($ex->getConsoleOutput());
+				}
 				$this->isResultError = true;
 				$this->result = $ex->getMessage();
 			}
@@ -50,7 +77,7 @@ class ViewResultsController extends Controller {
 			<li>Unique id: {$this->project->getId()}</li>
 			</ul>";
 
-		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
+		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($uploadedFiles) || !empty($generatedFiles)) {
 			$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
@@ -69,7 +96,7 @@ class ViewResultsController extends Controller {
 		$output = "";	
 
 		$helper = \Utils\Helper::getHelper();
-		$uploadedFiles = $this->project->retrieveAlluploadedFiles();
+		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		if (!empty($uploadedFiles)) {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
 			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
@@ -90,7 +117,8 @@ class ViewResultsController extends Controller {
 			foreach ($generatedFilesFormatted as $runId => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
-					$output .= $this->renderFileMenu($file['name'], $file['status'], $isUploaded = false, $file['run_id']);
+					// TODO status not set if coming from generated files
+					$output .= $this->renderFileMenu($file['name'], 'generated', $isUploaded = false, $file['run_id']);
 				}
 				$output .= "</table></div>\n";
 			}
@@ -102,19 +130,19 @@ class ViewResultsController extends Controller {
 	private function renderFileMenu($fileName, $fileStatus, $isUploaded = true, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&" . (($isUploaded) ? "uploaded=true" : "run={$runId}");
 
-
 		$row = "<tr class=\"{$fileStatus}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
-			<td><a class=\"button\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500)\">More...</a>{$moreMenu}</td></td></tr>";
+			<td><a class=\"button\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500)\">More...</a></td></tr>";
 
 		$fileTypeInput = ($isUploaded) ? "<input type=\"hidden\" name=\"uploaded\" value=\"true\">" : "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
 		$genericForm = "<td><form method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
 
 		$row .= "<tr style=\"display:none\"><td>&nbsp;</td>";
 		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
-			$extraInput = "", $action = "delete", $lable = "Delete");
-		$row .= "<td></td><td></td></tr>\n";
+			$extraInput = "", $action = "delete", $label = "Delete");
+		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip", $label = "Unzip");
+		$row .= "<td></td></tr>\n";
 
 		return $row;
 	}

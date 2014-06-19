@@ -54,14 +54,12 @@ class UploadController extends Controller {
 		if (!$this->username || !$this->project) {
 			$this->disabled = " disabled";
 			$this->isResultError = true;
-			$this->hasResult = true;
 			$this->result = "In order to upload files, you must be logged in and have a project selected.";
 			return;
 		}
 		if (!isset($_POST['step']) ) {
 			return;
 		}
-		$this->hasResult = true;
 
 		if (!$this->getFileType()) {
 			$this->isResultError = true;

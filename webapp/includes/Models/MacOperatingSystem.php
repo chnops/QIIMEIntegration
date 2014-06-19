@@ -184,6 +184,7 @@ class MacOperatingSystem implements OperatingSystemI {
 		else {
 			$dir .= "/r{$runId}/";
 		}
+		
 		$code = "cd " . escapeshellarg($dir) . ";
 			touch " . escapeshellarg($fileName) . ";
 			rm " . escapeshellarg($fileName) . ";";
@@ -199,5 +200,38 @@ class MacOperatingSystem implements OperatingSystemI {
 		else {
 			return ob_get_clean();
 		}
+	}
+	public function unzipFile(ProjectI $project, $fileName, $isUploaded, $runId) {
+		$dir = $this->home . $project->getProjectDir();
+		if ($isUploaded) {
+			$dir .= "/uploads/";
+		}
+		else {
+			$dir .= "/r{$runId}/";
+		}
+
+		ob_start();
+		$returnCode = 0;
+
+		// TODO here and elsewhere perform escapeshellarg only once: more cohesive strings
+		system("cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
+			zipinfo -1 " . escapeshellarg($fileName) . "2> /dev/null;
+			unzip -qq " . escapeshellarg($fileName) . " &> /dev/null;
+			if [ $? -eq 0 ]; then rm " . escapeshellarg($fileName) . ";
+			else echo 'Unable to unzip file'; exit 1; fi;", $returnCode);
+
+		if ($returnCode) {
+			$ex = new OperatingSystemException("Unable to unzip file");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		$allFiles = explode("\n", trim(ob_get_clean()));
+		$nonDirFiles = array();
+		foreach ($allFiles as $file) {
+			if ($file[strlen($file) - 1] != "/") {
+				$nonDirFiles[] = $file;
+			}
+		}
+		return $nonDirFiles;
 	}
 }

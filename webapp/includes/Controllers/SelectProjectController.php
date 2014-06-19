@@ -24,7 +24,6 @@ class SelectProjectController extends Controller {
 
 	public function parseInput() {
 		if (!$this->username) {
-			$this->hasResult = true;
 			$this->isResultError = true;
 			$this->result = "You cannot choose a project if you aren't logged in.";
 			return;
@@ -32,7 +31,6 @@ class SelectProjectController extends Controller {
 		if (!isset($_POST['project'])) {
 			return;
 		}
-		$this->hasResult = true;
 
 		if ($_POST['create']) {
 			$projectName = $_POST['project'];
