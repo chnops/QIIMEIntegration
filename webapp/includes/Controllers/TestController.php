@@ -18,25 +18,22 @@ class TestController extends Controller {
 	public function renderInstructions() {
 		ob_start();
 
-		echo "<p>Testing radio buttons w/jQuery<p>";
-		$script = "<script type=\"text/javascript\">$(function() {
-			$('[name=\"rad\"]').change(function() {
-				var val = $(this).val();
-				$('#click_result').html(\"we are here, we are here!! \" + val);
-			});
-		})</script>";
-		echo $script;
-		echo "<pre>";
-		echo htmlentities($script);
-		echo "</pre>";
+		echo "<p>Testing table row selectors</p>";
 
-		$html = "<form action=\"#\">
-			<label for=\"rad\">Option 1<input type=\"radio\" name=\"rad\" value=\"1\"></label>
-			<label for=\"rad\">Option 2<input type=\"radio\" name=\"rad\" value=\"2\"></label>
-			<label for=\"rad\">Option 3<input type=\"radio\" name=\"rad\" value=\"3\"></label>
-			</form>
-			<div id=\"click_result\" style=\"border-width:1px\"><div>";
-		echo $html;
+		echo "<style>
+			div.form table{border-collapse:collapse;margin:0px;width:100%}
+			div.form td{padding:.5em;white-space:nowrap}
+			div.form tr:nth-child(4n+1){background-color:#FFFFE0}
+			div.form tr:nth-child(4n+2){background-color:#FFFFE0}
+			</style>";
+		echo "<div class=\"form\" style=\"width:100%\"><table>";
+
+		for ($i = 0 ; $i < 100; $i++) {
+			$display = $i + 1;
+			echo "<tr><td>{$display}</td></tr>";
+		}
+
+		echo "</table></div>";
 
 		return ob_get_clean();
 	}

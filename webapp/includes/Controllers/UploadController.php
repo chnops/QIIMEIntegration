@@ -39,11 +39,11 @@ class UploadController extends Controller {
 		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
 
 		foreach ($previousFilesFormatted as $fileType => $files) {
-			$output .= "<div><h4>{$fileType} files</h4><div><ul>\n";
+			$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><ul>\n";
 			foreach ($files as $file) {
 				$output .= "<li>" . htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
-			$output .= "</ul></div></div>\n";
+			$output .= "</ul></div>\n";
 		}
 		return $output . "</div>";
 	}
@@ -52,18 +52,17 @@ class UploadController extends Controller {
 		if (!$this->username || !$this->project) {
 			$this->disabled = " disabled";
 			$this->isResultError = true;
-			$this->hasResult = true;
 			$this->result = "In order to upload files, you must be logged in and have a project selected.";
 			return;
 		}
 		if (!isset($_POST['step']) ) {
 			return;
 		}
-		$this->hasResult = true;
 
 		if (!$this->getFileType()) {
 			$this->isResultError = true;
 			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
+			return;
 		}
 		else {
 			$this->result = "";
@@ -74,8 +73,16 @@ class UploadController extends Controller {
 		$isDownload = isset($_POST['url']);
 		if ($isDownload) {
 			$this->url = $_POST['url'];
-			$fileName = explode('/', $this->url);
-			$fileName = array_pop($fileName);
+			$urlParts = explode('/', $this->url);
+			$fileName = "";
+			while (!$fileName && $urlParts) {
+				$fileName = array_pop($urlParts);
+			}
+			if (!$fileName) {
+				$this->isResultError = true;
+				$this->result = "Unable to determine file name from given url";
+				return;
+			}
 		}
 		else {
 			$fileName = $_FILES['file']['name'];

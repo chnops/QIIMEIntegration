@@ -91,7 +91,7 @@ abstract class DefaultProject implements ProjectI {
 		}
 
 		try {	
-			$consoleOutput = $this->operatingSystem->downloadFile($this, $url,
+			$consoleOutput = $this->operatingSystem->downloadFile($this, $url, $fileName,
 				$onSuccess = $this->database->renderCommandUploadSuccess($this->owner, $this->id, $fileName),
 				$onFail = $this->database->renderCommandUploadFailure($this->owner, $this->id, $fileName));
 			$this->database->executeAllRequests();
@@ -105,6 +105,15 @@ abstract class DefaultProject implements ProjectI {
 	}
 	public function deleteGeneratedFile($fileName, $runId) {
 		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function unzipGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function compressGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->compressFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function decompressGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->decompressFile($this, $fileName, $isUploaded = false, $runId);
 	}
 	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType) {
 		$this->database->startTakingRequests();
@@ -139,6 +148,44 @@ abstract class DefaultProject implements ProjectI {
 		catch(OperatingSystemException $ex) {
 			$this->database->forgetAllRequests();
 			throw $ex;
+		}
+	}
+	public function unzipUploadedFile($fileName) {
+		$this->database->startTakingRequests();
+		$removeResult = $this->database->removeUploadedFile($this->owner, $this->id, $fileName);
+		if (!$removeResult) {
+			$this->database->forgetAllReqeusts();
+			throw new \Exception("Unable to find/remove .zip file from the database");
+		}
+
+		try {	
+			// TODO this one will be difficult to do parallel
+			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $isUploaded = true, $runId = -1);
+			foreach ($newFileNames as $newFileName) {
+				if(!$this->database->createuploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
+					throw new \Exception("Unable to add unzipped file to database");
+				}
+			}
+			$this->database->executeAllRequests();
+			return true;
+		}
+		catch (OperatingSystemException $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
+	}
+	public function compressUploadedFile($fileName) {
+		$newFileName = $this->operatingSystem->compressFile($this, $fileName, $isUploaded = true, $runId = -1);
+		$nameChangeResult = $this->database->changeFileName($this->owner, $this->id, $fileName, $newFileName);
+		if (!$nameChangeResult) {
+			throw new \Exception("Unable to change file name, compression failed.");
+		}
+	}
+	public function decompressUploadedFile($fileName) {
+		$newFileName = $this->operatingSystem->decompressFile($this, $fileName, $isUploaded = true, $runId = -1);
+		$nameChangeResult = $this->database->changeFileName($this->owner, $this->id, $fileName, $newFileName);
+		if (!$nameChangeResult) {
+			throw new \Exception("Unable to change file name, decompression failed.");
 		}
 	}
 	public function retrieveAllUploadedFiles() {

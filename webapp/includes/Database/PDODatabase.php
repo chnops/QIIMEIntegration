@@ -289,6 +289,21 @@ class PDODatabase implements DatabaseI {
 		}
 	}
 
+	public function changeFileName($username, $projectId, $fileName, $newFileName) {
+		try {
+			$pdoStatement = $this->pdo->prepare("UPDATE uploaded_files SET name = :newName WHERE 
+				project_owner = :owner AND project_id = :id AND name = :oldName");
+			return $pdoStatement->execute(array("owner" => $username, "id" => $projectId, 
+				"newName" => $newFileName, "oldName" => $fileName));
+		}
+		catch (\Exception $ex) {
+			error_log("Unable to : " . $ex->getMessage());
+			// TODO error handling
+			// TODO transactions
+			return false;
+		}
+	}
+
 	/*Try catch block commong to all functions
 		try {
 		}

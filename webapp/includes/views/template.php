@@ -37,14 +37,15 @@ $link = '#003366'; // bluish
 
 		a{color:<?php echo $link?>;cursor:pointer;}
 		a:link {color:<?php echo $link?>;text-decoration:none;font-style:italic;}
-		a:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
+		a:hover, input[type="submit"]:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
 		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;white-space:nowrap;margin:.25em}
 		a.button:active {border:2px <?php echo $internalBorder?> inset;}
 		button{background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset}
-		button:active{border:2px <?php echo $internalBorder?> inset}
+		button:active, input[type="submit"]:active {border:2px <?php echo $internalBorder?> inset}
 		label{display:block;margin:.5em 0em;}
 		input,select{background-color:<?php echo $neutralPale?>}
 		input[type="text"],input[type="file"],select{border-width:1px;border-color:<?php echo $internalBorder?>}
+		input[type="submit"]{border: 2px <?php echo $internalBorder?> outset;font-size:.8em;margin:.25em;color:<?php echo $link?>}
 		input[disabled],select[disabled]{background-color:<?php echo $darkBackground?>;}
 		optgroup.big{font-size:1.25em;font-weight:bold}
 
@@ -53,26 +54,17 @@ $link = '#003366'; // bluish
 
 		<?php echo $this->renderSpecificStyle()?>
 
-		.accordion > div h4,.accordion > div {outline:none;padding:.25em .5em;margin:0em}
-		.accordion > div h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
-		.accordion > div h4:active {border-style:inset}
-		.accordion > div div{background-color:<?php echo $neutralPale?>;margin:0em 0em 0em .5em;border-width:1px;padding:0em}
+		.accordion h4{outline:none;padding:.25em .5em;margin-bottom:.25em}
+		.accordion h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
+		.accordion h4:active {border-style:inset}
+		.accordion div{background-color:<?php echo $neutralPale?>;margin-left:.5em;border-width:1px;padding:0em}
 		.draggable{padding:.5em;background-color:#ffffcc;border-width:1px}
 	</style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 <script type="text/javascript">
-function hideMe(trigger) {
-	var triggerObj = $(trigger);
-	var responseObj = triggerObj.parents('.hideme').find('.hideme');
-	if (triggerObj.html() == "hide") {
-		triggerObj.html("show");
-		responseObj.css('display', "none");
-	}
-	else {
-		triggerObj.html("hide");
-		responseObj.css('display', "block");
-	}
+function hideMe(me) {
+	me.toggle('blind', {}, 500);
 }	
 var hideableFields = [];
 var displayedHideableId = "";
@@ -89,9 +81,6 @@ function paramHelp(text) {
 	$('#parameter_help').html("Parameter help: " + text);
 }
 	$(function() {
-		$('.accordion > div').accordion({
-			collapsible: true,
-		});
 		var accordionContainer = $('.accordion').parent();
 		accordionContainer.width(accordionContainer.width());
 		$('.draggable').draggable({
@@ -122,7 +111,7 @@ foreach ($steps as $key => $step) {
 <div id="content"><?php echo $this->getContent() ?></div>
 <?php $help = $this->renderHelp();
 if ($help):?>
-<div id="help" class="hideme"><em>Help (<a onclick="hideMe(this)">hide</a>)</em><div class="hideme"><?php echo $help;?></div></div>
+<div id="help"><em>Help (<a onclick="hideMe($(this).parent().next())">hide</a>)</em><div><?php echo $help;?></div></div>
 <?php endif; ?>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
