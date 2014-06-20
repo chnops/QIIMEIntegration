@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS file_statuses (
 	description TEXT NOT NULL UNIQUE ,
 	PRIMARY KEY (status)
 	);
-INSERT INTO file_statuses (status, description) VALUES (0, "ready");
-INSERT INTO file_statuses (status, description) VALUES (1, "download in progress");
-INSERT INTO file_statuses (status, description) VALUES (2, "download failed");
-INSERT INTO file_statuses (status, description) VALUES (-1, "deleted");
+--INSERT INTO file_statuses (status, description) VALUES (0, "ready");
+--INSERT INTO file_statuses (status, description) VALUES (1, "download in progress");
+--INSERT INTO file_statuses (status, description) VALUES (2, "download failed");
+--INSERT INTO file_statuses (status, description) VALUES (-1, "deleted");
 
 CREATE TABLE IF NOT EXISTS uploaded_files (
 	project_id INT(11) NOT NULL ,
@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS uploaded_files (
 	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
 	);
 --TODO given_name is unique per 'project'
-ALTER TABLE uploaded_files ADD COLUMN status INTEGER DEFAULT 0 REFERENCES file_statuses(status);
+--ALTER TABLE uploaded_files ADD COLUMN status INTEGER DEFAULT 0 REFERENCES file_statuses(status);
+ALTER TABLE uploaded_files ADD COLUMN approx_size INTEGER;
 
 CREATE TABLE IF NOT EXISTS script_runs (
 	id INTEGER NOT NULL UNIQUE PRIMARY KEY ,

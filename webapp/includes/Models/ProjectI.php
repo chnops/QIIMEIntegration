@@ -34,7 +34,7 @@ interface ProjectI {
 	// complex mutators
 	public function beginProject();
 	public function receiveDownloadedFile($url, $fileName, FileType $fileType);
-	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType);
+	public function receiveUploadedFile($givenName, $tmpName, $size, FileType $fileType);
 	public function runScript(array $allInput);
 	public function deleteUploadedFile($fileName);
 	public function deleteGeneratedFile($fileName, $runId);

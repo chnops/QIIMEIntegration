@@ -139,7 +139,7 @@ class ViewResultsController extends Controller {
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
-					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], $file['status']);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], $file['status'], $file['size']);
 					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
@@ -154,8 +154,8 @@ class ViewResultsController extends Controller {
 			foreach ($generatedFilesFormatted as $runId => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
-					// TODO status not set if coming from generated files
-					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', $file['run_id']);
+					// TODO status/size not set if coming from generated files
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', -1, $file['run_id']);
 					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
@@ -165,11 +165,13 @@ class ViewResultsController extends Controller {
 
 		return $output;
 	}
-	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $runId = -1) {
+	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $fileSize, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&run={$runId}";
 
+		$sizeDisclaimer = ($fileSize >= 0) ? "<em>size: {$fileSize}B</em>" : "<em>size uncertain</em>";
+
 		$helper = \Utils\Helper::getHelper();	
-		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus})</td>
+		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
 			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";

@@ -84,7 +84,7 @@ abstract class DefaultProject implements ProjectI {
 	public function receiveDownloadedFile($url, $fileName, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile(
-			$this->owner, $this->id, $fileName, $fileType->getHtmlId(), $isDownload = true);
+			$this->owner, $this->id, $fileName, $fileType->getHtmlId(), $isDownload = true, $size = -1);
 		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
 			throw new \Exception("There was a problem storing your new file in the database");
@@ -115,9 +115,9 @@ abstract class DefaultProject implements ProjectI {
 	public function decompressGeneratedFile($fileName, $runId) {
 		$this->operatingSystem->decompressFile($this, $fileName, $isUploaded = false, $runId);
 	}
-	public function receiveUploadedFile($givenName, $tmpName, FileType $fileType) {
+	public function receiveUploadedFile($givenName, $tmpName, $size, FileType $fileType) {
 		$this->database->startTakingRequests();
-		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId());
+		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId(), $isDownloaded = false, $size);
 		if (!$databaseSuccess) {
 			$this->database->forgetAllRequests();
 			throw new \Exception("Unable to create file in database");
@@ -194,7 +194,7 @@ abstract class DefaultProject implements ProjectI {
 			foreach ($rawFiles as $fileArray) {
 				$this->uploadedFiles[] = array("name" => $fileArray['name'], 
 					"type" => $fileArray['file_type'], "uploaded" => "true",
-					"status" => $fileArray['description']);
+					"status" => $fileArray['description'], "size" => $fileArray['approx_size']);
 			}
 		}
 		return $this->uploadedFiles;

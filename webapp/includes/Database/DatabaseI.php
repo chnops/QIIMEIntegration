@@ -14,7 +14,7 @@ interface DatabaseI {
 	public function createProject($username, $projectName);
 	public function getProjectName($username, $projectId);
 
-	public function createUploadedFile($username, $projectId, $fileName, $fileType);
+	public function createUploadedFile($username, $projectId, $fileName, $fileType, $isDownloaded = false, $size = -1);
 	public function getAllUploadedFiles($username, $projectId);
 	public function removeUploadedFile($username, $projectId, $fileName);
 	public function changeFileName($username, $projectId, $fileName, $newFilename);

@@ -130,12 +130,11 @@ class UploadController extends Controller {
 			$this->result = "There was an error uploading your file: " . $fileUploadErrors->getErrorMessage($file['error']);
 			return;
 		}
-		// TODO if size/type are valid
+		// TODO if type is valid
 
 		$givenName = $file['name'];
-		$tmpName = $file['tmp_name'];
 		try {
-			$this->project->receiveUploadedFile($givenName, $tmpName, $fileType);
+			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $fileType);
 			$this->result = "File " . $helper->htmlentities($givenName) . " successfully uploaded!";
 		}
 		catch (\Exception $ex) {

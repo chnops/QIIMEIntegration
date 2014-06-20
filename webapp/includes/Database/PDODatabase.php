@@ -150,13 +150,13 @@ class PDODatabase implements DatabaseI {
 		}
 	}
 
-	public function createUploadedFile($username, $projectId, $fileName, $fileType, $isDownload = false) {
+	public function createUploadedFile($username, $projectId, $fileName, $fileType, $isDownload = false, $size = -1) {
 		try {
-			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type, status)
-				VALUES (:id, :owner, :name, :fileType, :status)");
+			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type, status, approx_size)
+				VALUES (:id, :owner, :name, :fileType, :status, :size)");
 			$status = ($isDownload) ? 1 : 0;
 			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName,
-				"fileType" => $fileType, "status" => $status));
+				"fileType" => $fileType, "status" => $status, "size" => $size));
 			if (!$insertSuccess) {
 				$errorInfo = $pdoStatement->errorInfo();
 				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
@@ -174,7 +174,7 @@ class PDODatabase implements DatabaseI {
 	public function getAllUploadedFiles($username, $projectId) {
 		$files = array();
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT name, file_type, description FROM uploaded_files
+			$pdoStatement = $this->pdo->prepare("SELECT name, file_type, description, approx_size FROM uploaded_files
 				INNER JOIN file_statuses ON uploaded_files.status = file_statuses.status
 				WHERE project_id = :id AND project_owner = :owner");
 			$pdoStatement->execute(array("id" => $projectId, "owner" => $username));
