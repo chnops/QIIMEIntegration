@@ -15,47 +15,43 @@ class ViewResultsController extends Controller {
 			return;
 		}
 
-		// TODO add action input
-		if (!isset($_POST['delete']) && !isset($_POST['unzip']) && !isset($_POST['gzip']) && !isset($_POST['gunzip'])) {
+		if (!isset($_POST['action'])) {
 			return;
 		}
-
-		$isUploaded = (isset($_POST['uploaded']) && $_POST['uploaded']);
-		if (!$isUploaded) {
-			if (!isset($_POST['run'])) {
-				$this->isResultError = true;
-				$this->result = "You must provide either a run id, or specify that the file is uploaded.";
-			}
-			if (!is_numeric($_POST['run'])) {
-				$this->isResulsError = true;
-				$this->result = "Run id must be numeric";
-			}
+		$action = $_POST['action'];
+		$run = $_POST['run'];
+		$file = $_POST['file'];
+		
+		if (!is_numeric($run)) {
+			$this->isResulsError = true;
+			$this->result = "Run id must be numeric";
 		}
+		$isUploaded = ($run == -1);
 
-		if (isset($_POST['delete'])) {
+		if ($action == 'delete') {
 			try {
 				if ($isUploaded) {
-					$this->project->deleteUploadedFile($_POST['delete']);
+					$this->project->deleteUploadedFile($file);
 				}
 				else {
-					$this->project->deleteGeneratedFile($_POST['delete'], $_POST['run']);
+					$this->project->deleteGeneratedFile($file, $run);
 				}
-				$this->result = "File deleted: " . htmlentities($_POST['delete']);
+				$this->result = "File deleted: " . htmlentities($file);
 			}
 			catch (\Exception $ex) {
 				$this->isResultError = true;
 				$this->result = $ex->getMessage();
 			}
 		}
-		else if (isset($_POST['unzip'])) {
+		else if ($action == 'unzip') {
 			try {
 				if ($isUploaded) {
-					$this->project->unzipUploadedFile($_POST['unzip']);
+					$this->project->unzipUploadedFile($file);
 				}
 				else {
-					$this->project->unzipGeneratedFile($_POST['unzip'], $_POST['run']);
+					$this->project->unzipGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully unzipped file: " . htmlentities($_POST['unzip']);
+				$this->result = "Successfully unzipped file: " . htmlentities($run);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -65,15 +61,15 @@ class ViewResultsController extends Controller {
 				$this->result = $ex->getMessage();
 			}
 		}
-		else if (isset($_POST['gzip'])) {
+		else if ($action == 'gzip')) {
 			try {
 				if ($isUploaded) {
-					$this->project->compressUploadedFile($_POST['gzip']);
+					$this->project->compressUploadedFile($file);
 				}
 				else {
-					$this->project->compressGeneratedFile($_POST['gzip'], $_POST['run']);
+					$this->project->compressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully compressed file: " . htmlentities($_POST['gzip']);
+				$this->result = "Successfully compressed file: " . htmlentities($file);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -83,15 +79,15 @@ class ViewResultsController extends Controller {
 				$this->result = $ex->getMessage();
 			}
 		}
-		else if (isset($_POST['gunzip'])) {
+		else if ($action == 'gunzip')) {
 			try {
 				if ($isUploaded) {
-					$this->project->decompressUploadedFile($_POST['gunzip']);
+					$this->project->decompressUploadedFile($file);
 				}
 				else {
-					$this->project->decompressGeneratedFile($_POST['gunzip'], $_POST['run']);
+					$this->project->decompressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully de-compressed file: " . htmlentities($_POST['gunzip']);
+				$this->result = "Successfully de-compressed file: " . htmlentities($file);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -140,7 +136,7 @@ class ViewResultsController extends Controller {
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
-					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], $file['status'], $isUploaded = true);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], $file['status']);
 					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
@@ -156,7 +152,7 @@ class ViewResultsController extends Controller {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
 					// TODO status not set if coming from generated files
-					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', $isUploaded = false, $file['run_id']);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', $file['run_id']);
 					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
@@ -166,24 +162,25 @@ class ViewResultsController extends Controller {
 
 		return $output;
 	}
-	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $isUploaded = true, $runId = -1) {
-		$downloadLink = "download.php?file_name={$fileName}&" . (($isUploaded) ? "uploaded=true" : "run={$runId}");
+	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $runId = -1) {
+		$downloadLink = "download.php?file_name={$fileName}&run={$runId}";
 
 		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
 			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";
 
-		$fileTypeInput = ($isUploaded) ? "<input type=\"hidden\" name=\"uploaded\" value=\"true\">" : "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
-		$genericForm = "<td><form action=\"#result_file_{$rowHtmlId}\" method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
+		$fileTypeInput = "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
+		$fileNameInput = "<input type=\"hidden\" name=\"file\" value=\"{$fileName}\">";
+		$genericForm = "<td><form action=\"#result_file_{$rowHtmlId}\" method=\"POST\" %s>%s{$fileTypeInput} {$fileNameInput}<input type=\"submit\" name=\"action\" value=\"%s\"></form></td>";
 
-		$row .= "<tr style=\"display:none\"><td>&nbsp;</td>";
+		$row .= "<tr><td>&nbsp;</td>";
 		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
-			$extraInput = "", $action = "delete", $label = "Delete");
-		$row .= $compressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gzip", $label = "Compress");
-		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip", $label = "Unzip");
-		$row .= "</tr><tr style=\"display:none\"><td>&nbsp;</td><td>&nbsp;</td>";
-		$row .= $deCompressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gunzip", $label = "De-compress");
+			$extraInput = "", $action = "delete");
+		$row .= $compressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gzip");
+		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip");
+		$row .= "</tr><tr><td>&nbsp;</td><td>&nbsp;</td>";
+		$row .= $deCompressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gunzip");
 		$row .= "<td>&nbsp;</td></tr>";
 
 		return $row;
@@ -207,7 +204,16 @@ class ViewResultsController extends Controller {
 			var displayDiv = $('#file_preview');
 			displayDiv.css('display', 'block');
 			displayDiv.load(url);}
-			$(function() {var hash = window.location.hash;$(hash + ' a.more').click();});";
+			$(function() {
+				$('div.form td').each(function() {
+					$(this).width($(this).width());
+				});
+				$('a.more').click();
+				var hash = window.location.hash;
+				if(hash) {
+					$(hash + ' a.more').click();
+				}
+			});";
 	}
 	public function getScriptLibraries() {
 		return array();

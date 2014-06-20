@@ -37,14 +37,15 @@ $link = '#003366'; // bluish
 
 		a{color:<?php echo $link?>;cursor:pointer;}
 		a:link {color:<?php echo $link?>;text-decoration:none;font-style:italic;}
-		a:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
+		a:hover, input[type="submit"]:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
 		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;white-space:nowrap;margin:.25em}
 		a.button:active {border:2px <?php echo $internalBorder?> inset;}
 		button{background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset}
-		button:active{border:2px <?php echo $internalBorder?> inset}
+		button:active, input[type="submit"]:active {border:2px <?php echo $internalBorder?> inset}
 		label{display:block;margin:.5em 0em;}
 		input,select{background-color:<?php echo $neutralPale?>}
 		input[type="text"],input[type="file"],select{border-width:1px;border-color:<?php echo $internalBorder?>}
+		input[type="submit"]{border: 2px <?php echo $internalBorder?> outset;font-size:.8em;margin:.25em;color:<?php echo $link?>}
 		input[disabled],select[disabled]{background-color:<?php echo $darkBackground?>;}
 		optgroup.big{font-size:1.25em;font-weight:bold}
 
