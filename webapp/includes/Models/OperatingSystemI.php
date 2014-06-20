@@ -17,4 +17,5 @@ interface OperatingSystemI {
 	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function unzipFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function compressFile(ProjectI $project, $fileName, $isUploaded, $runId);
+	public function decompressFile(ProjectI $project, $fileName, $isUploaded, $runId);
 }

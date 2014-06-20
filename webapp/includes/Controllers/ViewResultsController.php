@@ -16,7 +16,7 @@ class ViewResultsController extends Controller {
 		}
 
 		// TODO add action input
-		if (!isset($_POST['delete']) && !isset($_POST['unzip']) && !isset($_POST['gzip'])) {
+		if (!isset($_POST['delete']) && !isset($_POST['unzip']) && !isset($_POST['gzip']) && !isset($_POST['gunzip'])) {
 			return;
 		}
 
@@ -74,6 +74,24 @@ class ViewResultsController extends Controller {
 					$this->project->compressGeneratedFile($_POST['gzip'], $_POST['run']);
 				}
 				$this->result = "Successfully compressed file: " . htmlentities($_POST['gzip']);
+			}
+			catch (\Exception $ex) {
+				if ($ex instanceof \Models\OperatingSystemException) {
+					error_log($ex->getConsoleOutput());
+				}
+				$this->isResultError = true;
+				$this->result = $ex->getMessage();
+			}
+		}
+		else if (isset($_POST['gunzip'])) {
+			try {
+				if ($isUploaded) {
+					$this->project->decompressUploadedFile($_POST['gunzip']);
+				}
+				else {
+					$this->project->decompressGeneratedFile($_POST['gunzip'], $_POST['run']);
+				}
+				$this->result = "Successfully de-compressed file: " . htmlentities($_POST['gunzip']);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -154,18 +172,19 @@ class ViewResultsController extends Controller {
 		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
-			<td><a class=\"button\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500)\">More...</a></td></tr>";
+			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";
 
-		$targetHtmlRow = "result_file_" . (($rowHtmlId == 0) ? 0 : $rowHtmlId - 1);
 		$fileTypeInput = ($isUploaded) ? "<input type=\"hidden\" name=\"uploaded\" value=\"true\">" : "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
-		$genericForm = "<td><form action=\"#{$targetHtmlRow}\" method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
+		$genericForm = "<td><form action=\"#result_file_{$rowHtmlId}\" method=\"POST\" %s>{$fileTypeInput}%s<button type=\"submit\" name=\"%s\" value=\"{$fileName}\">%s</button></form></td>";
 
 		$row .= "<tr style=\"display:none\"><td>&nbsp;</td>";
 		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
 			$extraInput = "", $action = "delete", $label = "Delete");
 		$row .= $compressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gzip", $label = "Compress");
 		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip", $label = "Unzip");
-		$row .= "</tr>\n";
+		$row .= "</tr><tr style=\"display:none\"><td>&nbsp;</td><td>&nbsp;</td>";
+		$row .= $deCompressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gunzip", $label = "De-compress");
+		$row .= "<td>&nbsp;</td></tr>";
 
 		return $row;
 	}
@@ -178,15 +197,17 @@ class ViewResultsController extends Controller {
 			div.form table{border-collapse:collapse;margin:0px;width:100%}
 			div.form td{padding:.5em;white-space:nowrap}
 			div.form tr{background-color:#FFF6B2}
-			div.form tr:nth-child(4n+1){background-color:#FFFFE0}
-			div.form tr:nth-child(4n+2){background-color:#FFFFE0}
+			div.form tr:nth-child(6n+1){background-color:#FFFFE0}
+			div.form tr:nth-child(6n+2){background-color:#FFFFE0}
+			div.form tr:nth-child(6n+3){background-color:#FFFFE0}
 			div.form button{padding:.25em;margin:.25em;font-size:.80em}";
 	}
 	public function renderSpecificScript() {
 		return "function previewFile(url){
 			var displayDiv = $('#file_preview');
 			displayDiv.css('display', 'block');
-			displayDiv.load(url);}";
+			displayDiv.load(url);}
+			$(function() {var hash = window.location.hash;$(hash + ' a.more').click();});";
 	}
 	public function getScriptLibraries() {
 		return array();
