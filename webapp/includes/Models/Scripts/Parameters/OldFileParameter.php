@@ -11,6 +11,7 @@ class OldFileParameter extends DefaultParameter {
 		$this->value = $default;
 	}
 	public function renderForForm($disabled) {
+		$helper = \Utils\Helper::getHelper();
 		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
 		$output = "{$this->name} <a onclick=\"paramHelp('{$this->name}')\">&amp;</a><select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
@@ -30,7 +31,7 @@ class OldFileParameter extends DefaultParameter {
 				foreach ($fileNames as $fileName) {
 					$valueAttr = "../uploads/{$fileName}";
 					$selected = ($this->value == $valueAttr) ? " selected" : "";
-					$output .= "<option value=\"{$valueAttr}\"{$selected}>uploads/" . htmlentities($fileName) . "</option>\n";
+					$output .= "<option value=\"{$valueAttr}\"{$selected}>uploads/" . $helper->htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -51,7 +52,7 @@ class OldFileParameter extends DefaultParameter {
 				foreach ($fileNames as $fileName) {
 					$valueAttr = "../r{$runId}/{$fileName}";
 					$selected = ($this->value == $valueAttr) ? " selected" : "";
-					$output .= "<option value=\"{$valueAttr}\"{$selected}>generated/" . htmlentities($fileName) . "</option>\n";
+					$output .= "<option value=\"{$valueAttr}\"{$selected}>generated/" . $helper->htmlentities($fileName) . "</option>\n";
 				}
 				$output .= "</optgroup>\n";
 			}
@@ -64,7 +65,7 @@ class OldFileParameter extends DefaultParameter {
 
 			foreach ($builtInFiles as $fileName) {
 				$selected = ($this->value == $fileName) ? " selected" : "";
-				$output .= "<option value=\"{$fileName}\"{$selected}>" . htmlentities($fileName) . "</option>\n";
+				$output .= "<option value=\"{$fileName}\"{$selected}>" . $helper->htmlentities($fileName) . "</option>\n";
 			}
 		}
 

@@ -23,6 +23,7 @@ class SelectProjectController extends Controller {
 	}
 
 	public function parseInput() {
+		$helper = \Utils\Helper::getHelper();
 		if (!$this->username) {
 			$this->isResultError = true;
 			$this->result = "You cannot choose a project if you aren't logged in.";
@@ -47,7 +48,7 @@ class SelectProjectController extends Controller {
 				try {
 					$project->beginProject();
 					$this->projects[] = $project;
-					$this->result = "Successfully created project: " . htmlentities($projectName);
+					$this->result = "Successfully created project: " . $helper->htmlentities($projectName);
 					$_SESSION['project_id'] = $project->getId();
 					$this->project = $project;
 				}
@@ -63,7 +64,7 @@ class SelectProjectController extends Controller {
 			$projectExists = $this->projectIdExists($projectId);
 			if ($projectExists) { 
 				$project = $this->workflow->findProject($this->username, $projectId);
-				$this->result = "Project selected: " . htmlentities($project->getName());
+				$this->result = "Project selected: " . $helper->htmlentities($project->getName());
 				$_SESSION['project_id'] = $projectId;
 				$this->project = $project;
 			}
@@ -96,6 +97,7 @@ class SelectProjectController extends Controller {
 	}
 
 	public function renderForm() {
+		$helper = \Utils\Helper::getHelper();
 		$selectForm = "";
 		if (!empty($this->projects)) {
 			$selectForm = "
@@ -106,7 +108,7 @@ class SelectProjectController extends Controller {
 			foreach ($this->projects as $project) {
 				$checkedName = ($this->project) ? $this->project->getName() : "";
 				$checked = ($checkedName == $project->getName()) ? " checked" : "";
-				$projectName = htmlentities($project->getName());
+				$projectName = $helper->htmlentities($project->getName());
 				$selectForm .= "<label class=\"radio\" for=\"project\">
 					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$this->disabled}{$checked}>{$projectName}</label>";
 			}

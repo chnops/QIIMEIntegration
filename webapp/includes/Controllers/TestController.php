@@ -18,22 +18,11 @@ class TestController extends Controller {
 	public function renderInstructions() {
 		ob_start();
 
-		echo "<p>Testing table row selectors</p>";
+		echo "<p>Testing htmlentities</p>";
 
-		echo "<style>
-			div.form table{border-collapse:collapse;margin:0px;width:100%}
-			div.form td{padding:.5em;white-space:nowrap}
-			div.form tr:nth-child(4n+1){background-color:#FFFFE0}
-			div.form tr:nth-child(4n+2){background-color:#FFFFE0}
-			</style>";
-		echo "<div class=\"form\" style=\"width:100%\"><table>";
-
-		for ($i = 0 ; $i < 100; $i++) {
-			$display = $i + 1;
-			echo "<tr><td>{$display}</td></tr>";
-		}
-
-		echo "</table></div>";
+		echo "if false: " . htmlentities(false) . "<br/>";
+		echo "if 0: " . htmlentities(0) . "<br/>";
+		echo "if empty: " . htmlentities("") . "<br/>";
 
 		return ob_get_clean();
 	}

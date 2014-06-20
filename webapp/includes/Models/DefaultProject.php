@@ -202,6 +202,7 @@ abstract class DefaultProject implements ProjectI {
 	
 	public function getPastScriptRuns() {
 		if (empty($this->pastScriptRuns)) {
+			$helper = \Utils\Helper::getHelper();
 			$pastRunsRaw = $this->database->getPastRuns($this->owner, $this->id);
 			foreach ($pastRunsRaw as $run) {
 				$runFileNames = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $run['id']);
@@ -211,7 +212,7 @@ abstract class DefaultProject implements ProjectI {
 					"name" => $run['script_name'],
 					"input" => $run['script_string'],
 					"file_names" => $runFileNames,
-					"output" => $run['output'],
+					"output" => $helper->htmlentities($run['output']),
 					"version" => $run['version'],
 				);
 			}

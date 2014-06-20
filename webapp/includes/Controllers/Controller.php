@@ -47,10 +47,11 @@ abstract class Controller {
 		if (!$this->username) {
 			return "You are not logged on.";
 		}
-		$output =  "You are currently logged in as <strong>" . htmlentities($this->username) . "</strong>";
+		$helper = \Utils\Helper::getHelper();
+		$output =  "You are currently logged in as <strong>" . $helper->htmlentities($this->username) . "</strong>";
 
 		if ($this->project) {
-			$output .= ", and you have selected the project <strong>" . htmlentities($this->project->getName()) . "</strong>";
+			$output .= ", and you have selected the project <strong>" . $helper->htmlentities($this->project->getName()) . "</strong>";
 		}
 		else {
 			$output .= ", but <strong>you have not selected a project.</strong>";

@@ -30,6 +30,7 @@ class RunScriptsController extends Controller {
 		$helper = \Utils\Helper::getHelper();
 		$pastScriptRunsFormatted = $helper->categorizeArray($pastScriptRuns, 'name');
 
+		$helper = \Utils\Helper::getHelper();
 		$output = "";
 		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {
 			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
@@ -41,11 +42,11 @@ class RunScriptsController extends Controller {
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
 				$output .= "<li><strong>Run {$run['id']}</strong><br/>";
 				$output .= "<strong>Script name:</strong> {$run['name']}<br/>";
-				$output .= "<strong>User input:</strong> " . htmlentities($run['input']) . "<br/>";
+				$output .= "<strong>User input:</strong> " . $helper->htmlentities($run['input']) . "<br/>";
 
 				$output .= "<strong>Generated files:</strong><ul>";
 				foreach ($run['file_names'] as $fileName) {
-					$output .= "<li>" . htmlentities($fileName) . "</li>";
+					$output .= "<li>" . $helper->htmlentities($fileName) . "</li>";
 				}
 				$output .= "</ul>";
 

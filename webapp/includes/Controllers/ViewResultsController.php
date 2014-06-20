@@ -27,6 +27,8 @@ class ViewResultsController extends Controller {
 			$this->result = "Run id must be numeric";
 		}
 		$isUploaded = ($run == -1);
+		$helper = \Utils\Helper::getHelper();
+		$fileDisplay = $helper->htmlentities($file);
 
 		if ($action == 'delete') {
 			try {
@@ -36,7 +38,7 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->deleteGeneratedFile($file, $run);
 				}
-				$this->result = "File deleted: " . htmlentities($file);
+				$this->result = "File deleted: " . $fileDisplay;
 			}
 			catch (\Exception $ex) {
 				$this->isResultError = true;
@@ -51,7 +53,7 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->unzipGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully unzipped file: " . htmlentities($run);
+				$this->result = "Successfully unzipped file: " . $fileDisplay; 
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -69,7 +71,7 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->compressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully compressed file: " . htmlentities($file);
+				$this->result = "Successfully compressed file: " . $fileDisplay;
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -87,7 +89,7 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->decompressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully de-compressed file: " . htmlentities($file);
+				$this->result = "Successfully de-compressed file: " . $fileDisplay;
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -103,10 +105,11 @@ class ViewResultsController extends Controller {
 			return "<p>In order to view results, you must <a href=\"\">log in</a> and <a href=\"\">select a project</a></p>";
 		}
 
-		$output = "<h3>{$this->project->getName()}</h3>";
+		$helper = \Utils\Helper::getHelper();
+		$output = "<h3>" . $helper->htmlentities($this->project->getName()) . "</h3>";
 		$output .= "<ul>
-			<li>Owner: {$this->project->getOwner()}</li>
-			<li>Unique id: {$this->project->getId()}</li>
+			<li>Owner:  " . $helper->htmlentities($this->project->getOwner()) . "</li>
+			<li>Unique id: " . $helper->htmlentities($this->project->getId()) . "</li>
 			</ul>";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
@@ -165,7 +168,8 @@ class ViewResultsController extends Controller {
 	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&run={$runId}";
 
-		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . htmlentities($fileName) . " ({$fileStatus})</td>
+		$helper = \Utils\Helper::getHelper();	
+		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
 			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";

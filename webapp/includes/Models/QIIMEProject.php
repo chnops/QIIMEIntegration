@@ -93,6 +93,7 @@ class QIIMEProject extends DefaultProject {
 		);
 	}
 	public function runScript(array $allInput) {
+		$helper = \Utils\Helper::getHelper();
 		$this->generatedFiles = array();
 		$this->pastScriptRuns = array();
 
@@ -100,7 +101,7 @@ class QIIMEProject extends DefaultProject {
 		$scriptId = $allInput['script'];
 		unset($allInput['script']);
 		if (!isset($scripts[$scriptId])) {
-			throw new \Exception("Unable to find script: " . htmlentities($scriptId));
+			throw new \Exception("Unable to find script: " . $helper->htmlentities($scriptId));
 		}
 		$script = $scripts[$scriptId];
 
@@ -136,14 +137,14 @@ class QIIMEProject extends DefaultProject {
 			$result .= "<br/>Script run successful!";
 			$codeOutput = trim($codeOutput);
 			if ($codeOutput) {
-				$result .= "<br/>Here is the output from the console:<br/>" . htmlentities($codeOutput);
+				$result .= "<br/>Here is the output from the console:<br/>" . $helper->htmlentities($codeOutput);
 			}
 
 		}
 		catch (OperatingSystemException $ex) {
 			$consoleError = true;
 			$codeOutput = $ex->getConsoleOutput();
-			$result .= "<br/>There was a problem with the operating system: " . htmlentities(trim($ex->getMessage()));
+			$result .= "<br/>There was a problem with the operating system: " . $helper->htmlentities(trim($ex->getMessage()));
 		}
 
 		$outputSaveResult = $this->database->addRunResults($runId, $codeOutput, $version);

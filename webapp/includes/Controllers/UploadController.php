@@ -41,7 +41,7 @@ class UploadController extends Controller {
 		foreach ($previousFilesFormatted as $fileType => $files) {
 			$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><ul>\n";
 			foreach ($files as $file) {
-				$output .= "<li>" . htmlentities($file['name']) . " ({$file['status']})</li>\n";
+				$output .= "<li>" . $helper->htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
 			$output .= "</ul></div>\n";
 		}
@@ -113,15 +113,17 @@ class UploadController extends Controller {
 	}
 
 	private function downloadFile($url, $fileName, \Models\FileType $fileType) {
+		$helper = \Utils\Helper::getHelper();
 		$output = "File downloaded successfully.";
 		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $fileType);
 		if ($consoleOutput) {
-			$output .= "<br/>The console returned the following output:<br/>" . htmlentities($consoleOutput);
+			$output .= "<br/>The console returned the following output:<br/>" . $helper->htmlentities($consoleOutput);
 		}
 		return $output;
 	}
 
 	private function uploadFile(array $file, \Models\FileType $fileType) {
+		$helper = \Utils\Helper::getHelper();
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
 			$fileUploadErrors = new FileUploadErrors();
@@ -134,7 +136,7 @@ class UploadController extends Controller {
 		$tmpName = $file['tmp_name'];
 		try {
 			$this->project->receiveUploadedFile($givenName, $tmpName, $fileType);
-			$this->result = "File " . htmlentities($givenName) . " successfully uploaded!";
+			$this->result = "File " . $helper->htmlentities($givenName) . " successfully uploaded!";
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
