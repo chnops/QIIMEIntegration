@@ -11,15 +11,13 @@ class UploadController extends Controller {
 	private $url = "";
 
 	private function getFileType() {
-		if (!$this->project) {
-			return "";
-		}
 		if (!$this->fileType) {
+			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 			if (isset($_POST['type'])) {
-				$this->fileType = $this->project->getFileTypeFromHtmlId($_POST['type']);
+				$this->fileType = $project->getFileTypeFromHtmlId($_POST['type']);
 			}
 			else {
-				$fileTypes = $this->project->getFileTypes();
+				$fileTypes = $project->getFileTypes();
 				$this->fileType = $fileTypes[0];
 			}
 		}
