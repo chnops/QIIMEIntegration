@@ -61,7 +61,7 @@ class ViewResultsController extends Controller {
 				$this->result = $ex->getMessage();
 			}
 		}
-		else if ($action == 'gzip')) {
+		else if ($action == 'gzip') {
 			try {
 				if ($isUploaded) {
 					$this->project->compressUploadedFile($file);
@@ -79,7 +79,7 @@ class ViewResultsController extends Controller {
 				$this->result = $ex->getMessage();
 			}
 		}
-		else if ($action == 'gunzip')) {
+		else if ($action == 'gunzip') {
 			try {
 				if ($isUploaded) {
 					$this->project->decompressUploadedFile($file);
@@ -100,7 +100,7 @@ class ViewResultsController extends Controller {
 	}
 	public function retrievePastResults() {
 		if (!$this->project) {
-			return "<p>In order to view results, you much <a href=\"\">log ing</a> and <a href=\"\">select a project</a></p>";
+			return "<p>In order to view results, you must <a href=\"\">log in</a> and <a href=\"\">select a project</a></p>";
 		}
 
 		$output = "<h3>{$this->project->getName()}</h3>";
