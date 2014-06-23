@@ -10,11 +10,11 @@ class OldFileParameter extends DefaultParameter {
 		$this->project = $project;
 		$this->value = $default;
 	}
-	public function renderForForm($disabled) {
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		$helper = \Utils\Helper::getHelper();
 		$disabledString = ($disabled) ? " disabled" : "";
 		$helper = \Utils\Helper::getHelper();
-		$output = "{$this->name} <a onclick=\"paramHelp('{$this->name}')\">&amp;</a><select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
+		$output = "{$this->name} <a class=\"param_help\" id=\"{$this->getJsVar($script->getJsVar())}\">&amp;</a><select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		if (!empty($uploadedFiles)) {

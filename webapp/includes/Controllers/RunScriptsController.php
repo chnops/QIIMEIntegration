@@ -8,16 +8,7 @@ class RunScriptsController extends Controller {
 		return "Run Scripts";
 	}
 	private $scriptId = "";
-
-	public function getContent() {
-		ob_start();
-		include 'views/content.php';
-		$output = ob_get_clean();
-		return $output;// . "<div id=\"parameter_help_tracks\" style=\"display:inline-block;border-width:0px 1px;height:100px;margin-left:1em\"
-//			ondblclick=\"var anchor_pos=$('#parameter_help_tracks').position();event=jQuery.event.fix(event);$('#parameter_help').css('top',event.pageY - anchor_pos.top);\">
-//			<div id=\"parameter_help\" class=\"draggable\" style=\"margin:.5em -.75em;white-space:nowrap;cursor:pointer\">Parameter help</div></div>";
-//		TODO re-implement
-	}
+	
 	public function retrievePastResults() {
 		if (!$this->project) {
 			return "";
@@ -106,8 +97,8 @@ class RunScriptsController extends Controller {
 			$project = $this->workflow->getNewProject();
 			$shouldBeDisabled = true;
 		}
-		$scripts = $project->getScripts();
 		$form = "";
+		$scripts = $project->getScripts();
 		foreach ($scripts as $script) {
 			$form .= "<div class=\"hideable script_form\" id=\"form_{$script->getHtmlId()}\">{$script->renderAsForm($shouldBeDisabled)}</div>\n";
 		}
@@ -137,16 +128,27 @@ class RunScriptsController extends Controller {
 			table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
 			table.either_or td{padding:.25em;text-align:center}
 			table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
-			table.either_or td:not(:first-child) {border-left:1px solid #999966}";
+			table.either_or td:not(:first-child) {border-left:1px solid #999966}
+			#per_param_help{white-space:pre-line;overflow:auto}";
 	}
 	public function renderSpecificScript() {
-		$onLoadJavascript = "hideableFields=['form', 'help', 'past_results'];";
+		$displayHideables= "hideableFields=['form', 'help', 'past_results'];";
 		if ($this->scriptId) {
-			$onLoadJavascript .= "displayHideables('{$this->scriptId}');";
+			$displayHideables.= "displayHideables('{$this->scriptId}');";
 		}
-		return "window.onload=function(){{$onLoadJavascript}};";
+		$perParamHelp = "$('.param_help').click(function() {
+		   	$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });";
+		return "$(function() {{$displayHideables};{$perParamHelp}});";
 	}
 	public function getScriptLibraries() {
 		return array("parameter_relationships.js");
+	}
+
+	public function getExtraHtml($marker) {
+		if ($marker == 'post_help') {
+			return "<p>Parameter-specific help (<a onclick=\"hideMe($(this).parent().next());\">hide</a>)</p>
+				<div id=\"per_param_help\"></div>";
+		}
+		return "";
 	}
 }

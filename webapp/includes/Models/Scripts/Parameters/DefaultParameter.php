@@ -29,9 +29,10 @@ class DefaultParameter implements ParameterI {
 		}
 		return "";
 	}
-	public function renderForForm($disabled) {
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		$disabledString = ($disabled) ? " disabled" : "";
-		return "<label for=\"{$this->name}\">{$this->name} <a onclick=\"paramHelp('{$this->name}');\">&amp;</a><input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"{$disabledString}/></label>";
+		return "<label for=\"{$this->name}\">{$this->name} <a class=\"param_help\" id=\"{$this->getJsVar($script->getJsVar())}\">&amp;</a>
+			<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"{$disabledString}/></label>";
 	}
 	public function renderFormScript($formJsVar, $disabled) {
 		if ($disabled) {

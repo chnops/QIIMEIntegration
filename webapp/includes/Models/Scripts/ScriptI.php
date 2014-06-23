@@ -8,6 +8,7 @@ interface ScriptI {
 
 	// Dumb accessors
 	public function getParameters();
+	public function getJsVar();
 	// (script specific)
 	public function getScriptName();
 	public function getScriptTitle();

@@ -4,7 +4,7 @@ namespace Models\Scripts\Parameters;
 
 interface ParameterI {
 	public function renderForOperatingSystem();
-	public function renderForForm($disabled);
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script);
 	public function renderFormScript($formJsVar, $disabled);
 	public function getJsVar($formJsVar);
 

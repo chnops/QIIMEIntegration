@@ -30,7 +30,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$form = "<form method=\"POST\"><h4>{$this->getScriptTitle()} - {$this->getScriptName()}</h4>\n";
 		foreach ($this->getParameters() as $parameter) {
-			$form .= $parameter->renderForForm($disabled) . "\n";
+			$form .= $parameter->renderForForm($disabled, $this) . "\n";
 		}
 
 		$form .= "<input type=\"hidden\" name=\"step\" value=\"run\"{$disabledString}/>
@@ -38,7 +38,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			<button type=\"submit\"{$disabledString}>Run</button>\n</form>";
 
 		if (!$disabled) {
-			$formJsVar = "js_" . $this->getHtmlId();
+			$formJsVar = $this->getJsVar();
 			$form .= "<script type=\"text/javascript\">\nvar {$formJsVar} = $('div#form_{$this->getHtmlId()} form');\n";
 			$triggerScript = "";
 			foreach ($this->getParameters() as $parameter) {
@@ -50,6 +50,9 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 			$form .= $triggerScript . "</script>\n";
 		}
 		return $form;
+	}
+	public function getJsvar() {
+		return "js_" . $this->getHtmlId();
 	}
 
 	public function acceptInput(array $input) {

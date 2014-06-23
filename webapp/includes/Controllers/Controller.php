@@ -87,4 +87,7 @@ abstract class Controller {
 		$this->parseInput();
 		$this->renderOutput();
 	}
+	public function getExtraHtml($marker) {
+		return "";
+	}
 }

@@ -14,7 +14,7 @@ class HelpParameter extends DefaultParameter {
 	public function renderForOperatingSystem() {
 		return "";
 	}
-	public function renderForForm($disabled) {
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		return "<a href=\"public/manual/{$this->script->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
 	}
 

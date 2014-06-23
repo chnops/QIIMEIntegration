@@ -10,7 +10,7 @@ class Label extends DefaultParameter {
 	public function renderForOperatingSystem() {
 		return "";
 	}
-	public function renderForForm($disabled) {
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		return "<p><strong>{$this->value}</strong></p>\n";
 	}
 

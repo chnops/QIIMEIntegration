@@ -25,9 +25,9 @@ $link = '#003366'; // bluish
 		div#navigation table td{border-width:0px 0px 0px 1px;padding:0em .5em;border-color:<?php echo $internalBorder?>}
 		div#navigation table td:first-child {border-left:none}
 
-		div#content,div#help{background-color:<?php echo $neutral?>;border-width:1.5px;margin:.25em .5em;padding:1em;}
+		div#content,div#help,div#post_help{background-color:<?php echo $neutral?>;border-width:1.5px;margin:.25em .5em;padding:1em;}
 		div#content{width:65%;float:left;display:inline;margin-left:1.5em}
-		div#help{width:25%;float:left;display:inline}
+		div#help,div#post_help{width:25%;float:left;display:inline}
 		div#session_data{border-width:0px 0px 1px 1px;border-color:<?php echo $internalBorder?>;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
 		div#content h2{margin-bottom:.5em}
 		div#instructions {margin-bottom:1em}
@@ -58,7 +58,6 @@ $link = '#003366'; // bluish
 		.accordion h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
 		.accordion h4:active {border-style:inset}
 		.accordion div{background-color:<?php echo $neutralPale?>;margin-left:.5em;border-width:1px;padding:0em}
-		.draggable{padding:.5em;background-color:#ffffcc;border-width:1px}
 	</style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
@@ -77,17 +76,9 @@ function displayHideables(hideableToDisplayId) {
 	}
 	displayedHideableId = hideableToDisplayId;
 }
-function paramHelp(text) {
-	$('#parameter_help').html("Parameter help: " + text);
-}
 	$(function() {
 		var accordionContainer = $('.accordion').parent();
 		accordionContainer.width(accordionContainer.width());
-		$('.draggable').draggable({
-			scroll: false,
-			axis: "y",
-			containment: "parent",
-		});
 	})
 <?php echo $this->renderSpecificScript()?>
 </script>
@@ -112,7 +103,11 @@ foreach ($steps as $key => $step) {
 <?php $help = $this->renderHelp();
 if ($help):?>
 <div id="help"><em>Help (<a onclick="hideMe($(this).parent().next())">hide</a>)</em><div><?php echo $help;?></div></div>
-<?php endif; ?>
+<?php endif;
+$postHelp = $this->getExtraHtml('post_help');
+if ($postHelp) {
+echo "<div id=\"post_help\">{$postHelp}</div>";
+}?>
 <div id="footer"><h3>Please remember to <a href="http://qiime.org" target="_blank">cite QIIME</a></h3></div> 
 </body>
 </html>

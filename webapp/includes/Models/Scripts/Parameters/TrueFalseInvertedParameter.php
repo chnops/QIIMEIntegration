@@ -15,10 +15,11 @@ class TrueFalseInvertedParameter extends DefaultParameter {
 			return "";
 		}
 	}
-	public function renderForForm($disabled) {
+	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		$disabledString = ($disabled) ? " disabled" : "";
 		$checked = ($this->value) ? " checked" : "";
-		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name} <a onclick=\"paramHelp('{$this->name}')\">&amp;</a></label>";
+		return "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"{$checked}{$disabledString}/> {$this->name}
+		   <a class=\"param_help\" id=\"{$this->getJsVar($script->getJsVar())}\">&amp;</a></label>";
 	}
 
 	public function acceptInput(array $input) {
