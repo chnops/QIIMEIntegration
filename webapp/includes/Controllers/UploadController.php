@@ -183,11 +183,12 @@ class UploadController extends Controller {
 		return $output;
 	}
 	public function renderHelp() {
-		$help = "<p>There are three types of files QIIME uses:
+		$help = "<p>There are four types of files QIIME uses:
 			<ol>
 			<li>A map file</li>
 			<li>A fasta formatted sequence file</li>
 			<li>A sequence quality file</li>
+			<li>A fastq sequence-quality file</li>
 			</ol></p>";
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 		$fileTypes = $project->getFileTypes();

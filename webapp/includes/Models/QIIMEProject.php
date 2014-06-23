@@ -90,6 +90,7 @@ class QIIMEProject extends DefaultProject {
 			new MapFileType(),
 			new SequenceFileType(),
 			new SequenceQualityFileType(),
+			new FastqFileType(),
 		);
 	}
 	public function runScript(array $allInput) {
