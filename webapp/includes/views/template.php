@@ -3,83 +3,12 @@
 <head>
 	<title><?php echo $this->getSubTitle() ?></title>
 	<meta charset="UTF-8">
-	<?php
-$darkBackground = '#999966'; // dark grey
-$internalBorder = '#666633'; // greyish green
-$neutral = '#ffcc66'; // yellowish
-$neutralPale = '#ffffcc'; // yellowish-white
-$striking = '#cc0000'; // red
-$text = '#330000'; // close to black
-$error = '#cc6600'; // orange
-$link = '#003366'; // bluish
-	?>
-	<style>
-		body {padding:0px;margin:0px;background-color:<?php echo $darkBackground?>;color:<?php echo $text?>}
-		body *{border-style:solid;border-width:0px}
-		div#banner,div#footer,div#navigation{background-color:<?php echo $striking?>;width:97%;border-width:1.5px;float:left;margin:.25em .5em;padding:0em .5em;}
-		div#banner{margin-bottom:0em;}
-		div#banner h1, div#banner h2{float:left;display:inline;}
-		div#banner h2{float:right;font-style:italic;}
-		div#navigation{background-color:<?php echo $neutral?>;border-top:none;margin-top:0em}
-		div#navigation table{border-width:0px 1px;margin-right:auto;margin-left:auto;border-color:<?php echo $internalBorder?>}
-		div#navigation table td{border-width:0px 0px 0px 1px;padding:0em .5em;border-color:<?php echo $internalBorder?>}
-		div#navigation table td:first-child {border-left:none}
-
-		div#content,div#help,div#post_help{background-color:<?php echo $neutral?>;border-width:1.5px;margin:.25em .5em;padding:1em;}
-		div#content{width:65%;float:left;display:inline;margin-left:1.5em}
-		div#help,div#post_help{width:25%;float:left;display:inline}
-		div#session_data{border-width:0px 0px 1px 1px;border-color:<?php echo $internalBorder?>;font-size:.9em;font-style:italic;display:inline-block;padding-left:.25em}
-		div#content h2{margin-bottom:.5em}
-		div#instructions {margin-bottom:1em}
-		div#content div.form,div#result,div#past_results{border-width:1px;border-color:<?php echo $internalBorder?>;display:inline-block;margin-left:2.5em;padding:1em;overflow:auto;max-width:90%}
-		div#result{background-color:<?php echo $neutralPale?>}
-		div#result.error{background-color:<?php echo $error?>}
-
-		a{color:<?php echo $link?>;cursor:pointer;}
-		a:link {color:<?php echo $link?>;text-decoration:none;font-style:italic;}
-		a:hover, input[type="submit"]:hover {background-color:<?php echo $neutralPale?>;text-decoration:underline;}
-		a.button{font-style:normal;background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset;padding:.25em;white-space:nowrap;margin:.25em}
-		a.button:active {border:2px <?php echo $internalBorder?> inset;}
-		button{background-color:<?php echo $neutralPale?>;border:2px <?php echo $internalBorder?> outset}
-		button:active, input[type="submit"]:active {border:2px <?php echo $internalBorder?> inset}
-		label{display:block;margin:.5em 0em;}
-		input,select{background-color:<?php echo $neutralPale?>}
-		input[type="text"],input[type="file"],select{border-width:1px;border-color:<?php echo $internalBorder?>}
-		input[type="submit"]{border: 2px <?php echo $internalBorder?> outset;font-size:.8em;margin:.25em;color:<?php echo $link?>}
-		input[disabled],select[disabled]{background-color:<?php echo $darkBackground?>;}
-		optgroup.big{font-size:1.25em;font-weight:bold}
-
-		div.hideable{display:none;}
-		div.file_example{border-width:1px;background-color:<?php echo $darkBackground?>;overflow:auto;font-family:monspace;padding:.25em;white-space:pre;padding:.5em;margin:.5em;}
-
-		<?php echo $this->renderSpecificStyle()?>
-
-		.accordion h4{outline:none;padding:.25em .5em;margin-bottom:.25em}
-		.accordion h4{background-color:<?php echo $neutralPale?>;margin-bottom:.25em;border-style:solid;border-width:2px;border-style:outset}
-		.accordion h4:active {border-style:inset}
-		.accordion div{background-color:<?php echo $neutralPale?>;margin-left:.5em;border-width:1px;padding:0em}
-	</style>
+	<link rel="stylesheet" href="style.css">
+<style><?php echo $this->renderSpecificStyle()?></style>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="javascript.js"></script>
 <script type="text/javascript">
-function hideMe(me) {
-	me.toggle('blind', {}, 500);
-}	
-var hideableFields = [];
-var displayedHideableId = "";
-function displayHideables(hideableToDisplayId) {
-	for (var i = 0; i < hideableFields.length; i++) {
-		var hideableToDisplay = document.getElementById(hideableFields[i] + "_" + hideableToDisplayId);
-		var displayedHideable = document.getElementById(hideableFields[i] + "_" + displayedHideableId);
-		if (displayedHideable) displayedHideable.style.display="none";
-		if (hideableToDisplay) hideableToDisplay.style.display="block";
-	}
-	displayedHideableId = hideableToDisplayId;
-}
-	$(function() {
-		var accordionContainer = $('.accordion').parent();
-		accordionContainer.width(accordionContainer.width());
-	})
 <?php echo $this->renderSpecificScript()?>
 </script>
 <?php foreach ($this->getScriptLibraries() as $lib):?>

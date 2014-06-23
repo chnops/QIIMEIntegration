@@ -34,7 +34,8 @@ class SplitLibraries extends DefaultScript {
 
 		$reversePrimers = new ChoiceParameter("--reverse_primers", "disable", array("disable", "truncate_only", "truncate_remove"));
 		$reversePrimerMismatches = new TextArgumentParameter("--reverse_primer_mismatches", "0", TextArgumentParameter::PATTERN_DIGIT);
-		$reversePrimerMismatches->excludeButAllowIf($reversePrimers);
+		$reversePrimerMismatches->excludeButAllowIf($reversePrimers, "truncate_only");
+		$reversePrimerMismatches->excludeButAllowIf($reversePrimers, "truncate_remove");
 
 		$qual = new OldFileParameter("--qual", $this->project);
 		$minQualScore = new TextArgumentParameter("--min-qual-score", "25", TextArgumentParameter::PATTERN_DIGIT);

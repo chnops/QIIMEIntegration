@@ -28,8 +28,8 @@ class PDODatabase implements DatabaseI {
 
 	public function userExists($username) {
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-			$pdoStatement->execute(array($username));
+			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE username = :name");
+			$pdoStatement->execute(array("name" => $username));
 			$result = $pdoStatement->fetchColumn(0);
 			return $result > 0;
 		}
@@ -47,8 +47,8 @@ class PDODatabase implements DatabaseI {
 			$root = $result->fetchColumn(0);
 			$root += 1;
 
-			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (?, ?)");
-			if ($pdoStatement->execute(array($username, $root))) {
+			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (:name, :root)");
+			if ($pdoStatement->execute(array("name" => $username, "root" => $root))) {
 				return $root;
 			}
 			else {
@@ -66,8 +66,8 @@ class PDODatabase implements DatabaseI {
 	}
 	public function getUserRoot($username) {
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT root FROM users WHERE username = ?");
-			$pdoStatement->execute(array($username));
+			$pdoStatement = $this->pdo->prepare("SELECT root FROM users WHERE username = :name");
+			$pdoStatement->execute(array("name" => $username));
 			return $pdoStatement->fetchColumn(0);
 		}
 		catch (\Exception $ex) {
@@ -80,8 +80,8 @@ class PDODatabase implements DatabaseI {
 
 	public function getAllProjects($username) {
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT * FROM projects WHERE owner = ?");
-			$pdoStatement->execute(array($username));
+			$pdoStatement = $this->pdo->prepare("SELECT * FROM projects WHERE owner = :owner");
+			$pdoStatement->execute(array("owner" => $username));
 			return $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
 		}
 		catch (\Exception $ex) {
@@ -94,7 +94,6 @@ class PDODatabase implements DatabaseI {
 
 	public function createProject($username, $projectName) {
 		try {
-
 			$usersProjects = $this->getAllProjects($username);
 			foreach ($usersProjects as $project) {
 				if ($projectName == $project['name']) {
@@ -103,15 +102,15 @@ class PDODatabase implements DatabaseI {
 				}
 			}
 
-			$pdoStatement = $this->pdo->prepare("SELECT id FROM projects WHERE owner = ? ORDER BY id DESC LIMIT 1");
-			$pdoStatement->execute(array($username));
+			$pdoStatement = $this->pdo->prepare("SELECT id FROM projects WHERE owner = :owner ORDER BY id DESC LIMIT 1");
+			$pdoStatement->execute(array("owner" => $username));
 			$id = $pdoStatement->fetchColumn(0);
 			$id += 1;
 
-			$pdoStatement = $this->pdo->prepare("INSERT INTO projects (id, owner, name) VALUES (:id, :owner, :name)"); 
+			$pdoStatement = $this->pdo->prepare("INSERT INTO projects (owner, id, name) VALUES (:owner, :id, :name)"); 
 			$result = $pdoStatement->execute(array(
-				"id" => "$id",
 				"owner" => $username,
+				"id" => "$id",
 				"name" => $projectName,
 			));
 			if ($result) {
@@ -133,8 +132,8 @@ class PDODatabase implements DatabaseI {
 
 	public function getProjectName($username, $projectId) {
 		try {
-			$pdoStatement = $this->pdo->prepare("SELECT name FROM projects WHERE owner = :name AND id = :id");
-			$pdoStatement->execute(array ("name" => $username, "id" => $projectId));
+			$pdoStatement = $this->pdo->prepare("SELECT name FROM projects WHERE owner = :owner AND id = :id");
+			$pdoStatement->execute(array ("owner" => $username, "id" => $projectId));
 			$result = $pdoStatement->fetchColumn(0);
 			if ($result) {
 				return $result;
@@ -152,8 +151,8 @@ class PDODatabase implements DatabaseI {
 
 	public function createUploadedFile($username, $projectId, $fileName, $fileType, $isDownload = false, $size = -1) {
 		try {
-			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_id, project_owner, name, file_type, status, approx_size)
-				VALUES (:id, :owner, :name, :fileType, :status, :size)");
+			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_owner, project_id, name, file_type, status, approx_size)
+				VALUES (:owner, :id, :name, :fileType, :status, :size)");
 			$status = ($isDownload) ? 1 : 0;
 			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName,
 				"fileType" => $fileType, "status" => $status, "size" => $size));
@@ -176,8 +175,8 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT name, file_type, description, approx_size FROM uploaded_files
 				INNER JOIN file_statuses ON uploaded_files.status = file_statuses.status
-				WHERE project_id = :id AND project_owner = :owner");
-			$pdoStatement->execute(array("id" => $projectId, "owner" => $username));
+				WHERE project_owner = :owner AND project_id = :id");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
 			$files = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
 		}
 		catch (\Exception $ex) {
@@ -191,8 +190,8 @@ class PDODatabase implements DatabaseI {
 
 	public function removeUploadedFile($username, $projectId, $fileName) {
 		try {
-			$pdoStatement = $this->pdo->prepare("DELETE FROM uploaded_files WHERE project_id = :id AND project_owner = :owner AND name = :name");
-			return $pdoStatement->execute(array("id" => $projectId, "owner" => $username, "name" => $fileName));
+			$pdoStatement = $this->pdo->prepare("DELETE FROM uploaded_files WHERE project_owner = :owner AND project_id = :id AND name = :name");
+			return $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName));
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to delete file: " . $ex->getMessage());
@@ -278,8 +277,8 @@ class PDODatabase implements DatabaseI {
 	public function uploadExists($username, $projectId, $fileName) {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM uploaded_files WHERE
-				project_owner = :owner AND project_id = :id AND name = :fileName");
-			$pdoStatement->execute(array("owner" => $username, "id" => $projectId, "fileName" => $fileName));
+				project_owner = :owner AND project_id = :id AND name = :name");
+			$pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName));
 			$fileCount = $pdoStatement->fetchColumn(0);
 			$pdoStatement->closeCursor();
 			return $fileCount == 1;
