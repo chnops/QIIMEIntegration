@@ -13,7 +13,7 @@ interface OperatingSystemI {
 
 	// TODO refactor
 	public function uploadFile(ProjectI $project, $givenName, $tmpName);
-	public function downloadFile(ProjectI $project, $url, $outputName, $onSuccess, $onFail);
+	public function downloadFile(ProjectI $project, $url, $outputName, \Database\DatabaseI $database);
 	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function unzipFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function compressFile(ProjectI $project, $fileName, $isUploaded, $runId);

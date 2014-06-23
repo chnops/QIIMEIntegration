@@ -23,7 +23,7 @@ interface DatabaseI {
 	public function addRunResults($runId, $consoleOutput, $version);
 	public function getPastRuns($username, $projectId);
 
-	public function renderCommandUploadSuccess($username, $projectId, $fileName);
-	public function renderCommandUploadFailure($username, $projectId, $fileName);
+	public function renderCommandUploadSuccess($username, $projectId, $fileName, $size);
+	public function renderCommandUploadFailure($username, $projectId, $fileName, $size);
 	public function uploadExists($username, $projectId, $fileName);
 }

@@ -255,23 +255,24 @@ class PDODatabase implements DatabaseI {
 		}
 	}
 
-	public function renderCommandUploadSuccess($username, $projectId, $fileName) {
+	public function renderCommandUploadSuccess($username, $projectId, $fileName, $size) {
 		if (!$this->uploadExists($username, $projectId, $fileName)) {
 			throw new \Exception("File not found");
 		}
-		return $this->renderCommandSetUploadStatus($username, $projectId, $fileName, 0);
+		return $this->renderCommandUpdateFile($username, $projectId, $fileName, 0, $size);
 	}
-	public function renderCommandUploadFailure($username, $projectId, $fileName) {
+	public function renderCommandUploadFailure($username, $projectId, $fileName, $size) {
 		if (!$this->uploadExists($username, $projectId, $fileName)) {
 			throw new \Exception("File not found");
 		}
-		return $this->renderCommandSetUploadStatus($username, $projectId, $fileName, 2);
+		return $this->renderCommandUpdateFile($username, $projectId, $fileName, 2, $size);
 	}
-	private function renderCommandSetUploadStatus($username, $projectId, $fileName, $status) {
-		$sql = "UPDATE uploaded_files SET status = {$status} WHERE project_owner = " . $this->pdo->quote($username) . 
+	private function renderCommandUpdateFile($username, $projectId, $fileName, $status, $size) {
+		$sql = "UPDATE uploaded_files SET status = {$status}, approx_size = " . $this->pdo->quote($size) . 
+		   	" WHERE project_owner = " . $this->pdo->quote($username) . 
 			" AND project_id = " . $this->pdo->quote($projectId) . 
 			" AND name = " . $this->pdo->quote($fileName) . ";";
-		$command = PDODatabase::$dbProgram. " " . PDODatabase::$dbFile . " " . escapeshellarg($sql);
+		$command = PDODatabase::$dbProgram. " " . PDODatabase::$dbFile . " \"" . preg_replace("/\"/", "\\\"", $sql) . "\"";
 		return $command;		
 	}
 	public function uploadExists($username, $projectId, $fileName) {

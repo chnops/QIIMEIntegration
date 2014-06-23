@@ -91,9 +91,7 @@ abstract class DefaultProject implements ProjectI {
 		}
 
 		try {	
-			$consoleOutput = $this->operatingSystem->downloadFile($this, $url, $fileName,
-				$onSuccess = $this->database->renderCommandUploadSuccess($this->owner, $this->id, $fileName),
-				$onFail = $this->database->renderCommandUploadFailure($this->owner, $this->id, $fileName));
+			$consoleOutput = $this->operatingSystem->downloadFile($this, $url, $fileName, $this->database);
 			$this->database->executeAllRequests();
 			$this->uploadedFiles = array();
 			return $consoleOutput;

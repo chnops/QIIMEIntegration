@@ -151,21 +151,27 @@ class MacOperatingSystem implements OperatingSystemI {
 			}
 			return true;
 	}
-	public function downloadFile(ProjectI $project, $url, $outputName, $onSuccess, $onFail) {
+	public function downloadFile(ProjectI $project, $url, $outputName, \Database\DatabaseI $database) {
 		ob_start();
+
 		$urlEsc = escapeshellarg($url);
+		$outputNameEsc = escapeshellarg($outputName);
+		$onSuccess = $database->renderCommandUploadSuccess($project->getOwner(), $project->getId(), $outputName, $size = "\$size");
+		$onFail = $database->renderCommandUploadFailure($project->getOwner(), $project->getId(), $outputName, $size = "\$size");
+
 		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
 			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
 			cd {$this->home}{$project->getProjectDir()}/uploads;
 			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
 			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
-				then echo 'The requested URL does not exist';
+				then echo 'The requested URL, {$urlEsc}, does not exist';
 				exit 1;
 			fi;
 			which wget &> /dev/null;
 			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
-			(wget {$urlEsc} --limit-rate=1M --quiet --output-document=" . escapeshellarg($outputName) . ";
+			(wget {$urlEsc} --limit-rate=1M --quiet --output-document={$outputNameEsc};
 				let wget_success=$?;
+				size=`wc -c {$outputNameEsc} | awk '{print $1}'`;
 				cd \$OLDPWD;
 				if [ \$wget_success -eq 0 ]; then {$onSuccess}; else {$onFail}; fi;) &> /dev/null &";
 		$returnCode = 0;

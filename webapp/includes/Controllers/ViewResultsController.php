@@ -102,7 +102,7 @@ class ViewResultsController extends Controller {
 	}
 	public function retrievePastResults() {
 		if (!$this->project) {
-			return "<p>In order to view results, you must <a href=\"\">log in</a> and <a href=\"\">select a project</a></p>";
+			return "<p>In order to view results, you must <a href=\"?step=login\">log in</a> and <a href=\"?step=select\">select a project</a></p>";
 		}
 
 		$helper = \Utils\Helper::getHelper();
@@ -168,7 +168,7 @@ class ViewResultsController extends Controller {
 	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $fileSize, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&run={$runId}";
 
-		$sizeDisclaimer = ($fileSize >= 0) ? "<em>size: {$fileSize}B</em>" : "<em>size uncertain</em>";
+		$sizeDisclaimer = ($fileSize && $fileSize >= 0) ? "<em>size: {$fileSize}B</em>" : "<em>size uncertain</em>";
 
 		$helper = \Utils\Helper::getHelper();	
 		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
