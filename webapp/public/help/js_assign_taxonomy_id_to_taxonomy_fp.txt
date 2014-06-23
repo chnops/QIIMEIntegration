@@ -1,1 +1,12 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+File path containing taxonomy-id mappings
+
+Contains identifiers specific to known OTUs. Said identifiers correspond to a reference sequence files somewhere else.
+
+Generally a built in file...
+
+/macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt for bacterial ribosomal 16S subunit sequences
+
+/macqiime/UNITe/sh_taxonomy_qiime_ver6_97_13.05.2014.txt for fungal ITS sequences
+
+<a target="_BLANK" href="http://greengenes.secondgenome.com/downloads">Read about green genes</a>
+<a target="_BLANK" href="http://unite.ut.ee/">Read about UNITe</a>

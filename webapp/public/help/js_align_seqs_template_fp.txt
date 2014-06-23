@@ -1,1 +1,12 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Alignment template file path
+
+Contains pre-aligned sequences specific to known, related OTUs.
+
+Generally a built in file...
+
+/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta for bacterial ribosomal 16S subunit sequences
+
+<a target="_BLANK" href="http://greengenes.secondgenome.com/downloads">Read about green genes</a>
+
+If you are using fungal ITS data, there is not a good pre-made alignment to use here.  We suggest using MUSCLE instead and aligning without a template.
+Unfortunately, doing so may take a long time.

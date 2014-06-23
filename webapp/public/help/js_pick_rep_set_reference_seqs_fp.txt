@@ -1,1 +1,12 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Reference sequences file path
+
+Contains sequences specific to known OTUs. Use as an alternative to de-novo OTU cluster creation.
+
+Generally a built in file...
+
+/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta for bacterial ribosomal 16S subunit sequences
+
+/macqiime/UNITe/sh_refs_qiime_ver6_97_13.05.2014.fasta for fungal ITS sequences
+
+<a target="_BLANK" href="http://greengenes.secondgenome.com/downloads">Read about green genes</a>
+<a target="_BLANK" href="http://unite.ut.ee/">Read about UNITe</a>

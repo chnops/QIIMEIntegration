@@ -1,1 +1,8 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Fasta file
+
+Contains sequence data for your samples specifically.  E. g. The result of library demultiplexing.
+
+This is not required if:
+	you picked OTUs using a reference set (green genes or UNITe)
+	you didn't allow the creation of new OTUs
+It is required otherwise.

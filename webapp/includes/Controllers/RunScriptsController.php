@@ -129,7 +129,7 @@ class RunScriptsController extends Controller {
 			table.either_or td{padding:.25em;text-align:center}
 			table.either_or tbody tr:first-child td {border-bottom:1px solid #999966}
 			table.either_or td:not(:first-child) {border-left:1px solid #999966}
-			#per_param_help{white-space:pre-line;overflow:auto}";
+			#per_param_help{white-space:pre-line;overflow:auto;border-top-width:1px}";
 	}
 	public function renderSpecificScript() {
 		$displayHideables= "hideableFields=['form', 'help', 'past_results'];";
