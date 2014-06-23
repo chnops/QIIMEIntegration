@@ -30,6 +30,7 @@ class ExtractBarcodes extends DefaultScript {
 
 		$bc2Len = new TextArgumentParameter("--bc2_len", "6", TextArgumentParameter::PATTERN_DIGIT);
 		$bc2Len->excludeButAllowIf($fastq2);
+		$bc2Len->excludeButAllowIf($inputType, "barcode_paired_stitched");
 
 		$charDelineator = new TextArgumentParameter("--char_delineator", ":", '/^\S$/');
 		$charDelineator->excludeButAllowIf($inputType, "barcode_in_label");
@@ -43,8 +44,9 @@ class ExtractBarcodes extends DefaultScript {
 
 		$disableHeaderMatch = new TrueFalseParameter("--disable_header_match");
 		$disableHeaderMatch->excludeButAllowIf($fastq2);
-		$revCompBc1 = new TrueFalseParameter("--rev_comp_bc2");
-		$revCompBc1->excludeButAllowIf($fastq2);
+		$revCompBc2 = new TrueFalseParameter("--rev_comp_bc2");
+		$revCompBc2->excludeButAllowIf($fastq2);
+		$revCompBc2->excludeButAllowIf($inputType, "barcode_paired_stitched");
 
 		array_push($this->parameters,
 			new Label("Required Parameters"),
@@ -65,7 +67,7 @@ class ExtractBarcodes extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", ".", $isDir = true),
 			new TrueFalseParameter("--rev_comp_bc1"),
-			$revCompBc1
+			$revCompBc2
 		);
 	}
 	public function getScriptName() {
