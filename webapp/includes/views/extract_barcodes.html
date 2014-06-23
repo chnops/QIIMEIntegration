@@ -26,3 +26,11 @@
 <li><a onclick="displayHideables('split_libraries_fastq')">De-multiplex libraries (fastq)</a> - This script generates a new .fastq file that has just barcodes as its sequences</li>
 </ul>
 </p>
+
+<p><strong>Here are some of the common pitfalls using this script</strong>
+<ul>
+<li>Be sure to specify the correct barcode length. The default length is 6 bases, which is frequently incorrect</li>
+<li>You may have to reverse complement the barcodes. We recommend using a --mapping_fp to perform the orientation for you.<ul>
+<li>If you have paired ends, this only works if your map file has ReversePrimers</li></ul></li>
+</ul>
+</p>

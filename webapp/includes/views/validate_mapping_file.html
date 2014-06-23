@@ -16,8 +16,8 @@
 
 <p><strong>Here are the scripts to run after this one</strong>
 <ul>
-<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - If your sequence data is multiplexed (multiple samples in one sequencing lane to save money; samples differentiated by a unique sequence barcode), you must explicitly assign each read to a sample by using this script</li>
-<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - If your sequence has paired ends (two fasta files with corresponding reads; this is likely if you used Illumina), you will need to join them using this script before you can continue the QIIME pipeline</li>
+<li><a onclick="displayHideables('split_libraries')">De-multiplex libraries</a> - If your sequence data is multiplexed (multiple samples in one sequencing lane to save money; samples differentiated by a unique sequence barcode), you must explicitly assign each read to a sample by using Split libraries</li>
+<li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - If your sequence has paired ends (two fasta files with corresponding reads; this is likely if you used Illumina), you will need to join them using Join paired ends before you can continue the QIIME pipeline</li>
 <li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - If your sequences are neither multiplexed, nor paired-ended, you can just straight to this step</li>
 </ul>
 </p>
@@ -40,3 +40,10 @@
 		<li>SampleIDs: alphanumerics periods</li>
 	</ul>
 </ul></p>
+
+<p><strong>Here are some of the common pitfalls using this script</strong>
+<ul>
+<li>If your mapping file contains illegal characters, this script will create a corrected mapping file.
+	Be sure to use that corrected version in future scripts (not the original one, which this script will not change)</li>
+</ul>
+</p>

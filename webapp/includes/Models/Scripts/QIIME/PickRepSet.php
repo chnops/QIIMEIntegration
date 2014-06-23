@@ -19,13 +19,18 @@ class PickRepSet extends DefaultScript {
 		$inputFile = new OldFileParameter("--input_file", $this->project);
 		$inputFile->requireIf();
 
+		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project, 
+			'/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta');
+		$fastaFile = new OldFileParameter("--fasta_file", $this->project);
+		$fastaFile->requireIf($referenceSeqsFp, false);
+
 		array_push($this->parameters,
 			new Label("Required Parameters"),
 			$inputFile,
 
 			new Label("Optional Parameters"),
-			new OldFileParameter("--reference_seqs_fp", $this->project),
-			new OldFileParameter("--fasta_file", $this->project), // TODO REQUIRED if not picking against a reference set
+			$referenceSeqsFp,
+			$fastaFile,
 			new ChoiceParameter("--rep_set_picking_method", "first", 
 				array("first", "random", "longest", "most_abundant")),
 

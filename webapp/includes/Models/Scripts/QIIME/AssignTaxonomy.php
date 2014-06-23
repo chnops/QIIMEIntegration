@@ -46,14 +46,13 @@ class AssignTaxonomy extends DefaultScript {
 //		$uclustSimilarity->excludeButAllowIf($assignmentMethod, "uclust");
 //		$uclustMaxAccepts->excludeButAllowIf($assignmentMethod, "uclust");
 
-		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project);
-			// TODO built in files: default: /macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt; 
+		$idToTaxonomyFp = new OldFileParameter("--id_to_taxonomy_fp", $this->project,
+			'/macqiime/greengenes/gg_13_8_otus/taxonomy/97_otu_taxonomy.txt'); 
 		$treeFp = new OldFileParameter("--tree_fp", $this->project);
 
-		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project);
-				// TODO built in files default: /macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta; 
+		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project,
+			'/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta'); 
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
-				// TODO build in files
 		$eitherBlastDatabase = $referenceSeqsFp->linkTo($blastDb);
 
 		$idToTaxonomyFp->requireIf($assignmentMethod, "blast");

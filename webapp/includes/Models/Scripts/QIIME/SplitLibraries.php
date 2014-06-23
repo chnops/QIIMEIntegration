@@ -26,6 +26,7 @@ class SplitLibraries extends DefaultScript {
 		$barcodeType = new ChoiceParameter("--barcode-type", "golay_12", array("hamming_8", "golay_12", "variable_length"));
 		$b = new TextArgumentParameter("-b", "", TextArgumentParameter::PATTERN_DIGIT);
 		$eitherBarcode = $barcodeType->linkTo($b);
+		$eitherBarcode->requireIf();
 
 		$maxAmbig = new TextArgumentParameter("--max-ambig", "6", TextArgumentParameter::PATTERN_DIGIT);
 		$truncateAmbiBases = new TrueFalseParameter("--truncate_ambi_bases");
@@ -49,9 +50,9 @@ class SplitLibraries extends DefaultScript {
 			new Label("Required Parameters"),
 			$map, 
 			$fasta, 
+			$eitherBarcode,
 			new Label("Optional Parameters - Demultiplexing"),
 			new TextArgumentParameter("--added_demultiplex_field", "", "/[^=]+/"), // TODO or run_header
-			$eitherBarcode,
 			new TrueFalseParameter("--disable_bc_correction"), // Can improve performance
 			new TextArgumentParameter("--max-barcode-errors", "1.5", TextArgumentParameter::PATTERN_NUMBER),
 			new TrueFalseParameter("--disable_primers"),

@@ -4,7 +4,7 @@
 <ul>
 <li><a onclick="displayHideables('validate_mapping_file')">Validate mapping file</a> - This script relies on a mapping file to accurately tell which samples correspond to which sequence barcodes.  You may want to check the format of your file before running this script</li>
 <li><a onclick="displayHideables('join_paired_ends')">Join paired ends</a> - This script only works on a single fasta file.  QIIME provides you a script to join paired end reads into a single file</li>
-<li><a onclick="displayHideables('extract_barcodes')">Extract barcodes</a> - If your fastq file includes barcode information, this script will create the necessary barcode read file</li>
+<li><a onclick="displayHideables('extract_barcodes')">Extract barcodes</a> - If your fastq file includes barcode information, Extract barcodes will use it to create the necessary barcode read file</li>
 </ul>
 </p>
 
@@ -23,5 +23,11 @@
 <p><strong>Here are the scripts to run after this one</strong>
 <ul>
 <li><a onclick="displayHideables('pick_otus')">Pick OTUs</a> - Once your multiplexed reads have been assigned to samples, you are ready to select OTUs</li>
+</ul>
+</p>
+
+<p><strong>Here are some of the common pitfalls using this script</strong>
+<ul>
+<li>As far as barcode types, golay_12 does not refer to all 12-length barcodes</li>
 </ul>
 </p>

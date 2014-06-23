@@ -49,7 +49,8 @@ class PickOtus extends DefaultScript {
 		$maxEValue = new TextArgumentParameter("--max_e_value", "1e-10", TextArgumentParameter::PATTERN_NUMBER);
 		$maxEValue->excludeButAllowIf($otuPickingMethod, "blast");
 
-		$refSeqsFp = new OldFileParameter("--refseqs_fp", $this->project);
+		$refSeqsFp = new OldFileParameter("--refseqs_fp", $this->project,
+			'/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta');
 		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "blast");
 		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$refSeqsFp->excludeButAllowIf($otuPickingMethod, "usearch_ref");
@@ -117,7 +118,7 @@ class PickOtus extends DefaultScript {
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
 		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); // TODO forces usearch61_sort_method = long
-				// TODO can't be used with --enable_rev_strand_matchign
+				// TODO has different exclude criteria than its linked parameter
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61");
