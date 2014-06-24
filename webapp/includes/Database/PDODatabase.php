@@ -201,7 +201,7 @@ class PDODatabase implements DatabaseI {
 		}
 	}
 
-	public function saveRun($username, $projectId, $scriptName, $scriptText) {
+	public function createRun($username, $projectId, $scriptName, $scriptText) {
 		try {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO script_runs (project_owner, project_id, script_name, script_string)
 				VALUES (:owner, :id, :name, :string)");
@@ -214,40 +214,45 @@ class PDODatabase implements DatabaseI {
 			}
 		}
 		catch (\Exception $ex) {
-			error_log("Unable to save run: " . $ex->getMessage());
+			error_log("Unable to create run: " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions
 			return false;
 		}
 	}
 
-	public function addRunResults($runId, $consoleOutput, $version) {
+	public function giveRunPid($runId, $pid) {
 		try {
-			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET output = :output, version = :version WHERE id = :id");
-			return $pdoStatement->execute(array("id" => $runId, "output" => $consoleOutput, "version" => $version));
+			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET run_status = :pid WHERE id = :id");
+			return $pdoStatement->execute(array("id" => $runId, "pid" => $pid));
 		}
 		catch (\Exception $ex) {
-			error_log("Unable to add results from run: " . $ex->getMessage());
+			error_log("Unable to give run pid: " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions
 			return false;
 		}
 	}
+	public function renderCommandRunComplete($runId) {
+		$sql = "UPDATE script_runs SET run_status = -1 WHERE id = " . $this->pdo->quote($runId);
+		return PDODatabase::$dbProgram. " " . PDODatabase::$dbFile . 
+			" \"" . preg_replace("/\"/", "\\\"", $sql) . "\"";
+	}
 
-	public function getPastRuns($username, $projectId) {
+	public function getAllRuns($username, $projectId) {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT * FROM script_runs WHERE project_owner = :owner AND project_id = :id");
 			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
 			$result = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
 			if ($result === FALSE) {
 				$errorInfo = $pdoStatement->errorInfo();
-				error_log("Unable to retrieve past runs: " . $errorInfo[2]);
+				error_log("Unable to get all runs: " . $errorInfo[2]);
 				return array();
 			}
 			return $result;
 		}
 		catch (\Exception $ex) {
-			error_log("Unable to retrieve past runs: " . $ex->getMessage());
+			error_log("Unable to get all runs: " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions
 			return array();

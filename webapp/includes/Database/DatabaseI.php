@@ -19,9 +19,10 @@ interface DatabaseI {
 	public function removeUploadedFile($username, $projectId, $fileName);
 	public function changeFileName($username, $projectId, $fileName, $newFilename);
 
-	public function saveRun($username, $projectId, $sriptName, $scriptText);
-	public function addRunResults($runId, $consoleOutput, $version);
-	public function getPastRuns($username, $projectId);
+	public function createRun($username, $projectId, $scriptName, $paramText);
+	public function giveRunPid($runId, $pid);
+	public function renderCommandRunComplete($runId);
+	public function getAllRuns($username, $projectId);
 
 	public function renderCommandUploadSuccess($username, $projectId, $fileName, $size);
 	public function renderCommandUploadFailure($username, $projectId, $fileName, $size);

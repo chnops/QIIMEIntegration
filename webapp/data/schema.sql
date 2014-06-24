@@ -37,15 +37,26 @@ CREATE TABLE IF NOT EXISTS uploaded_files (
 	);
 --TODO given_name is unique per 'project'
 --ALTER TABLE uploaded_files ADD COLUMN status INTEGER DEFAULT 0 REFERENCES file_statuses(status);
-ALTER TABLE uploaded_files ADD COLUMN approx_size INTEGER;
+--ALTER TABLE uploaded_files ADD COLUMN approx_size INTEGER;
 
 CREATE TABLE IF NOT EXISTS script_runs (
 	id INTEGER NOT NULL UNIQUE PRIMARY KEY ,
 	project_id INT(11) NOT NULL ,
 	project_owner VARCHAR(255) NOT NULL ,
 	script_name VARCHAR(255) NOT NULL ,
-	script_string TEXT NOT NULL ,
-	output TEXT ,
-	version TEXT ,
+	script_string TEXT NOT NULL , -- rename to param_string
+	output TEXT , -- delete
+	version TEXT , -- delete
 	FOREIGN KEY (project_id, project_owner) REFERENCES projects(id, owner)
 	);
+ALTER TABLE script_runs ADD COLUMN run_status INTEGER DEFAULT -1;
+ALTER TABLE script_runs ADD COLUMN deleted INTEGER DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS generated_files (
+	run_id INTEGER NOT NULL ,
+	name TEXT NOT NULL ,
+	size INTEGER DEFAULT -1 ,
+	PRIMARY KEY (run_id, name) ,
+	FOREIGN KEY (run_id) REFERENCES script_runs(id)
+	);
+-- maybe add type information
