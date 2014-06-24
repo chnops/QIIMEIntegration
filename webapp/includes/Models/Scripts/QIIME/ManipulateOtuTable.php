@@ -60,8 +60,9 @@ class ManipulateOtuTable extends DefaultScript {
 		$headerKey->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$outputMetadataId->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$processObsMetadata->excludeIf($conversionType);
-		$tableType->excludeIf($conversionType);
+		$tableType->excludeIf($conversionType, "--biom-to-classic-table");
 		$tableType->requireIf($conversionType, false);
+		$tableType->requireIf($conversionType, "__sparse_biom_to_dense_biom__dense_biom_to_sparse_biom__");
 		$tableType->dismissIf($action, "summarize-table");
 
 		array_push($this->parameters,
