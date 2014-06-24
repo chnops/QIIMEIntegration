@@ -286,4 +286,34 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return preg_replace("/\.gz/", "", $fileName);
 	}
+
+	public function runScript(ProjectI $project, $runId, \Models\Scripts\ScriptI $script, \Database\DatabaseI $database) {
+		$projectDir = $project->getProjectDir();
+		$runDir = $projectDir . "/r" . $runId;
+
+		$bashCode = "
+			mkdir {$this->home}/{$runDir};
+			if [ $? -ne 0 ]; then echo 'Unable to create run dir'; exit 1; fi;
+			cd {$this->home}/{$runDir};
+			source {$project->getEnvironmentSource()};
+			if [ $? -ne 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
+			printenv > env.txt;
+			{$script->renderVersionCommand()} >> env.txt;
+			if [ $? -ne 0 ]; then echo 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
+			jobs &> /dev/null;
+			({$script->renderCommand()};cd \$OLDPWD;{$database->renderCommandRunComplete($runId)})  >> output.txt 2>> error_log.txt &
+			job_id=`jobs -n`;
+			if [ ! -n \$job_id ]; then echo 'Unable to start the script'; exit 1; fi;
+			echo \$!;
+			";
+
+		$codeReturn = 0;
+		system($bashCode, $codeReturn);
+		if ($codeReturn) {
+			$ex = new OperatingSystemException("There was a problem initializing your script");
+			$ex->setConsoleOutput(ob_get_clean());
+			throw $ex;
+		}
+		return ob_get_clean();
+	}
 }

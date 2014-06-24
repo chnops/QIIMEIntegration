@@ -18,4 +18,5 @@ interface OperatingSystemI {
 	public function unzipFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function compressFile(ProjectI $project, $fileName, $isUploaded, $runId);
 	public function decompressFile(ProjectI $project, $fileName, $isUploaded, $runId);
+	public function runScript(ProjectI $project, $runId, \Models\Scripts\ScriptI $script, \Database\DatabaseI $databse);
 }
