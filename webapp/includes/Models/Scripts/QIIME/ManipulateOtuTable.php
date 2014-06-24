@@ -100,6 +100,20 @@ class ManipulateOtuTable extends DefaultScript {
 		return $command . $args;
 	}
 
+	public function renderVersionCommand() {
+		$action = "";
+		foreach ($this->getParameters() as $parameter) {
+			if ($parameter->getName() == "action") {
+				$action = $parameter->getValue();
+				break;
+			}
+		}
+		if (!$action) {
+			return "true";
+		}
+		return $this->getScriptName() . " " . $action . " --version";
+	}
+
 	public function getScriptName() {
 		return "biom";
 	}

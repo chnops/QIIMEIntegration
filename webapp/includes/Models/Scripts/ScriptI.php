@@ -19,6 +19,7 @@ interface ScriptI {
 	// output
 	public function renderAsForm($disabled);
 	public function renderCommand();
+	public function renderVersionCommand();
 
 	// input
 	public function acceptInput(array $input);
