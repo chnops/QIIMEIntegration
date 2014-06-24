@@ -56,7 +56,7 @@ class ManipulateOtuTable extends DefaultScript {
 		$tableType->excludeButAllowIf($action, "convert");
 
 		$sampleMetadataFp->excludeIf($conversionType);
-		$matrixType->excludeIf($conversionType, $biomToClassic->getName());
+		$matrixType->excludeIf($conversionType);
 		$headerKey->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$outputMetadataId->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$processObsMetadata->excludeIf($conversionType);
