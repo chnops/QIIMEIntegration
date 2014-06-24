@@ -36,8 +36,8 @@ class ManipulateOtuTable extends DefaultScript {
 		$sparseToDense = new TrueFalseParameter("--sparse-biom-to-dense-biom");
 		$denseToSparse = new TrueFalseParameter("--dense-biom-to-sparse-biom");
 		$biomToClassic = new TrueFalseParameter("--biom-to-classic-table");
-		$biomConversionDirection = $sparseToDense->linkTo($denseToSparse);
-		$conversionType = $biomToClassic->linkTo($biomConversionDirection);
+		$biomConversionDirection = $sparseToDense->linkTo($denseToSparse, "Sparse to dense or vice versa");
+		$conversionType = $biomToClassic->linkTo($biomConversionDirection, "Conversion type");
 		$sampleMetadataFp = new OldFileParameter("--sample-metadata-fp", $this->project);
 		$matrixType = new ChoiceParameter("--matrix-type", "sparse",
 			array("sparse", "dense"));
@@ -60,9 +60,8 @@ class ManipulateOtuTable extends DefaultScript {
 		$headerKey->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$outputMetadataId->excludeButAllowIf($conversionType, $biomToClassic->getName());
 		$processObsMetadata->excludeIf($conversionType);
-		$tableType->excludeIf($conversionType, "--biom-to-classic-table");
+		$tableType->excludeIf($conversionType);
 		$tableType->requireIf($conversionType, false);
-		$tableType->requireIf($conversionType, "__sparse_biom_to_dense_biom__dense_biom_to_sparse_biom__");
 		$tableType->dismissIf($action, "summarize-table");
 
 		array_push($this->parameters,

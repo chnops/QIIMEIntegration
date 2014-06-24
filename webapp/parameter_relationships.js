@@ -154,6 +154,11 @@ function makeEitherOr(jQueryObj) {
 	jQueryObj.change(function() {
 		jQueryObj.each(function() {
 			var contentLabel = $(this).next();
-			contentLabel.find('[name]').prop('disabled', !($(this).is(':checked')))
+			if ($(this).is(':checked')) {
+				contentLabel.find('[name]').prop('disabled', false).change();
+			}
+			else {
+				contentLabel.find('[name]').prop('disabled', true);
+			}
 		})});
 }

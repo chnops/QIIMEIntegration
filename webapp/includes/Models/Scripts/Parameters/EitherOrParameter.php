@@ -7,10 +7,22 @@ class EitherOrParameter extends DefaultParameter {
 	protected $default;
 	protected $alternative;
 
-	public function __construct($default, $alternative) {
+	protected $currentSelection = NULL;
+	protected $currentNonSelection = NULL;
+
+	protected $displayName;
+
+	public function __construct($default, $alternative, $displayName = "") {
 		$this->default = $default;
 		$this->alternative = $alternative;
+
 		$this->name = "__{$default->getName()}__{$alternative->getName()}__";
+		if ($displayName) {
+			$this->displayName = $displayName;
+		}
+		else {
+			$this->displayName = $this->default->getName() . " or " . $this->alternative->getName();
+		}
 	}
 
 	public function renderForOperatingSystem() {
@@ -38,7 +50,7 @@ class EitherOrParameter extends DefaultParameter {
 			$checkedArray[2] = " checked";
 		}
 
-		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->default->getName()} or {$this->alternative->getName()}
+		$output = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->displayName}
 			<a class=\"param_help\" id=\"{$this->getJsVar($script->getJsVar())}\">&amp;</a><br/>";
 		$output .= "<input type=\"radio\" name=\"{$this->name}\" value=\"\"{$checkedArray[0]}{$disabledString}>Neither</label></td></tr>";
 		$output .= "<tr>" . 
@@ -73,14 +85,23 @@ class EitherOrParameter extends DefaultParameter {
 		return false;
 	}
 
-	public function getAlternativeValue() {
-		if (!$this->value) {
+	public function setValue($value) {
+		parent::setValue($value);
+		if ($this->value == $this->default->getName()) {
+			$this->currentSelection = $this->default;
+			$this->currentNonSelection = $this->alternative;
+		}
+		else {
+			$this->currentSelection = $this->alternative;
+			$this->currentNonSelection = $this->default;
+		}
+	}
+
+	public function getUnselectedValue() {
+		if (!$this->value || !$this->currentNonSelection) {
 			return "";
 		}
-		if ($this->value == $this->default->getName()) {
-			return $this->alternative->getName();
-		}
-		return $this->default->getName();
+		return $this->currentNonSelection->getName();
 	}
 
 	public function acceptInput(array $input) {
@@ -94,9 +115,9 @@ class EitherOrParameter extends DefaultParameter {
 		if (!isset($input[$this->value])) {
 			throw new ScriptException("Since {$this->name} is set to {$this->value}, that parameter must be specified.");
 		}
-		if (isset($input[$this->getAlternativeValue()])) {
-			throw new ScriptException("Since {$this->name} is set to {$this->value}, {$this->getAlternativeValue()} is not allowed.");
+		if (isset($input[$this->getUnselectedValue()])) {
+			throw new ScriptException("Since {$this->name} is set to {$this->value}, {$this->getUnselectedValue()} is not allowed.");
 		}
-		$this->default->setValue($input[$this->getValue()]);
+		$this->currentSelection->acceptInput($input);
 	}
 }

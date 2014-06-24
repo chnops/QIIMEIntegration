@@ -20,6 +20,6 @@ interface ParameterI {
 	public function dismissIf(ParameterI $trigger, $value = "");
 	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = "");
 	public function excludeIf(ParameterI $trigger, $value = "");
-	public function linkTo(ParameterI $parameter);
+	public function linkTo(ParameterI $parameter, $displayName = "");
 	public function isATrigger($isIt = -1);
 }

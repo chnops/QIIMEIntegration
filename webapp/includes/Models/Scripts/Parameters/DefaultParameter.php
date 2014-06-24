@@ -278,8 +278,8 @@ class DefaultParameter implements ParameterI {
 		$trigger->isATrigger(true);
 		$this->excludingTriggers[] = array("parameter" => $trigger, "value" => $value);
 	}
-	public function linkTo(ParameterI $parameter) {
-		$eitherOr = new EitherOrParameter($this, $parameter);
+	public function linkTo(ParameterI $parameter, $displayName = "") {
+		$eitherOr = new EitherOrParameter($this, $parameter, $displayName);
 		return $eitherOr;
 	}
 	public function isATrigger($isIt = -1) {
