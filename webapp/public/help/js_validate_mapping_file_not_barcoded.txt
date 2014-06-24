@@ -1,1 +1,2 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Use this if your samples didn't have barcodes (i. e. they were never multiplexed).
+Your map file must still have the BarcodeSequence header! No entries below it, however, are necessary.

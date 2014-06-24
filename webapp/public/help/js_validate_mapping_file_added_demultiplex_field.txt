@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Ignore this parameter.  You will see it again during the de-multiplexing step, and at that point, it will actually do something.

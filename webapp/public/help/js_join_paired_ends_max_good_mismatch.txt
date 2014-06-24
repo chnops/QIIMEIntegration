@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+The maximum number of 'obvious errors' allowed in the overlap.  An 'obvious error' is one where differing bases are both high quality.

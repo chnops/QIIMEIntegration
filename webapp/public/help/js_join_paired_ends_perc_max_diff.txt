@@ -1,1 +1,2 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Maximum allowed % difference in overlapping region.
+For some reason, they want an integer, 1-100.  For me, a proportion, 0.00-1.00, would make more sense, but that's not what they want.

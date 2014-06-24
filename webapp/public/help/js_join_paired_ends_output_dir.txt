@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Call it whatever you want.  Or not.  The script says it's required, but if you leave it blank, it'll default to the current working directory.

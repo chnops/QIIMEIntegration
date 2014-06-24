@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+A .fastq formatted file with the first (forward) half of all your paired ends.

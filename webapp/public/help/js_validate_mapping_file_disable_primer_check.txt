@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Use this if you don't have primer sequences in your map file.  The header, LinkerPrimerSequence, is still required.

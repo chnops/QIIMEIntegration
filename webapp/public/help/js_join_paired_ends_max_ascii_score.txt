@@ -1,1 +1,2 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Because quality scores in .fastq must be stored as one character, it is the ASCII score of the character that counts.  For example, J = a quality of 74.
+For more information on .fastq quality encoding, check out <a target="_BLANK" href="http://en.wikipedia.org/wiki/FASTQ_format">the Wikipedia article</a>.

@@ -1,1 +1,2 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Invalid characters in your map file will be replaced with this one.
+Must be alphanumeric, period, or underscore.

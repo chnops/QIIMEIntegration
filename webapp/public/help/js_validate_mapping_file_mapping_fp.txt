@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Most likely an uploaded file.  Could be homemade, or the sequencing center might e-mail it to you.  Should follow the format described above.

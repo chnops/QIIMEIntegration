@@ -1,1 +1,5 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+A file in .fastq (not .fasta) format.
+
+Each entry has an ID that corresponds to your main (forward and reverse) sequence files, and a short sequence that is the barcode for the read.
+
+This parameter is different from your QIIME map file.

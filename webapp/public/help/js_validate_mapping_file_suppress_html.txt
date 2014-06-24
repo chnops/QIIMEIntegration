@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Prevents the output of an HTML (website style) version of your validation results.

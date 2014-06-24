@@ -1,1 +1,2 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+If you turn this option off, the script will not report any errors to the screen.
+You still must check the output files for errors and warnings in your map file.

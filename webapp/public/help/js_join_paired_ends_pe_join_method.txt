@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+SeqPrep is more customizable, ergo it has more decisions you have to make. Both SeqPrep and fastq-join yield similar results.

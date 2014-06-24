@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+Number of matching bases that must be found at the internal end of each paired-end.

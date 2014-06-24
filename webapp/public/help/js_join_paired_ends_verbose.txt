@@ -1,1 +1,1 @@
-This parameter's help text has not been written yet.  Sorry for the inconvenience.
+I don't think this script actually has any output, whether or not this option is specified.
