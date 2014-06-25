@@ -8,6 +8,5 @@ spl_autoload_register(function($class) {
 	require_once("../includes/" . str_replace("\\", "/", $class) . ".php");
 });
 
-system("rm -f ./data/database.sqlite; sqlite3 ./data/database.sqlite < ./../data/schema.sql;
+system("sqlite3 ./data/database.sqlite < ./data/clean_schema.sql;
 rm -rf ./projects/*;");
-

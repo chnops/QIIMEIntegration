@@ -31,6 +31,7 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE username = :name");
 			$pdoStatement->execute(array("name" => $username));
 			$result = $pdoStatement->fetchColumn(0);
+			$pdoStatement->closeCursor();
 			return $result > 0;
 		}
 		catch (\Exception $ex) {
@@ -48,11 +49,13 @@ class PDODatabase implements DatabaseI {
 			$root += 1;
 
 			$pdoStatement = $this->pdo->prepare("INSERT INTO users (username, root) VALUES (:name, :root)");
-			if ($pdoStatement->execute(array("name" => $username, "root" => $root))) {
+			$execResult = $pdoStatement->execute(array("name" => $username, "root" => $root));
+			$errorInfo = $pdoStatement->errorInfo();
+			$pdoStatement->closeCursor();
+			if ($execResult) {
 				return $root;
 			}
 			else {
-				$errorInfo = $pdoStatement->errorInfo();
 				error_log("Unable to create user: " . $errorInfo[2]);
 				return false;
 			}
@@ -68,7 +71,9 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT root FROM users WHERE username = :name");
 			$pdoStatement->execute(array("name" => $username));
-			return $pdoStatement->fetchColumn(0);
+			$result = $pdoStatement->fetchColumn(0);
+			$pdoStatement->closeCursor();
+			return $result;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get user root ({$username}): " . $ex->getMessage());
@@ -82,7 +87,9 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("SELECT * FROM projects WHERE owner = :owner");
 			$pdoStatement->execute(array("owner" => $username));
-			return $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+			$projects = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+			$pdoStatement->closeCursor();
+			return $projects;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get all projects: " . $ex->getMessage());
@@ -113,11 +120,12 @@ class PDODatabase implements DatabaseI {
 				"id" => "$id",
 				"name" => $projectName,
 			));
+			$errorInfo = $pdoStatement->errorInfo();
+			$pdoStatement->closeCursor();
 			if ($result) {
 				return $id;
 			}
 			else {
-				$errorInfo = $pdoStatement->errorInfo();
 				error_log("Unable to create project: " . $errorInfo[2]);
 				return false;
 			}
@@ -135,6 +143,7 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("SELECT name FROM projects WHERE owner = :owner AND id = :id");
 			$pdoStatement->execute(array ("owner" => $username, "id" => $projectId));
 			$result = $pdoStatement->fetchColumn(0);
+			$pdoStatement->closeCursor();
 			if ($result) {
 				return $result;
 			}
@@ -153,11 +162,16 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO uploaded_files (project_owner, project_id, name, file_type, status, approx_size)
 				VALUES (:owner, :id, :name, :fileType, :status, :size)");
+			if (!$pdoStatement) {
+				$errorInfo = $this->pdo->errorInfo();
+				error_log($errorInfo[2]);
+			}
 			$status = ($isDownload) ? 1 : 0;
 			$insertSuccess = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName,
 				"fileType" => $fileType, "status" => $status, "size" => $size));
+			$errorInfo = $pdoStatement->errorInfo();
+			$pdoStatement->closeCursor();
 			if (!$insertSuccess) {
-				$errorInfo = $pdoStatement->errorInfo();
 				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
 			}
 			return true;
@@ -178,6 +192,7 @@ class PDODatabase implements DatabaseI {
 				WHERE project_owner = :owner AND project_id = :id");
 			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
 			$files = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+			$pdoStatement->closeCursor();
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get uploaded files: " . $ex->getMessage());
@@ -191,7 +206,9 @@ class PDODatabase implements DatabaseI {
 	public function removeUploadedFile($username, $projectId, $fileName) {
 		try {
 			$pdoStatement = $this->pdo->prepare("DELETE FROM uploaded_files WHERE project_owner = :owner AND project_id = :id AND name = :name");
-			return $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName));
+			$execResult = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $fileName));
+			$pdoStatement->closeCursor();
+			return $execResult;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to delete file: " . $ex->getMessage());
@@ -206,6 +223,7 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO script_runs (project_owner, project_id, script_name, script_string)
 				VALUES (:owner, :id, :name, :string)");
 			$result = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, "name" => $scriptName, "string" => $scriptText));
+			$pdoStatement->closeCursor();
 			if ($result) {
 				return $this->pdo->lastInsertId();
 			}
@@ -224,7 +242,9 @@ class PDODatabase implements DatabaseI {
 	public function giveRunPid($runId, $pid) {
 		try {
 			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET run_status = :pid WHERE id = :id");
-			return $pdoStatement->execute(array("id" => $runId, "pid" => $pid));
+			$execResult = $pdoStatement->execute(array("id" => $runId, "pid" => $pid));
+			$pdoStatement->closeCursor();
+			return $execResult;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to give run pid: " . $ex->getMessage());
@@ -244,8 +264,9 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("SELECT * FROM script_runs WHERE project_owner = :owner AND project_id = :id");
 			$pdoStatement->execute(array("owner" => $username, "id" => $projectId));
 			$result = $pdoStatement->fetchAll(\PDO::FETCH_ASSOC);
+			$errorInfo = $pdoStatement->errorInfo();
+			$pdoStatement->closeCursor();
 			if ($result === FALSE) {
-				$errorInfo = $pdoStatement->errorInfo();
 				error_log("Unable to get all runs: " . $errorInfo[2]);
 				return array();
 			}
@@ -298,8 +319,10 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("UPDATE uploaded_files SET name = :newName WHERE 
 				project_owner = :owner AND project_id = :id AND name = :oldName");
-			return $pdoStatement->execute(array("owner" => $username, "id" => $projectId, 
+			$execResult = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, 
 				"newName" => $newFileName, "oldName" => $fileName));
+			$pdoStatement->closeCursor();
+			return $execResult;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to : " . $ex->getMessage());
