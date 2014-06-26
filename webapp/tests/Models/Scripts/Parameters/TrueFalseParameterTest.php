@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
 
 class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 
