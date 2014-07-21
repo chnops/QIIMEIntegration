@@ -13,6 +13,6 @@ function displayHideables(hideableToDisplayId) {
 	displayedHideableId = hideableToDisplayId;
 }
 $(function() {
-	var accordionContainer = $('.accordion').parent();
-	accordionContainer.width(accordionContainer.width());
+	var accordion = $('.accordion');
+	accordion.width(accordion.width());
 })

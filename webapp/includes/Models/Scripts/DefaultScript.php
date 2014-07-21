@@ -84,6 +84,9 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 		return $script;
 	}
+	public function renderVersionCommand() {
+		return $this->getScriptName() . " --version";
+	}
 	public function renderHelp() {
 		ob_start();
 		echo "<p><strong>{$this->getScriptTitle()} - {$this->getScriptName()}</strong></p>";

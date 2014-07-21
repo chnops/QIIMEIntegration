@@ -110,54 +110,30 @@ class QIIMEProject extends DefaultProject {
 		$result = "Able to validate script input-";
 		$code = $script->renderCommand();
 
-		$runId = $this->database->saveRun($this->owner, $this->id, $scriptId, $code);
+		$this->database->startTakingRequests();
+		$runId = $this->database->createRun($this->owner, $this->id, $scriptId, $code);
 		if (!$runId) {
 			$result .= "<br/>However, we were unable to save the run in the database.";
 			throw new \Exception($result);
 		}
 
-		$version = "";
-		$consoleError = false;
-
-		$projectDir = $this->getProjectDir();
-		$runDir = $projectDir . "/r" . $runId;
 		try {
-			$this->operatingSystem->createDir($runDir);
+			$pid = $this->operatingSystem->runScript($this, $runId, $script, $this->database);
 
-			// TODO this whole fix is a bit tacky.  Get version should be the responsibility of the sciprt, not project	
-			try {
-				$version = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $script->getScriptName() . " --version");
-				$version = trim($version);
-			}
-			catch (OperatingSystemException $ex) {
-				// do nothing; error was logged already
+			$pidResult = $this->database->giveRunPid($runId, $pid);
+			if (!$pidResult) {
+				$result .= "<br/>However, we were unable to save the run in the database.";
+				$this->database->forgetAllRequests();
+				throw new \Exception($result);
 			}
 
-			$codeOutput = $this->operatingSystem->executeArbitraryCommand($this->getEnvironmentSource(), $runDir, $code);
-
-			$result .= "<br/>Script run successful!";
-			$codeOutput = trim($codeOutput);
-			if ($codeOutput) {
-				$result .= "<br/>Here is the output from the console:<br/>" . $helper->htmlentities($codeOutput);
-			}
-
+			$this->database->executeAllRequests();
+			return $result . "<br/>Script was started successfully";
 		}
-		catch (OperatingSystemException $ex) {
-			$consoleError = true;
-			$codeOutput = $ex->getConsoleOutput();
-			$result .= "<br/>There was a problem with the operating system: " . $helper->htmlentities(trim($ex->getMessage()));
+		catch (\Exception $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
 		}
-
-		$outputSaveResult = $this->database->addRunResults($runId, $codeOutput, $version);
-		if (!$outputSaveResult) {
-			$conjunction = ($consoleError) ? "Also" : "However";
-			$result .= "<br/><br/>{$conjunction}, we were unable to save the results to the database.";
-		}
-
-		if ($consoleError) {
-			throw new \Exception($result);
-		}
-		return $result;
 	}
 
 	public function renderOverview() {

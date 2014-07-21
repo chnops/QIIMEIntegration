@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Scripts;
+namespace Models\Scripts\Parameters;
 
 class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 
@@ -11,7 +11,7 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function setUp() {
-		$mockProject = $this->getMock("\Models\Project", array(), array(), "", $callConstructor = false);
+		$mockProject = $this->getMock("\Models\DefaultProject", array(), array(), "", $callConstructor = false);
 		$mockProject->expects($this->any())->method("getVersion")->will($this->returnValue("mock version 1.7"));
 		$this->parameter = new VersionParameter($mockProject, "");
 	}

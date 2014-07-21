@@ -21,35 +21,32 @@ class RunScriptsController extends Controller {
 		$helper = \Utils\Helper::getHelper();
 		$pastScriptRunsFormatted = $helper->categorizeArray($pastScriptRuns, 'name');
 
-		$helper = \Utils\Helper::getHelper();
 		$output = "";
 		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {
-			$output .= "<div class=\"hideable\" id=\"past_results_{$scriptName}\"><ul>";
+			$output .= "<div class=\"hideable accordion\" id=\"past_results_{$scriptName}\">";
 			if (!isset($pastScriptRunsFormatted[$scriptName])) {
 				$output .= "This script has not been run yet.";
-				$output .= "</ul></div>\n";
+				$output .= "</div>\n";
 				continue;
 			}
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
-				$output .= "<li><strong>Run {$run['id']}</strong><br/>";
-				$output .= "<strong>Script name:</strong> {$run['name']}<br/>";
-				$output .= "<strong>User input:</strong> " . $helper->htmlentities($run['input']) . "<br/>";
-
-				$output .= "<strong>Generated files:</strong><ul>";
-				foreach ($run['file_names'] as $fileName) {
-					$output .= "<li>" . $helper->htmlentities($fileName) . "</li>";
+				$status = ($run['is_finished']) ? "ready" : "still running";
+				$output .= "<h4 onclick=\"hideMe($(this).next())\">Run {$run['id']} (<em>{$status}</em>)</h4>";
+				$output .= "<div><strong>User input:</strong> " . $helper->htmlentities($run['input']);
+				if (!empty($run['file_names'])) {
+					$output .= "<br/><strong>Generated files</strong><ul>";
+					foreach($run['file_names'] as $fileName) {
+						$output .= "<li>" . $helper->htmlentities($fileName) . "</li>";
+					}
+					$output .= "</ul>";
 				}
-				$output .= "</ul>";
-
-				$output .= "<strong>Console output:</strong> {$run['output']}<br/>";
-				$output .= "<strong>Script version:</strong> {$run['version']}<br/>";
-				$output .= "</li>\n";
+				$output .= "</div>";
 			}
-			$output .= "</ul></div>\n";
+			$output .= "</div>\n";
 		}
 
 		if ($output) {
-			return "<h4>Past runs:</h4>\n" . $output;
+			return $output;
 		}
 		return "";
 	}
@@ -124,6 +121,7 @@ class RunScriptsController extends Controller {
 			div#project_overview{border-width:1px;padding:.5em;overflow:auto}
 			div#project_overview div{margin:1em 0em 1.5em 0em;white-space:nowrap}
 			div#project_overview span{margin:0em 1em}
+			.accordion h4,.accordion div{margin-bottom:0em;margin-top:0em;padding:.25em;white-space:nowrap}
 			select[size]{padding:.5em .5em 1.5em .5em}
 			table.either_or{border:1px solid #999966;display:inline-block;padding:.25em}
 			table.either_or td{padding:.25em;text-align:center}
@@ -137,8 +135,9 @@ class RunScriptsController extends Controller {
 			$displayHideables.= "displayHideables('{$this->scriptId}');";
 		}
 		$perParamHelp = "$('.param_help').click(function() {
-		   	$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });";
-		return "$(function() {{$displayHideables};{$perParamHelp}});";
+			$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });";
+		$hideAccordionChildren = "$('.accordion div').css('display', 'none')";
+		return "$(function() {{$displayHideables};{$perParamHelp};{$hideAccordionChildren}});";
 	}
 	public function getScriptLibraries() {
 		return array("parameter_relationships.js");

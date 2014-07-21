@@ -114,7 +114,7 @@ class UploadController extends Controller {
 
 	private function downloadFile($url, $fileName, \Models\FileType $fileType) {
 		$helper = \Utils\Helper::getHelper();
-		$output = "File downloaded successfully.";
+		$output = "File downloaded has started.";
 		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $fileType);
 		if ($consoleOutput) {
 			$output .= "<br/>The console returned the following output:<br/>" . $helper->htmlentities($consoleOutput);

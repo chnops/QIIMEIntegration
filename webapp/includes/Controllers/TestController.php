@@ -6,7 +6,7 @@ use \Models\Scripts\Parameters\TrueFalseParameter;
 
 class TestController extends Controller {
 	public function parseSession() {
-		return;
+		parent::parseSession();
 	}
 	public function parseInput() {
 		if (isset($_GET['clean'])) {
@@ -20,30 +20,32 @@ class TestController extends Controller {
 	public function renderInstructions() {
 		ob_start();
 
-		echo "<p>Testing nested EitherOr parameters</p>";
+		echo "<p>Testing past run display</p>";
 
-		if (!empty($_POST)) {
-			echo "<pre>";
-			print_r($_POST);
-			echo "</pre>";
-			echo "<hr/>";
+		$helper = \Utils\Helper::getHelper();
+		$pastRuns = $this->project->getPastScriptRuns();
+//		$pastRuns = $helper->categorizeArray($pastRuns, "name");
+
+		echo "<style>
+			.accordion h4,.accordion div{margin-bottom:0em;margin-top:0em;padding:.25em}
+			</style>";
+
+		echo "<div class=\"accordion\" style=\"display:inline-block\">";
+		foreach ($pastRuns as $run) {
+			echo "<h4 onclick=\"hideMe($(this).next())\">Run id: {$run['id']}</h4>";
+			echo "<div><strong>User input:</strong> {$run['input']}";
+			if (!empty($run['file_names'])) {
+				echo "<br/><strong>Generated files</strong><ul>";
+				foreach($run['file_names'] as $file) {
+					echo "<li>{$file}</li>";
+				}
+				echo "</ul>";
+			}
+			echo "</div>";
 		}
-		$cBox1 = new TrueFalseParameter("--left_left");
-		$cBox2 = new TrueFalseParameter("--left_right");
-		$cBox3 = new TrueFalseParameter("--right_left");
-		$cBox4 = new TrueFalseParameter("--right_right");
-		$eo1 = $cBox1->linkTo($cBox2);
-		$eo2 = $cBox3->linkTo($cBox4);
-		$parentParam = $eo1->linkTo($eo2);
+		echo "</div>";
 
-		echo "<form method=\"POST\">";
-		echo $parentParam->renderForForm($disabled = false,
-			new \Models\Scripts\QIIME\ValidateMappingFile($this->workflow->getNewProject()));
-		echo "<script type=\"text/javascript\">var js_ = $('form');" .
-			$parentParam->renderFormScript('js_', $disabled = false) . "</script>";
-		echo "<input type=\"hidden\" name=\"step\" value=\"test\">
-			<button type=\"submit\">Submit</button></form>";
-
+		echo "<script type=\"text/javascript\">$(function() { $('.accordion').width($('.accordion').width()) })</script>";
 		return ob_get_clean();
 	}
 	public function renderForm() {

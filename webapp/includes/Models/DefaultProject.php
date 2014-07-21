@@ -201,7 +201,7 @@ abstract class DefaultProject implements ProjectI {
 	public function getPastScriptRuns() {
 		if (empty($this->pastScriptRuns)) {
 			$helper = \Utils\Helper::getHelper();
-			$pastRunsRaw = $this->database->getPastRuns($this->owner, $this->id);
+			$pastRunsRaw = $this->database->getAllRuns($this->owner, $this->id);
 			foreach ($pastRunsRaw as $run) {
 				$runFileNames = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $run['id']);
 	
@@ -210,8 +210,9 @@ abstract class DefaultProject implements ProjectI {
 					"name" => $run['script_name'],
 					"input" => $run['script_string'],
 					"file_names" => $runFileNames,
-					"output" => $helper->htmlentities($run['output']),
-					"version" => $run['version'],
+					"is_finished" => ($run['run_status'] == -1),
+					"is_deleted" => $run['deleted'],
+					"pid" => $run['run_status'],
 				);
 			}
 		}
@@ -220,7 +221,7 @@ abstract class DefaultProject implements ProjectI {
 
 	public function retrieveAllGeneratedFiles() {
 		if (empty($this->generatedFiles)) {
-			$pastRuns = $this->database->getPastRuns($this->owner, $this->id);
+			$pastRuns = $this->database->getAllRuns($this->owner, $this->id);
 			foreach ($pastRuns as $run) {
 				$runId = $run['id'];
 				$runFiles = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $runId);
