@@ -69,7 +69,7 @@ class QIIMEWorkflow implements WorkflowI {
 	}
 	public function findProject($username, $projectId) {
 		$projectName = $this->database->getProjectName($username, $projectId);
-		if ($projectName == "ERROR") {
+		if (!$projectName) {
 			return NULL;
 		}
 		$project = $this->getNewProject();
