@@ -148,13 +148,13 @@ class PDODatabase implements DatabaseI {
 				return $result;
 			}
 			else {
-				return "ERROR";
+				return false;
 			}
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to find project name: " . $ex->getMessage());
 			// TODO error handling
-			return "ERROR";
+			return false;
 		}
 	}
 

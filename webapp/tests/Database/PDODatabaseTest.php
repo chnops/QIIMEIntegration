@@ -227,11 +227,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getProjectName
 	 */
 	public function testGetProjectName_userDoesNotExist() {
-		$expected = "ERROR";
+		$expected = false;
 	   
 		$actual = $this->object->getProjectName($this->newUser['username'], $this->goodProj['id']);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers PDODatabase::getProjectName
@@ -247,11 +247,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getProjectName
 	 */
 	public function testGetProjectName_userDoesExistButProjectDoesNot() {
-		$expected = "ERROR";
+		$expected = false;
 		
 		$actual = $this->object->getProjectName($this->newProj['owner'], $this->newProj['id']);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
