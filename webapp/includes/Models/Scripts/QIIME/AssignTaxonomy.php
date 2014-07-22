@@ -35,9 +35,9 @@ class AssignTaxonomy extends DefaultScript {
 		$read2SeqsFp = new OldFileParameter("--read_2_seqs_fp", $this->project);
 		$singleOk = new TrueFalseParameter("--single_ok");
 		$noSingleOkGeneric = new TrueFalseParameter("--no_single_ok_generic");
-		$readIdRegex = new TextArgumentParameter("--read_id_regex", "\\S+\\s+(\\S+)", "/.*/"); // TODO really complex regex
-		$ampliconIdRegex = new TextArgumentParameter("--amplicon_id_regex", "(\\S+)\\s+(\\S+?)\\/", "/.*/"); // TODO really complex regex
-		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", "/.*/"); // TODO really complex regex
+		$readIdRegex = new TextArgumentParameter("--read_id_regex", "\\S+\\s+(\\S+)", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
+		$ampliconIdRegex = new TextArgumentParameter("--amplicon_id_regex", "(\\S+)\\s+(\\S+?)\\/", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
+		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
 		$confidence = new TextArgumentParameter("--confidence", "0.8", TextArgumentParameter::PATTERN_PROPORTION);
 		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", TextArgumentParameter::PATTERN_DIGIT); // TODO units = MB
 		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", TextArgumentParameter::PATTERN_PROPORTION);

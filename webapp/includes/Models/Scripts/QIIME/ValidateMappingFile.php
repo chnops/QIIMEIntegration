@@ -36,7 +36,7 @@ class ValidateMappingFile extends DefaultScript {
 			 new TrueFalseParameter("--not_barcoded"),
 			 new TrueFalseParameter("--variable_len_barcodes"),
 			 new TrueFalseParameter("--disable_primer_check"),
-			 new TextArgumentParameter("--added_demultiplex_field", "", "/.*/"),// TODO same as split_libraries or run header 
+			 new TextArgumentParameter("--added_demultiplex_field", "", "/^[^=]+$/"),// TODO same as SplitLibraries.php, --added_demultiplex_field
 
 			 new Label("Output Options"),
 			 new TrueFalseInvertedParameter("--verbose"),

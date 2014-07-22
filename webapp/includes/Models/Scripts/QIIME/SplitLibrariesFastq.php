@@ -45,7 +45,7 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--samples_ids", "", TextArgumentParameter::PATTERN_NO_WHITE_SPACE),
 			new TrueFalseParameter("--rev_comp_barcode"),
 			new TrueFalseParameter("--rev_comp_mapping_barcodes"),
-			new TextArgumentParameter("--barcode_type", "golay_12", '/.*/'),
+			new TextArgumentParameter("--barcode_type", "golay_12", TextArgumentParameter::PATTERN_ANYTHING_GOES),
 
 			new Label("Optional Parameters - Filtering (not quality)"),
 			new TextArgumentParameter("--sequence_max_n", "0", TextArgumentParameter::PATTERN_DIGIT),

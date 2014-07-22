@@ -38,8 +38,8 @@ class JoinPairedEnds extends DefaultScript {
 		$minOverlap = new TextArgumentParameter("--min_overlap", "", TextArgumentParameter::PATTERN_DIGIT);
 		$peJoinMethod = new ChoiceParameter("--pe_join_method", "fastq-join",
 			array("fastq-join", "SeqPrep"));
-		$percMaxDiff = new TextArgumentParameter("--perc_max_diff", "", TextArgumentParameter::PATTERN_DIGIT);// TODO why on earth this is an integer, we may never know
-		$maxAsciiScore = new TextArgumentParameter("--max_ascii_score", "J", "/.*/"); // TODO regex
+		$percMaxDiff = new TextArgumentParameter("--perc_max_diff", "", TextArgumentParameter::PATTERN_DIGIT);
+		$maxAsciiScore = new TextArgumentParameter("--max_ascii_score", "J", "/^.$/");
 		$minFracMatch = new TextArgumentParameter("--min_frac_match", "", TextArgumentParameter::PATTERN_PROPORTION);
 		$maxGoodMismatch = new TextArgumentParameter("--max_good_mismatch", "", TextArgumentParameter::PATTERN_PROPORTION);
 		$phred64 = new TrueFalseParameter("--phred_64");

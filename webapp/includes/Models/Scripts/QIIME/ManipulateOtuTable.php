@@ -49,7 +49,7 @@ class ManipulateOtuTable extends DefaultScript {
 		$sampleMetadataFp = new OldFileParameter("--sample-metadata-fp", $this->project);
 		$matrixType = new ChoiceParameter("--matrix-type", "sparse",
 			array("sparse", "dense"));
-		$headerKey = new TextArgumentParameter("--header-key", "", "/.*/");
+		$headerKey = new TextArgumentParameter("--header-key", "", TextArgumentParameter::PATTERN_ANYTHING_GOES);
 		$outputMetadataId = new TextArgumentParameter("--output-metadata-id", "", TextArgumentParameter::PATTERN_NO_WHITE_SPACE);
 		$processObsMetadata = new ChoiceParameter("--process-obs-metadata", "naive",
 			array("taxonomy", "naive", "sc_separated"));
