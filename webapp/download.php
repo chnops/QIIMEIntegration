@@ -20,7 +20,7 @@ if (!isset($_GET['run']) || !isset($_GET['file_name'])) {
 	exit;
 }
 $runId = $_GET['run'];
-if (!is_numeric($runid)) {
+if (!is_numeric($runId)) {
 	header('HTTP/1.1 400 Bad request');
 	echo "<p>Run id must be numeric</p>";
 	exit;
