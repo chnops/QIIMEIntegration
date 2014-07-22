@@ -13,15 +13,25 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class PickRepSet extends DefaultScript {
+	public function getScriptName() {
+		return "pick_rep_set.py";
+	}
+	public function getScriptTitle() {
+		return "Pick representative sequences";
+	}
+	public function getHtmlId() {
+		return "pick_rep_set";
+	}
 
 	public function initializeParameters() {
 		parent::initializeParameters();
-		$inputFile = new OldFileParameter("--input_file", $this->project);
-		$inputFile->requireIf();
 
+		$inputFile = new OldFileParameter("--input_file", $this->project);
 		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project, 
 			'/macqiime/greengenes/gg_13_8_otus/rep_set/97_otus.fasta');
 		$fastaFile = new OldFileParameter("--fasta_file", $this->project);
+
+		$inputFile->requireIf();
 		$fastaFile->requireIf($referenceSeqsFp, false);
 
 		array_push($this->parameters,
@@ -40,14 +50,5 @@ class PickRepSet extends DefaultScript {
 			new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
 			new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id"))
 		);
-	}
-	public function getScriptName() {
-		return "pick_rep_set.py";
-	}
-	public function getScriptTitle() {
-		return "Pick representative sequences";
-	}
-	public function getHtmlId() {
-		return "pick_rep_set";
 	}
 }

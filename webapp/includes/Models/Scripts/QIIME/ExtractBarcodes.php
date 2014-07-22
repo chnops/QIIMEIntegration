@@ -13,6 +13,15 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class ExtractBarcodes extends DefaultScript {
+	public function getScriptName() {
+		return "extract_barcodes.py";
+	}
+	public function getScriptTitle() {
+		return "Extract barcodes";
+	}
+	public function getHtmlId() {
+		return "extract_barcodes";
+	}
 
 	public function initializeParameters() {
 		parent::initializeParameters();
@@ -21,32 +30,27 @@ class ExtractBarcodes extends DefaultScript {
 		$fastq1->requireIf();
 
 		$inputType = new ChoiceParameter("--input_type", "barcode_single_end",
-			array("barcode_single_end", "barcode_paired_end",
-			"barcode_paired_stitched", "barcode_in_label"));
-
+			array("barcode_single_end", "barcode_paired_end", "barcode_paired_stitched", "barcode_in_label"));
 		$fastq2 = new OldFileParameter("--fastq2", $this->project);
-		$fastq2->excludeButAllowIf($inputType, "barcode_paired_end");
-		$fastq2->excludeButAllowIf($inputType, "barcode_in_label");
-
 		$bc2Len = new TextArgumentParameter("--bc2_len", "6", TextArgumentParameter::PATTERN_DIGIT);
-		$bc2Len->excludeButAllowIf($fastq2);
-		$bc2Len->excludeButAllowIf($inputType, "barcode_paired_stitched");
-
-		$charDelineator = new TextArgumentParameter("--char_delineator", ":", '/^\S$/');
-		$charDelineator->excludeButAllowIf($inputType, "barcode_in_label");
-
+		$charDelineator = new TextArgumentParameter("--char_delineator", ":", TextArgumentParameter::PATTERN_NO_WHITE_SPACE);
 		$switchBcOrder = new TrueFalseParameter("--switch_bc_order");
-		$switchBcOrder->excludeButAllowIf($inputType, "barcode_paired_stitched");
-
 		$mappingFp = new OldFileParameter("--mapping_fp", $this->project);
 		$attemptReadReorientation = new TrueFalseParameter("--attempt_read_reorientation");
-		$attemptReadReorientation->excludeButAllowIf($mappingFp);
-
 		$disableHeaderMatch = new TrueFalseParameter("--disable_header_match");
-		$disableHeaderMatch->excludeButAllowIf($fastq2);
 		$revCompBc2 = new TrueFalseParameter("--rev_comp_bc2");
+
+		$fastq2->excludeButAllowIf($inputType, "barcode_paired_end");
+		$fastq2->excludeButAllowIf($inputType, "barcode_in_label");
+		$bc2Len->excludeButAllowIf($fastq2);
+		$bc2Len->excludeButAllowIf($inputType, "barcode_paired_stitched");
 		$revCompBc2->excludeButAllowIf($fastq2);
 		$revCompBc2->excludeButAllowIf($inputType, "barcode_paired_stitched");
+		$disableHeaderMatch->excludeButAllowIf($fastq2);
+
+		$charDelineator->excludeButAllowIf($inputType, "barcode_in_label");
+		$switchBcOrder->excludeButAllowIf($inputType, "barcode_paired_stitched");
+		$attemptReadReorientation->excludeButAllowIf($mappingFp);
 
 		array_push($this->parameters,
 			new Label("Required Parameters"),
@@ -69,14 +73,5 @@ class ExtractBarcodes extends DefaultScript {
 			new TrueFalseParameter("--rev_comp_bc1"),
 			$revCompBc2
 		);
-	}
-	public function getScriptName() {
-		return "extract_barcodes.py";
-	}
-	public function getScriptTitle() {
-		return "Extract barcodes";
-	}
-	public function getHtmlId() {
-		return "extract_barcodes";
 	}
 }

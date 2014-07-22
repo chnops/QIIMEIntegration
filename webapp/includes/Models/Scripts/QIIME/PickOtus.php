@@ -13,9 +13,19 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class PickOtus extends DefaultScript {
+	public function getScriptName() {
+		return "pick_otus.py";
+	}
+	public function getScriptTitle() {
+		return "Pick OTUs";
+	}
+	public function getHtmlId() {
+		return "pick_otus";
+	}
 
 	public function initializeParameters() {
 		parent::initializeParameters();
+
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
 		$inputSeqsFilePath->requireIf();
 
@@ -215,6 +225,7 @@ class PickOtus extends DefaultScript {
 		array_push($this->parameters,
 			new Label("Required Parameters"),
 			$inputSeqsFilePath,
+
 			new Label("Optional Parameters"),
 			$triePrefilter,
 			$prefixPrefilterLength,
@@ -263,14 +274,5 @@ class PickOtus extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) // TODO dynamic default
 		);
-	}
-	public function getScriptName() {
-		return "pick_otus.py";
-	}
-	public function getScriptTitle() {
-		return "Pick OTUs";
-	}
-	public function getHtmlId() {
-		return "pick_otus";
 	}
 }

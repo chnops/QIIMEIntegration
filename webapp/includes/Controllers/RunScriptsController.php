@@ -3,11 +3,11 @@
 namespace Controllers;
 
 class RunScriptsController extends Controller {
+	private $scriptId = "";
 
 	public function getSubTitle() {
 		return "Run Scripts";
 	}
-	private $scriptId = "";
 	
 	public function retrievePastResults() {
 		if (!$this->project) {
@@ -53,7 +53,6 @@ class RunScriptsController extends Controller {
 
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
-			$this->disabled = " disabled";
 			$this->isResultError = true;
 			$this->result = "In order to run scripts, you must be logged in and have a project selected.";
 			return;
@@ -61,11 +60,8 @@ class RunScriptsController extends Controller {
 		if (!isset($_POST['step'])) {
 			return;
 		}
-		$_GET['step'] = $_POST['step'];
-		unset($_POST['step']);
 
 		$this->scriptId = $_POST['script'];
-
 		try {
 			$this->result = $this->project->runScript($_POST);
 		}

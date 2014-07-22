@@ -7,15 +7,22 @@ class Helper {
 		return new Helper();
 	}
 
+	/**
+	 * Takes an array of element arrays
+	 * Groups the element arrays into categories, based on a shared category field
+	 * Returns and array of categories, each category contains several element arrays
+	 */
 	public function categorizeArray(array $rawArray, $categoryField, $fieldToKeep = "") {
 		$formattedArray = array();
 		foreach ($rawArray as $element) {
 			$category = $element[$categoryField];
-			if (!isset($formattedArray[$category])) {
-				$formattedArray[$category] = array();
-			}
+
 			if ($fieldToKeep) {
 				$element = $element[$fieldToKeep];
+			}
+
+			if (!isset($formattedArray[$category])) {
+				$formattedArray[$category] = array();
 			}
 			$formattedArray[$category][] = $element;
 		}

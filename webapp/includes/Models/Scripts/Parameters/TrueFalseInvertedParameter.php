@@ -11,9 +11,7 @@ class TrueFalseInvertedParameter extends DefaultParameter {
 		if (!$this->value) {
 			return $this->name;
 		}
-		else {
-			return "";
-		}
+		return "";
 	}
 	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		$disabledString = ($disabled) ? " disabled" : "";

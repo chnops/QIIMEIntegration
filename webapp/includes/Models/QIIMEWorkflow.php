@@ -14,51 +14,13 @@ class QIIMEWorkflow implements WorkflowI {
 		"run" => "Run scripts",
 		"view" => "View results");
 
-	public function getSteps() {
-		return $this->steps;
-	}
-
 	public function __construct(\Database\DatabaseI $database, OperatingSystemI $operatingSystem) {
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
 	}
 
-	public function getNextStep($step) {
-		$keys = array_keys($this->steps);
-		$currentPosition = 0;
-		$found = false;
-		for (; $currentPosition < count($keys); $currentPosition++) {
-			if ($step == $keys[$currentPosition]) {
-				$found = true;
-				break;
-			}
-		}
-		if ($found) {
-			if ($currentPosition == count($keys)-1) {
-				return $keys[$currentPosition];
-			}
-			return $keys[$currentPosition + 1];
-		}
-		return $keys[0];
-	}
-
-	public function getPreviousStep($step) {
-		$keys = array_keys($this->steps);
-		$currentPosition = count($keys) - 1;
-		$found = false;
-		for (; $currentPosition >= 0; $currentPosition--) {
-			if ($step == $keys[$currentPosition]) {
-				$found = true;
-				break;
-			}
-		}
-		if ($found) {
-			if ($currentPosition == 0) {
-				return $keys[$currentPosition];
-			}
-			return $keys[$currentPosition - 1];
-		}
-		return $keys[count($keys)-1];
+	public function getSteps() {
+		return $this->steps;
 	}
 
 	public function getCurrentStep($controller) {
@@ -103,7 +65,7 @@ class QIIMEWorkflow implements WorkflowI {
 	}
 
 	public function getNewProject() {
-		return new QIIMEProject($this->database, $this, $this->operatingSystem);
+		return new QIIMEProject($this->database, $this->operatingSystem);
 	}
 	public function findProject($username, $projectId) {
 		$projectName = $this->database->getProjectName($username, $projectId);

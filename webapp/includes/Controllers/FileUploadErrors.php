@@ -23,6 +23,16 @@ class FileUploadErrors {
 			);
 	}
 	public function getErrorMessage($errorCode) {
+		if ($errorCode == UPLOAD_ERR_PARTIAL) {
+			error_log("Only part of the file was recieved.");
+		}
+		else if ($errorCode == UPLOAD_ERR_NO_TMP_DIR) {
+			error_log("The application was unable to find a tmp dir to use");
+		}
+		else if ($errorCode == UPLOAD_ERR_CANT_WRITE) {
+			error_log("The application did not have write permission to the tmp dir");
+		}
+
 		if ($this->errors[$errorCode]) {
 			return $this->errors[$errorCode];
 		}

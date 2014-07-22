@@ -34,7 +34,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$operatingSystem = new \Models\MacOperatingSystem(OldFileParameterTest::$database);
 		OldFileParameterTest::$project = new \Models\QIIMEProject(
 			OldFileParameterTest::$database,
-			new \Models\QIIMEWorkflow(OldFileParameterTest::$database, $operatingSystem),
 			$operatingSystem
 		);
 		OldFileParameterTest::$project->setOwner(OldFileParameterTest::$owner);

@@ -3,6 +3,13 @@
 namespace Controllers;
 
 class SelectProjectController extends Controller {
+	private $projects = array();
+	private $helper = NULL;
+
+	public function __construct(\Models\WorkflowI $workflow) {
+		parent::__construct($workflow);
+		$this->helper = \Utils\Helper::getHelper();
+	}
 
 	public function getSubtitle() {
 		return "Select a Project";
@@ -10,25 +17,15 @@ class SelectProjectController extends Controller {
 	public function retrievePastResults() {
 		return "";
 	}
-	private $projects = array();
 	
-	public function parseSession() {
-		parent::parseSession();
-		if ($this->username) {
-			$this->projects = $this->workflow->getAllProjects($this->username);
-		}
-		if (!$this->username) { // could be an else, but this makes more sense conceptually
-			$this->disabled = " disabled";
-		}
-	}
-
 	public function parseInput() {
-		$helper = \Utils\Helper::getHelper();
 		if (!$this->username) {
+			$this->disabled = " disabled";
 			$this->isResultError = true;
 			$this->result = "You cannot choose a project if you aren't logged in.";
 			return;
 		}
+		$this->projects = $this->workflow->getAllProjects($this->username);
 		if (!isset($_POST['project'])) {
 			return;
 		}
@@ -42,31 +39,15 @@ class SelectProjectController extends Controller {
 				$this->result = "A project with that name already exists. Did you mean to select it?";
 			}
 			else {
-				$project = $this->workflow->getNewProject();
-				$project->setName($projectName);
-				$project->setOwner($this->username);
-				try {
-					$project->beginProject();
-					$this->projects[] = $project;
-					$this->result = "Successfully created project: " . $helper->htmlentities($projectName);
-					$_SESSION['project_id'] = $project->getId();
-					$this->project = $project;
-				}
-				catch (\Exception $ex) {
-					$this->isResultError = true;
-					error_log($ex->getMessage());
-					$this->result = "We were unable to create a new project. Please see the error log or contact your system administrator";
-				}
+				$this->createProject($projectName);
 			}
 		}
 		else {
 			$projectId = $_POST['project'];
 			$projectExists = $this->projectIdExists($projectId);
+
 			if ($projectExists) { 
-				$project = $this->workflow->findProject($this->username, $projectId);
-				$this->result = "Project selected: " . $helper->htmlentities($project->getName());
-				$_SESSION['project_id'] = $projectId;
-				$this->project = $project;
+				$this->selectProject($projectId);
 			}
 			else {
 				$this->isResultError = true;
@@ -91,13 +72,36 @@ class SelectProjectController extends Controller {
 		}
 		return false;
 	}
+	private function createProject($projectName) {
+		$project = $this->workflow->getNewProject();
+		$project->setName($projectName);
+		$project->setOwner($this->username);
+		try {
+			$project->beginProject();
+		}
+		catch (\Exception $ex) {
+			$this->isResultError = true;
+			$this->result = "We were unable to create a new project. Please see the error log or contact your system administrator";
+			error_log($ex->getMessage());
+			return;
+		}
+		$this->projects[] = $project;
+		$this->project = $project;
+		$this->result = "Successfully created project: " . $this->helper->htmlentities($projectName);
+		$_SESSION['project_id'] = $project->getId();
+	}
+	private function selectProject($projectId) {
+		$project = $this->workflow->findProject($this->username, $projectId);
+		$this->result = "Project selected: " . $this->helper->htmlentities($project->getName());
+		$_SESSION['project_id'] = $projectId;
+		$this->project = $project;
+	}
 
 	public function renderInstructions() {
 		return "";
 	}
 
 	public function renderForm() {
-		$helper = \Utils\Helper::getHelper();
 		$selectForm = "";
 		if (!empty($this->projects)) {
 			$selectForm = "
@@ -108,7 +112,7 @@ class SelectProjectController extends Controller {
 			foreach ($this->projects as $project) {
 				$checkedName = ($this->project) ? $this->project->getName() : "";
 				$checked = ($checkedName == $project->getName()) ? " checked" : "";
-				$projectName = $helper->htmlentities($project->getName());
+				$projectName = $this->helper->htmlentities($project->getName());
 				$selectForm .= "<label class=\"radio\" for=\"project\">
 					<input type=\"radio\" name=\"project\" value=\"{$project->getId()}\"{$this->disabled}{$checked}>{$projectName}</label>";
 			}
@@ -131,6 +135,7 @@ class SelectProjectController extends Controller {
 			Any work you do on a project is saved, and can be accessed at a later date. Usually there is no harm in walking away from or even logging off your computer while
 			longer analysis are running. No need to sit around and wait for your program to run. We'll take care of it.";
 	}
+	
 	public function renderSpecificStyle() {
 		return "label.radio{display:block}";
 	}

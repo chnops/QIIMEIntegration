@@ -3,25 +3,11 @@
 namespace Controllers;
 
 class UploadController extends Controller {
-
-	public function getSubTitle() {
-		return "Upload Input Files";
-	}
 	private $fileType = NULL;
 	private $url = "";
 
-	private function getFileType() {
-		if (!$this->fileType) {
-			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
-			if (isset($_POST['type'])) {
-				$this->fileType = $project->getFileTypeFromHtmlId($_POST['type']);
-			}
-			else {
-				$fileTypes = $project->getFileTypes();
-				$this->fileType = $fileTypes[0];
-			}
-		}
-		return $this->fileType;
+	public function getSubTitle() {
+		return "Upload Input Files";
 	}
 
 	public function retrievePastResults() {
@@ -61,14 +47,12 @@ class UploadController extends Controller {
 
 		if (!$this->getFileType()) {
 			$this->isResultError = true;
-			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
+			$this->result = "The file you uploaded had an unrecognized type.";
 			return;
 		}
 		else {
 			$this->result = "";
 		}
-		
-		// TODO if is valid form
 
 		$isDownload = isset($_POST['url']);
 		if ($isDownload) {
@@ -78,15 +62,16 @@ class UploadController extends Controller {
 			while (!$fileName && $urlParts) {
 				$fileName = array_pop($urlParts);
 			}
-			if (!$fileName) {
-				$this->isResultError = true;
-				$this->result = "Unable to determine file name from given url";
-				return;
-			}
 		}
 		else {
 			$fileName = $_FILES['file']['name'];
 		}
+		if (!$fileName) {
+			$this->isResultError = true;
+			$this->result = "Unable to determine file name";
+			return;
+		}
+
 		$pastFiles = $this->project->retrieveAllUploadedFiles();
 		foreach ($pastFiles as $extantFile) {
 			if ($extantFile['name'] == $fileName) {
@@ -95,9 +80,10 @@ class UploadController extends Controller {
 				return;
 			}
 		}
+		
 		if ($isDownload) {
 			try {
-				$this->result = $this->downloadFile($this->url, $fileName, $this->getFileType());
+				$this->result = $this->downloadFile($this->url, $fileName);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -108,21 +94,35 @@ class UploadController extends Controller {
 			}
 		}
 		else {
-			$this->uploadFile($_FILES['file'], $this->getFileType());
+			$this->uploadFile($_FILES['file']);
 		}
 	}
 
-	private function downloadFile($url, $fileName, \Models\FileType $fileType) {
+	private function getFileType() {
+		if (!$this->fileType) {
+			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+			if (isset($_POST['type'])) {
+				$this->fileType = $project->getFileTypeFromHtmlId($_POST['type']);
+			}
+			else {
+				$fileTypes = $project->getFileTypes();
+				$this->fileType = $fileTypes[0];
+			}
+		}
+		return $this->fileType;
+	}
+
+	private function downloadFile($url, $fileName) {
 		$helper = \Utils\Helper::getHelper();
 		$output = "File downloaded has started.";
-		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $fileType);
+		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $this->getFileType());
 		if ($consoleOutput) {
 			$output .= "<br/>The console returned the following output:<br/>" . $helper->htmlentities($consoleOutput);
 		}
 		return $output;
 	}
 
-	private function uploadFile(array $file, \Models\FileType $fileType) {
+	private function uploadFile(array $file) {
 		$helper = \Utils\Helper::getHelper();
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
@@ -130,11 +130,10 @@ class UploadController extends Controller {
 			$this->result = "There was an error uploading your file: " . $fileUploadErrors->getErrorMessage($file['error']);
 			return;
 		}
-		// TODO if type is valid
 
 		$givenName = $file['name'];
 		try {
-			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $fileType);
+			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $this->getFileType());
 			$this->result = "File " . $helper->htmlentities($givenName) . " successfully uploaded!";
 		}
 		catch (\Exception $ex) {
@@ -199,6 +198,7 @@ class UploadController extends Controller {
 		}
 		return $help;
 	}
+
 	public function renderSpecificStyle() {
 		return "";
 	}

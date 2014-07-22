@@ -27,7 +27,7 @@ class Roster {
 		}
 
 		try {
-			$this->operatingSystem->executeArbitraryCommand("", "","mkdir u" . $userId);
+			$this->operatingSystem->createDir("u" . $userId);
 			$this->database->executeAllRequests();
 			return true;
 		}

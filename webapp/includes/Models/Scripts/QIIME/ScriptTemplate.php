@@ -13,18 +13,6 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class  extends DefaultScript {
-
-	public function initializeParameters() {
-		parent::initializeParameters();
-		// TODO implement
-
-		array_push($this->parameters,
-			new Label("Required Parameters"),
-			new Label("Optional parameters"),
-			new Label("Output options"),
-			new TrueFalseParameter("--verbose")
-		);
-	}
 	public function getScriptName() {
 		return "dummy_script.py";
 	}
@@ -33,5 +21,17 @@ class  extends DefaultScript {
 	}
 	public function getHtmlId() {
 		return "";
+	}
+
+	public function initializeParameters() {
+		parent::initializeParameters();
+
+		array_push($this->parameters,
+			new Label("Required Parameters"),
+
+			new Label("Optional parameters"),
+
+			new Label("Output options"),
+		);
 	}
 }

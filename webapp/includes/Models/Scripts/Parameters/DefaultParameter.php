@@ -77,10 +77,10 @@ class DefaultParameter implements ParameterI {
 			$triggerName = $requiringTrigger['parameter']->getName();
 			$triggerValue = $requiringTrigger['value'];
 			if ($triggerValue === false) {
-				$triggerValue = 'false';
+				$triggerValue = "false";
 			}
 			else if ($triggerValue === true) {
-				$triggerValue = 'true';
+				$triggerValue = "true";
 			}
 			else {
 				$triggerValue = "'{$triggerValue}'";
@@ -94,10 +94,10 @@ class DefaultParameter implements ParameterI {
 			$triggerName = $excludingTrigger['parameter']->getName();
 			$triggerValue = $excludingTrigger['value'];
 			if ($triggerValue === false) {
-				$triggerValue = 'false';
+				$triggerValue = "false";
 			}
 			else if ($triggerValue === true) {
-				$triggerValue = 'true';
+				$triggerValue = "true";
 			}
 			else {
 				$triggerValue = "'{$triggerValue}'";
@@ -167,7 +167,6 @@ class DefaultParameter implements ParameterI {
 				foreach ($this->dismissingTriggers as $trigger) {
 					$triggerParam = $trigger['parameter'];
 					$triggerValue = $trigger['value'];
-					error_log("value: " . $triggerValue);
 
 					if ($triggerValue === false) {
 						if (!isset($input[$triggerParam->getName()])) {
@@ -191,6 +190,7 @@ class DefaultParameter implements ParameterI {
 			}
 		}
 		else {
+			$this->setValue($input[$this->name]);
 			if ($this->isEverExcluded) {
 				$isAllowed = false;
 				$errorMessage = (empty($this->allowingTriggers)) ? 
@@ -221,7 +221,7 @@ class DefaultParameter implements ParameterI {
 					}
 				}
 
-				$errorMessageExtended = "<br/>It is not allowed when:";
+				$errorMessageExtended = "";
 				foreach ($this->excludingTriggers as $trigger) {
 					$triggerParam = $trigger['parameter'];
 					$triggerValue = $trigger['value'];
@@ -245,12 +245,17 @@ class DefaultParameter implements ParameterI {
 						}
 					}
 				}
+				if ($errorMessageExtended) {
+					$errorMessage .= (empty($this->allowingTriggers)) ? 
+						" when:" :
+						"However, it is not allowed when:";
+					$errorMessage .= $errorMessageExtended;
+				}
 
 				if (!$isAllowed) {
 					throw new ScriptException($errorMessage);
 				}
 			}
-			$this->setValue($input[$this->name]);
 		}
 	}
 
@@ -263,8 +268,8 @@ class DefaultParameter implements ParameterI {
 		$trigger->isATrigger(true);
 	}
 	public function dismissIf(ParameterI $trigger, $value = true) {
-		$trigger->isATrigger(true);
 		$this->dismissingTriggers[] = array("parameter" => $trigger, "value" => $value);
+		$trigger->isATrigger(true);
 	}
 	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = true) {
 		$this->isEverExcluded = true;
@@ -275,8 +280,8 @@ class DefaultParameter implements ParameterI {
 	}
 	public function excludeIf(ParameterI $trigger = NULL, $value = true) {
 		$this->isEverExcluded = true;
-		$trigger->isATrigger(true);
 		$this->excludingTriggers[] = array("parameter" => $trigger, "value" => $value);
+		$trigger->isATrigger(true);
 	}
 	public function linkTo(ParameterI $parameter, $displayName = "") {
 		$eitherOr = new EitherOrParameter($this, $parameter, $displayName);

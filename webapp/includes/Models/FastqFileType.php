@@ -3,11 +3,6 @@
 namespace Models;
 
 class FastqFileType extends FileType {
-	/*protected $name;
-	protected $htmlId;
-	protected $help;
-	protected $example;*/
-
 	public function __construct() {
 		$this->name = "Fastq";
 		$this->htmlId = "fastq";
@@ -36,14 +31,5 @@ FFFFFFFFFFFFFFFFFFGFBB666;BFEEIB99>BBHHHIHHHIFFFFFFFFFFFAA55555DDFFFFFFFEEEFFFFF
 AGCACGAGCCTACATGCTGCCTCCCGTAGGAGTTTGGGCCGTGTCTCAGTCCCAATGTGGCCGATCAGTCTCTTAACTCGGCTATGCATCATTGCCTTGG
 +
 EFFFFFFFFFFFFFFFFFEEBB;66@EFFFEEBCCEFEFFFFFFFFFFFE===EEFFDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA";
-	}
-
-	public function renderHelp() {
-		$output = "<h4>{$this->name} Files</h4>
-			<p>{$this->help}</p>";
-		if ($this->example) {
-			$output .= "<div class=\"file_example\">{$this->example}</div>";
-		}
-		return $output;
 	}
 }

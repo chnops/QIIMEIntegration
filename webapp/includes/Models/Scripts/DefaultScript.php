@@ -13,7 +13,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		$this->project = $project;
 	}
 	public function initializeParameters() {
-		$helpParameter = new HelpParameter($this);
+		$helpParameter = new HelpParameter();
 		$versionParameter = new VersionParameter($this);
 		$helpParameter->excludeButAllowIf();
 		$versionParameter->excludeButAllowIf();
@@ -51,7 +51,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 		return $form;
 	}
-	public function getJsvar() {
+	public function getJsVar() {
 		return "js_" . $this->getHtmlId();
 	}
 

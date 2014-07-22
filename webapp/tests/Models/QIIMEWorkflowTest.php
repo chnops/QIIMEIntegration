@@ -34,41 +34,10 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
-	 * @covers QIIMEWorkflow::getNextStep
-	 */
-	public function testGetNextStep() {
-		$stepsInOrder = array ("login", "select", "upload", "run", "view");
-		$stepsCount = count($stepsInOrder);
-		for ($i = 0; $i < $stepsCount - 1; $i++) {
-			$expected = $stepsInOrder[$i + 1];
-			$this->assertEquals($expected, $this->workflow->getNextStep($stepsInOrder[$i]));
-		}
-		$this->assertEquals($stepsInOrder[$stepsCount - 1], $this->workflow->getNextStep($stepsInOrder[$stepsCount - 1]));
-		$this->assertEquals($stepsInOrder[0], $this->workflow->getNextStep("notAStep"));
-	}
-
-	/**
-	 * @test
-	 * @covers QIIMEWorkflow::getPreviousStep
-	 */
-	public function testGetPreviousStep() {
-		$stepsInReverseOrder = array ("view", "run", "upload", "select", "login");
-		$stepsCount = count($stepsInReverseOrder);
-		for ($i = 0; $i < $stepsCount - 1; $i++) {
-			$expected = $stepsInReverseOrder[$i + 1];
-			$this->assertEquals($expected, $this->workflow->getPreviousStep($stepsInReverseOrder[$i]));
-		}
-		$this->assertEquals($stepsInReverseOrder[$stepsCount - 1], $this->workflow->getPreviousStep($stepsInReverseOrder[$stepsCount - 1]));
-		$this->assertEquals($stepsInReverseOrder[0], $this->workflow->getPreviousStep("notAStep"));
-	}
-
-	/**
-	 * @test
 	 * @covers QIIMEWorkflow::getCurrentStep
 	 */
 	public function testGetCurrentStep() {
 		$controllersInOrder = array (
-				new \Controllers\TestController($this->database, $this->workflow), 
 				new \Controllers\IndexController($this->database, $this->workflow), 
 				new \Controllers\LoginController($this->database, $this->workflow), 
 				new \Controllers\SelectProjectController($this->database, $this->workflow), 
@@ -76,7 +45,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 				new \Controllers\RunScriptsController($this->database, $this->workflow),
 				new \Controllers\ViewResultsController($this->database, $this->workflow), 
 			);
-		$stepsInOrder = array ("test","login","login","select",
+		$stepsInOrder = array ("login","login","select",
 			"upload","run","view",);
 		$stepsCount = count($stepsInOrder);
 		for ($i = 0; $i < $stepsCount; $i++) {
@@ -89,10 +58,9 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 * @covers QIIMEWorkflow::getController
 	 */
 	public function testGetController() {
-		$stepsInOrder = array ("test","index","login","select",
+		$stepsInOrder = array ("index","login","select",
 			"upload","run","view",);
 		$controllerNamesInOrder = array (
-				"Controllers\\TestController", 
 				"Controllers\\LoginController", 
 				"Controllers\\LoginController", 
 				"Controllers\\SelectProjectController", 

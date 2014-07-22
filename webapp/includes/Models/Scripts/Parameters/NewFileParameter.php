@@ -20,11 +20,7 @@ class NewFileParameter extends DefaultParameter {
 			else if (!$this->value) {
 				return ".";
 			}
-			$separator = (strlen($this->name) == 2) ? " " : "=";
-			return $this->name . $separator . escapeshellarg($this->value);
 		}
-		else {
-			return parent::renderForOperatingSystem();
-		}
+		return parent::renderForOperatingSystem();
 	}
 }

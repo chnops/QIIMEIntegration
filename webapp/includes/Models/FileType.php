@@ -16,11 +16,6 @@ abstract class FileType implements HideableI {
 	public function getHtmlId() {
 		return $this->htmlId;
 	}
-	/* TODO
-	 * public function getDatabaseName() {
-	 * 	return $this->htmlId;
-	 * }
-	 */
 
 	public function renderHelp() {
 		$output = "<h4>{$this->name} Files</h4>

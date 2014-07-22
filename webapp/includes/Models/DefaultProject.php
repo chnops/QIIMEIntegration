@@ -21,8 +21,7 @@ abstract class DefaultProject implements ProjectI {
 	protected $pastScriptRuns = array();
 	protected $generatedFiles = array();
 
-	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem) {
-		$this->workflow = $workflow;
+	public function __construct(\Database\DatabaseI $database, OperatingSystemI $operatingSystem) {
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
 	}
@@ -101,18 +100,6 @@ abstract class DefaultProject implements ProjectI {
 			throw $ex;
 		}
 	}
-	public function deleteGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
-	}
-	public function unzipGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
-	}
-	public function compressGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->compressFile($this, $fileName, $isUploaded = false, $runId);
-	}
-	public function decompressGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->decompressFile($this, $fileName, $isUploaded = false, $runId);
-	}
 	public function receiveUploadedFile($givenName, $tmpName, $size, FileType $fileType) {
 		$this->database->startTakingRequests();
 		$databaseSuccess = $this->database->createUploadedFile($this->owner, $this->id, $givenName, $fileType->getHtmlId(), $isDownloaded = false, $size);
@@ -157,7 +144,6 @@ abstract class DefaultProject implements ProjectI {
 		}
 
 		try {	
-			// TODO this one will be difficult to do parallel
 			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $isUploaded = true, $runId = -1);
 			foreach ($newFileNames as $newFileName) {
 				if(!$this->database->createuploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
@@ -185,6 +171,18 @@ abstract class DefaultProject implements ProjectI {
 		if (!$nameChangeResult) {
 			throw new \Exception("Unable to change file name, decompression failed.");
 		}
+	}
+	public function deleteGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function unzipGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function compressGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->compressFile($this, $fileName, $isUploaded = false, $runId);
+	}
+	public function decompressGeneratedFile($fileName, $runId) {
+		$this->operatingSystem->decompressFile($this, $fileName, $isUploaded = false, $runId);
 	}
 	public function retrieveAllUploadedFiles() {
 		if (empty($this->uploadedFiles)) {
@@ -243,12 +241,69 @@ abstract class DefaultProject implements ProjectI {
 			}
 			return $dirContents;
 	}
+	public function runScript(array $allInput) {
+		$helper = \Utils\Helper::getHelper();
+		$this->generatedFiles = array();
+		$this->pastScriptRuns = array();
+
+		$scripts = $this->getScripts();
+		$scriptId = $allInput['script'];
+		if (!isset($scripts[$scriptId])) {
+			throw new \Exception("Unable to find script: " . $helper->htmlentities($scriptId));
+		}
+		$script = $scripts[$scriptId];
+
+		$script->acceptInput($allInput); // will throw an error if bad input
+		$result = "Able to validate script input-";
+		$code = $script->renderCommand();
+
+		$this->database->startTakingRequests();
+		$runId = $this->database->createRun($this->owner, $this->id, $scriptId, $code);
+		if (!$runId) {
+			$result .= "<br/>However, we were unable to save the run in the database.";
+			throw new \Exception($result);
+		}
+
+		try {
+			$pid = $this->operatingSystem->runScript($this, $runId, $script, $this->database);
+
+			$pidResult = $this->database->giveRunPid($runId, $pid);
+			if (!$pidResult) {
+				$result .= "<br/>However, we were unable to save the run in the database.";
+				$this->database->forgetAllRequests();
+				throw new \Exception($result);
+			}
+
+			$this->database->executeAllRequests();
+			return $result . "<br/>Script was started successfully";
+		}
+		catch (\Exception $ex) {
+			$this->database->forgetAllRequests();
+			throw $ex;
+		}
+	}
+
+	public function renderOverview() {
+		$overview = "<div id=\"project_overview\">\n";
+
+		if (!$this->scriptsFormatted) {
+			$this->initializeScripts();
+		}
+		foreach ($this->scriptsFormatted as $category => $scriptArray) {
+			$overview .= "<div><span>{$category}</span>";
+			foreach ($scriptArray as $script) {
+				$overview .= "<span><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></span>";
+			}
+			$overview .= "</div>\n";
+		}
+		$overview .= "</div>\n";
+		return $overview;
+	}
+
 
 	public abstract function beginProject();
 	public abstract function initializeScripts();
 	public abstract function getInitialFileTypes();
-	public abstract function runScript(array $allInput);
-	public abstract function renderOverview();
 	public abstract function retrieveAllBuiltInFiles();
 	public abstract function getEnvironmentSource();
 }

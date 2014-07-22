@@ -21,8 +21,42 @@ abstract class Controller {
 		$this->workflow = $workflow;
 		$this->step = $this->workflow->getCurrentStep($this);
 	}
+	public function run() {
+		$this->parseSession();
+		$this->parseInput();
+		$this->renderOutput();
+	}
 
 	public abstract function parseInput(); 
+	public abstract function retrievePastResults();
+
+	public abstract function getSubTitle();
+	public abstract function renderInstructions();
+	public abstract function renderForm();
+	public abstract function renderHelp();
+
+	public abstract function renderSpecificStyle();
+	public abstract function renderSpecificScript();
+	public abstract function getScriptLibraries();
+
+	public function isResultError() {
+		return $this->isResultError;
+	}
+	public function getResult() {
+		return $this->result;
+	}
+	public function renderPastResults() {
+		if (!$this->pastResults) {
+			$this->pastResults = $this->retrievePastResults();
+		}
+		return $this->pastResults;
+	}
+	public function getWorkflow() {
+		return $this->workflow;
+	}
+	public function getExtraHtml($marker) {
+		return "";
+	}
 
 	public function parseSession() {
 		if (!isset($_SESSION['username'])) {
@@ -33,15 +67,6 @@ abstract class Controller {
 			return;
 		}
 		$this->project = $this->workflow->findProject($this->username, $_SESSION['project_id']);
-	}
-
-	public abstract function retrievePastResults();
-
-	public function isResultError() {
-		return $this->isResultError;
-	}
-	public function getResult() {
-		return $this->result;
 	}
 	public function renderSessionData() {
 		if (!$this->username) {
@@ -58,36 +83,35 @@ abstract class Controller {
 		}
 		return $output;
 	}
-	public function renderPastResults() {
-		if (!$this->pastResults) {
-			$this->pastResults = $this->retrievePastResults();
-		}
-		return $this->pastResults;
-	}
-	public abstract function renderInstructions();
-	public abstract function renderForm();
-	public abstract function renderHelp();
-	public abstract function getSubTitle();
-	public abstract function renderSpecificStyle();
-	public abstract function renderSpecificScript();
-	public abstract function getScriptLibraries();
-	public function getWorkflow() {
-		return $this->workflow;
-	}
+
 	public function renderOutput() {
 		include 'views/template.php';
 	}
 	public function getContent() {
-		ob_start();
-		include 'views/content.php';
-		return ob_get_clean();
-	}
-	public function run() {
-		$this->parseSession();
-		$this->parseInput();
-		$this->renderOutput();
-	}
-	public function getExtraHtml($marker) {
-		return "";
+		$content =  "<div id=\"session_data\">{$this->renderSessionData()}</div>\n";
+		$content .=  "<h2>{$this->getSubtitle()}</h2>\n";
+
+		$result = $this->getResult();
+		if ($result) {
+			$class = $this->isResultError() ? " class=\"error\"" : "";
+			$content .=  "<div id=\"result\"{$class}>{$result}</div><br/>\n";
+		}
+
+		$instructions = $this->renderInstructions();
+		if ($instructions) {
+			$content .=  "<div id=\"instructions\"><em>Instructions (<a id=\"instruction_controller\" onclick=\"hideMe($(this).parent().next());\">hide</a>):</em><div>" .
+		   		$instructions . "</div></div>\n";
+		}
+
+		$pastResults = $this->renderPastResults();
+		if ($pastResults) {
+			$content .=  "<div id=\"past_results\"><em>Past results (<a onclick=\"hideMe($(this).parent().next())\">hide</a>)</em><div>{$pastResults}</div></div><br/>";
+		}
+
+		$form = $this->renderForm();
+		if ($form) {
+			$content .=  "<div class=\"form\">{$form}</div>\n";
+		}
+		return $content;
 	}
 }

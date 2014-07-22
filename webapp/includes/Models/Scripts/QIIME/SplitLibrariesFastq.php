@@ -13,15 +13,25 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class SplitLibrariesFastq extends DefaultScript {
+	public function getScriptName() {
+		return "split_libraries_fastq.py";
+	}
+	public function getScriptTitle() {
+		return "De-multiplex fastq";
+	}
+	public function getHtmlId() {
+		return "split_libraries_fastq";
+	}
 
 	public function initializeParameters() {
 		parent::initializeParameters();
 
 		$sequenceReadFps = new OldFileParameter("--sequence_read_fps", $this->project); 
-		$sequenceReadFps->requireIf();
 		$mappingFps = new OldFileParameter("--mapping_fps", $this->project);
-		$mappingFps->requireIf();
 		$outputDir = new NewFileParameter("--output_dir", "", $isDir = true);
+
+		$sequenceReadFps->requireIf();
+		$mappingFps->requireIf();
 		$outputDir->requireIf();
 
 		array_push($this->parameters,
@@ -55,14 +65,5 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--start_seq_id", "0", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--rev_comp")
 		);
-	}
-	public function getScriptName() {
-		return "split_libraries_fastq.py";
-	}
-	public function getScriptTitle() {
-		return "De-multiplex fastq";
-	}
-	public function getHtmlId() {
-		return "split_libraries_fastq";
 	}
 }

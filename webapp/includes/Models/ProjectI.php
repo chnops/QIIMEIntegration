@@ -4,7 +4,7 @@ namespace Models;
 
 interface ProjectI {
 	// Dumb getters and setters
-	public function __construct(\Database\DatabaseI $database, WorkflowI $workflow, OperatingSystemI $operatingSystem);
+	public function __construct(\Database\DatabaseI $database, OperatingSystemI $operatingSystem);
 	public function getOwner();
 	public function setOwner($owner);
 	public function getId();

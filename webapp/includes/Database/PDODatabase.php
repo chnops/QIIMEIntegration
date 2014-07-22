@@ -38,7 +38,7 @@ class PDODatabase implements DatabaseI {
 			error_log("Error checking user ({$username}) existance: " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions
-			return -1;
+			return FALSE;
 		}
 	}
 
@@ -117,7 +117,7 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO projects (owner, id, name) VALUES (:owner, :id, :name)"); 
 			$result = $pdoStatement->execute(array(
 				"owner" => $username,
-				"id" => "$id",
+				"id" => $id,
 				"name" => $projectName,
 			));
 			$errorInfo = $pdoStatement->errorInfo();
@@ -153,7 +153,7 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to find project name: " . $ex->getMessage());
-			// TODO error hendling
+			// TODO error handling
 			return "ERROR";
 		}
 	}
@@ -172,7 +172,7 @@ class PDODatabase implements DatabaseI {
 			$errorInfo = $pdoStatement->errorInfo();
 			$pdoStatement->closeCursor();
 			if (!$insertSuccess) {
-				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
+				throw new \Exception("Unable to insert uploaded_file: " . $errorInfo[2]);
 			}
 			return true;
 		}
@@ -331,14 +331,4 @@ class PDODatabase implements DatabaseI {
 			return false;
 		}
 	}
-
-	/*Try catch block commong to all functions
-		try {
-		}
-		catch (\Exception $ex) {
-			error_log("Unable to : " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
-		}
-	 */
 }

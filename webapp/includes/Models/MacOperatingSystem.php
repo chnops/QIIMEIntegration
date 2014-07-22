@@ -3,14 +3,12 @@
 namespace Models;
 
 class MacOperatingSystem implements OperatingSystemI {
-	// since all scripts execute in webapp/index.php,	
 	private $home = "./projects/";
 
 	public function getHome() {
 		return $this->home;
 	}
 	public function createDir($name) {
-		// TODO kindly strip preceding slash
 		$nameParts = explode("/", $name);
 		foreach ($nameParts as $namePart) {
 			if (!$namePart) {
@@ -43,7 +41,7 @@ class MacOperatingSystem implements OperatingSystemI {
 
 		$returnCode = 0;
 		ob_start();
-		system("rmdir " . $this->home . $name, $returnCode);
+		system("rmdir " . $this->home . "/" . $name, $returnCode);
 		ob_end_clean();
 		if ($returnCode != 0) {
 			return false;
@@ -100,36 +98,6 @@ class MacOperatingSystem implements OperatingSystemI {
 		return $output;
 	}
 
-	public function executeArbitraryCommand($environmentSource, $runDirectory, $script) {
-		if ($environmentSource) {
-			$code = "source {$environmentSource}; 
-				if [ $? -ne 0 ]; then echo 'Unable to source environment: {$environmentSource}'; exit 1; fi;";
-		}
-		else {
-			$code = "";
-		}
-		$code .= "cd {$this->home}/{$runDirectory};
-			if [ $? -ne 0 ]; then echo 'Requested directory cannot be found: {$this->home}{$runDirectory}'; exit 1; fi;
-		   	{$script} 2>> error_log.txt;";
-
-		$returnValue = 0;
-		ob_start();
-		system($code, $returnValue);
-		if ($returnValue) {
-			$exception = new OperatingSystemException("An error occurred while executing script." .
-				" An error_log.txt file should have been created, which you can acces on the View Results page.");
-			$exception->setConsoleOutput(ob_get_clean());
-			throw $exception;
-		}
-		return ob_get_clean();
-	}
-	public function combineCommands(array $commands) {
-		$output = "";
-		foreach ($commands as $command) {
-			$output .= $command . " 2>> error_log.txt;";
-		}
-		return $output;
-	}
 	public function isValidFileName($name) {
 		$whitelist = array("uploads");
 		if (in_array($name, $whitelist)) {
