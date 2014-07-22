@@ -7,7 +7,7 @@ class Roster {
 	public static function setDefaultRoster(Roster $roster) {
 		Roster::$roster = $roster;
 	}
-	public static function getDefaultRoster() {
+	public static function getRoster() {
 		return Roster::$roster;
 	}
 

@@ -12,11 +12,10 @@ class ViewResultsController extends Controller {
 			return "<p>In order to view results, you must <a href=\"?step=login\">log in</a> and <a href=\"?step=select\">select a project</a></p>";
 		}
 
-		$helper = \Utils\Helper::getHelper();
-		$output = "<h3>" . $helper->htmlentities($this->project->getName()) . "</h3>";
+		$output = "<h3>" . $this->helper->htmlentities($this->project->getName()) . "</h3>";
 		$output .= "<ul>
-			<li>Owner:  " . $helper->htmlentities($this->project->getOwner()) . "</li>
-			<li>Unique id: " . $helper->htmlentities($this->project->getId()) . "</li>
+			<li>Owner:  " . $this->helper->htmlentities($this->project->getOwner()) . "</li>
+			<li>Unique id: " . $this->helper->htmlentities($this->project->getId()) . "</li>
 			</ul>";
 
 		$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
@@ -45,8 +44,7 @@ class ViewResultsController extends Controller {
 		}
 		$isUploaded = ($run == -1);
 
-		$helper = \Utils\Helper::getHelper();
-		$fileDisplay = $helper->htmlentities($file);
+		$fileDisplay = $this->helper->htmlentities($file);
 
 		if ($action == 'delete') {
 			try {
@@ -128,12 +126,11 @@ class ViewResultsController extends Controller {
 		}
 		$output = "";	
 
-		$helper = \Utils\Helper::getHelper();
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		$rowHtmlId = 0;
 		if (!empty($uploadedFiles)) {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
-			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
+			$uploadedFilesFormatted = $this->helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
@@ -148,7 +145,7 @@ class ViewResultsController extends Controller {
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
 			$output .= "<h3>Generated Files:</h3><div class=\"accordion\">\n";
-			$generatedFilesFormatted = $helper->categorizeArray($generatedFiles, 'run_id');
+			$generatedFilesFormatted = $this->helper->categorizeArray($generatedFiles, 'run_id');
 			foreach ($generatedFilesFormatted as $runId => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
@@ -167,8 +164,7 @@ class ViewResultsController extends Controller {
 
 		$sizeDisclaimer = ($fileSize && $fileSize >= 0) ? "<em>size: {$fileSize}B</em>" : "<em>size uncertain</em>";
 
-		$helper = \Utils\Helper::getHelper();	
-		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
+		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $this->helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
 			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";

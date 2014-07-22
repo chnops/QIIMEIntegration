@@ -3,8 +3,15 @@
 namespace Utils;
 
 class Helper {
+	private static $helper = NULL;
+	public static function setDefaultHelper(Helper $helper) {
+		Helper::$helper = $helper;
+	}
 	public static function getHelper() {
-		return new Helper();
+		if (!Helper::$helper) {
+			Helper::$helper = new Helper();
+		}
+		return Helper::$helper;
 	}
 
 	/**

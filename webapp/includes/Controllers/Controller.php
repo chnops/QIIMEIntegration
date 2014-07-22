@@ -5,6 +5,7 @@ namespace Controllers;
 abstract class Controller {
 
 	protected $workflow = NULL;
+	protected $helper = NULL;
 
 	protected $title = "QIIME";
 	protected $step;
@@ -20,6 +21,7 @@ abstract class Controller {
 	public function __construct(\Models\WorkflowI $workflow) {
 		$this->workflow = $workflow;
 		$this->step = $this->workflow->getCurrentStep($this);
+		$this->helper = \Utils\Helper::getHelper();
 	}
 	public function run() {
 		$this->parseSession();
@@ -72,11 +74,10 @@ abstract class Controller {
 		if (!$this->username) {
 			return "You are not logged on.";
 		}
-		$helper = \Utils\Helper::getHelper();
-		$output =  "You are currently logged in as <strong>" . $helper->htmlentities($this->username) . "</strong>";
+		$output =  "You are currently logged in as <strong>" . $this->helper->htmlentities($this->username) . "</strong>";
 
 		if ($this->project) {
-			$output .= ", and you have selected the project <strong>" . $helper->htmlentities($this->project->getName()) . "</strong>";
+			$output .= ", and you have selected the project <strong>" . $this->helper->htmlentities($this->project->getName()) . "</strong>";
 		}
 		else {
 			$output .= ", but <strong>you have not selected a project.</strong>";

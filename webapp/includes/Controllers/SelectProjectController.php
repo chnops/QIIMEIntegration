@@ -4,11 +4,9 @@ namespace Controllers;
 
 class SelectProjectController extends Controller {
 	private $projects = array();
-	private $helper = NULL;
 
 	public function __construct(\Models\WorkflowI $workflow) {
 		parent::__construct($workflow);
-		$this->helper = \Utils\Helper::getHelper();
 	}
 
 	public function getSubtitle() {

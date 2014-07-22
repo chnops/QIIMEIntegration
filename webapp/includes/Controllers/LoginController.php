@@ -8,7 +8,7 @@ class LoginController extends Controller {
 
 	public function __construct(\Models\WorkflowI $workflow) {
 		parent::__construct($workflow);
-		$this->roster = \Utils\Roster::getDefaultRoster();
+		$this->roster = \Utils\Roster::getRoster();
 	}
 
 	public function retrievePastResults() {

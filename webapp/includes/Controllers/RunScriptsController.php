@@ -18,8 +18,7 @@ class RunScriptsController extends Controller {
 			return "";
 		}
 
-		$helper = \Utils\Helper::getHelper();
-		$pastScriptRunsFormatted = $helper->categorizeArray($pastScriptRuns, 'name');
+		$pastScriptRunsFormatted = $this->helper->categorizeArray($pastScriptRuns, 'name');
 
 		$output = "";
 		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {
@@ -32,11 +31,11 @@ class RunScriptsController extends Controller {
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
 				$status = ($run['is_finished']) ? "ready" : "still running";
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">Run {$run['id']} (<em>{$status}</em>)</h4>";
-				$output .= "<div><strong>User input:</strong> " . $helper->htmlentities($run['input']);
+				$output .= "<div><strong>User input:</strong> " . $this->helper->htmlentities($run['input']);
 				if (!empty($run['file_names'])) {
 					$output .= "<br/><strong>Generated files</strong><ul>";
 					foreach($run['file_names'] as $fileName) {
-						$output .= "<li>" . $helper->htmlentities($fileName) . "</li>";
+						$output .= "<li>" . $this->helper->htmlentities($fileName) . "</li>";
 					}
 					$output .= "</ul>";
 				}

@@ -21,13 +21,12 @@ class UploadController extends Controller {
 		$output = "";
 
 		$output .= "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n";
-		$helper = \Utils\Helper::getHelper();
-		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
+		$previousFilesFormatted = $this->helper->categorizeArray($previousFiles, 'type');
 
 		foreach ($previousFilesFormatted as $fileType => $files) {
 			$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><ul>\n";
 			foreach ($files as $file) {
-				$output .= "<li>" . $helper->htmlentities($file['name']) . " ({$file['status']})</li>\n";
+				$output .= "<li>" . $this->helper->htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
 			$output .= "</ul></div>\n";
 		}
@@ -113,17 +112,15 @@ class UploadController extends Controller {
 	}
 
 	private function downloadFile($url, $fileName) {
-		$helper = \Utils\Helper::getHelper();
 		$output = "File downloaded has started.";
 		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $this->getFileType());
 		if ($consoleOutput) {
-			$output .= "<br/>The console returned the following output:<br/>" . $helper->htmlentities($consoleOutput);
+			$output .= "<br/>The console returned the following output:<br/>" . $this->helper->htmlentities($consoleOutput);
 		}
 		return $output;
 	}
 
 	private function uploadFile(array $file) {
-		$helper = \Utils\Helper::getHelper();
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
 			$fileUploadErrors = new FileUploadErrors();
@@ -134,7 +131,7 @@ class UploadController extends Controller {
 		$givenName = $file['name'];
 		try {
 			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $this->getFileType());
-			$this->result = "File " . $helper->htmlentities($givenName) . " successfully uploaded!";
+			$this->result = "File " . $this->helper->htmlentities($givenName) . " successfully uploaded!";
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
