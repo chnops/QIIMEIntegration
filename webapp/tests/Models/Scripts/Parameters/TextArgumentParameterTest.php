@@ -5,7 +5,7 @@ namespace Models\Scripts\Parameters;
 class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 
 	private $name = "--test_text";
-	private $parameter;
+	private $object;
 
 	public static function setUpBeforeClass() {
 		error_log("TextArgumentParameterTest");
@@ -17,32 +17,36 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TextArgumentParameter::isValueValid
 	 */
 	public function testIsValueValid() {
-		$this->parameter = new TextArgumentParameter($this->name, "asdfasdf", "/.*/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "123123", "/.*/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "!@#_.", "/.*/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
+		$letters = "asdfasdf";
+		$digits = "123123";
+		$punct = "!@#_.";
 
-		$this->parameter = new TextArgumentParameter($this->name, "asdfasdf", "/[A-z]+/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "123123", "/\d+/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "!@#_.", "/[!|@|#|_|\.]/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
+		$this->object = new TextArgumentParameter($this->name, $letters, TextArgumentParameter::PATTERN_ANYTHING_GOES);
+		$this->assertEquals(true, $this->object->isValueValid($letters));
+		$this->object = new TextArgumentParameter($this->name, $digits, TextArgumentParameter::PATTERN_ANYTHING_GOES);
+		$this->assertEquals(true, $this->object->isValueValid($digits));
+		$this->object = new TextArgumentParameter($this->name, $punct, TextArgumentParameter::PATTERN_ANYTHING_GOES);
+		$this->assertEquals(true, $this->object->isValueValid($punct));
 
-		$this->parameter = new TextArgumentParameter($this->name, "asdfasdf", "/\d+/");
-		$this->assertNotEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "asdfasdf", "/[!|@|#|_|\.]/");
-		$this->assertNotEquals(true, $this->parameter->isValueValid());
+		$this->object = new TextArgumentParameter($this->name, $letters, "/[A-z]+/");
+		$this->assertEquals(true, $this->object->isValueValid($letters));
+		$this->object = new TextArgumentParameter($this->name, $digits, TextArgumentParameter::PATTERN_DIGIT);
+		$this->assertEquals(true, $this->object->isValueValid($digits));
+		$this->object = new TextArgumentParameter($this->name, $punct, "/[!|@|#|_|\.]/");
+		$this->assertEquals(true, $this->object->isValueValid($punct));
 
-		$this->parameter = new TextArgumentParameter($this->name, "123123", "/[A-z]+/");
-		$this->assertNotEquals(true, $this->parameter->isValueValid());
-		$this->parameter = new TextArgumentParameter($this->name, "123123", "/[!|@|#|_|\.]/");
-		$this->assertNotEquals(true, $this->parameter->isValueValid());
+		$this->object = new TextArgumentParameter($this->name, $letters, TextArgumentParameter::PATTERN_DIGIT);
+		$this->assertNotEquals(true, $this->object->isValueValid($letters));
+		$this->object = new TextArgumentParameter($this->name, $letters, "/[!|@|#|_|\.]/");
+		$this->assertNotEquals(true, $this->object->isValueValid($letters));
+
+		$this->object = new TextArgumentParameter($this->name, $digits, "/[A-z]+/");
+		$this->assertNotEquals(true, $this->object->isValueValid($digits));
+		$this->object = new TextArgumentParameter($this->name, $digits, "/[!|@|#|_|\.]/");
+		$this->assertNotEquals(true, $this->object->isValueValid($digits));
 		
-		$this->parameter = new TextArgumentParameter($this->name, "", "/\d+/");
-		$this->assertEquals(true, $this->parameter->isValueValid());
+		$this->object = new TextArgumentParameter($this->name, "", TextArgumentParameter::PATTERN_DIGIT);
+		$this->assertEquals(true, $this->object->isValueValid(""));
 	}
 
 }

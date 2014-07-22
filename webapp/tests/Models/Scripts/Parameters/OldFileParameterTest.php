@@ -4,46 +4,56 @@ namespace Models\Scripts\Parameters;
 
 class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
-	private static $database;
-	private static $owner;
-	private static $id;
-	private static $project;
-
 	public static function setUpBeforeClass() {
 		error_log("OldFileParameterTest");
-		OldFileParameterTest::$owner = "sharpa";
-		OldFileParameterTest::$id = 1;
+	}
+
+	private $owner;
+	private $id;
+	private $database;
+	private $project;
+	private $mockScript; 
+
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$stubGetter = new \Stubs\StubGetter();
+		$this->mockScript = $stubGetter->getScript();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+
+		$this->owner = "sharpa";
+		$this->id = 1;
 
 		$pdo = new \PDO("sqlite:./data/database.sqlite");
 		$pdo->exec("DELETE FROM uploaded_files");
 
-		OldFileParameterTest::$database = new \Database\PDODatabase(new \Models\MacOperatingSystem());
-		OldFileParameterTest::$database->createUploadedFile(
-			OldFileParameterTest::$owner,	
-			OldFileParameterTest::$id,
+		$this->database = new \Database\PDODatabase(new \Models\MacOperatingSystem());
+		$this->database->createUploadedFile(
+			$this->owner,	
+			$this->id,
 			"File1",
 			"arbitrary_text"
 		);
-		OldFileParameterTest::$database->createUploadedFile(
-			OldFileParameterTest::$owner,	
-			OldFileParameterTest::$id,
+		$this->database->createUploadedFile(
+			$this->owner,	
+			$this->id,
 			"File2",
 			"map"
 		);
 
-		$operatingSystem = new \Models\MacOperatingSystem(OldFileParameterTest::$database);
-		OldFileParameterTest::$project = new \Models\QIIMEProject(
-			OldFileParameterTest::$database,
+		$operatingSystem = new \Models\MacOperatingSystem($this->database);
+		$this->project = new \Models\QIIMEProject(
+			$this->database,
 			$operatingSystem
 		);
-		OldFileParameterTest::$project->setOwner(OldFileParameterTest::$owner);
-		OldFileParameterTest::$project->setId(OldFileParameterTest::$id);
+		$this->project->setOwner($this->owner);
+		$this->project->setId($this->id);
 	}
 
-	private $parameter;
+	private $object;
 
 	public function setUp() {
-		$this->parameter = new OldFileParameter("--old_file_param", OldFileParameterTest::$project);
+		$this->object = new OldFileParameter("--old_file_param", $this->project);
 	}
 
 	/**
@@ -54,18 +64,18 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testConstructor() {
 		$validValue1 = "File1";
 		$validValue2 = "File2";
-		$this->parameter->setValue($validValue1);
-		$this->assertTrue($this->parameter->isValueValid());
-		$this->parameter->setValue($validValue2);
-		$this->assertTrue($this->parameter->isValueValid());
+		$this->assertTrue($this->object->isValueValid($validValue1));
+		$this->object->setValue($validValue1);
+		$this->assertTrue($this->object->isValueValid($validValue2));
+		$this->object->setValue($validValue2);
 
 		$invalidValue = "File3";
-		$this->parameter->setValue($invalidValue);
-		$this->assertFalse($this->parameter->isValueValid());
+		$this->assertFalse($this->object->isValueValid($invalidValue));
+		$this->object->setValue($invalidValue);
 	}
 
 	public function testRenderForForm() {
-		$this->parameter->setValue("File2");
+		$this->object->setValue("File2");
 		$expectedForm = "<label for=\"--old_file_param\">--old_file_param<select name=\"--old_file_param\">\n";
 		$expectedForm .= "<option value=\"\">--Selected a file--</option>\n";
 		$expectedForm .= "<optgroup label=\"arbitrary_text files\">\n";
@@ -76,7 +86,7 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$expectedForm .= "</optgroup>\n";
 		$expectedForm .= "</select></label>\n";
 
-		$this->assertEquals($expectedForm, $this->parameter->renderForForm());
+		$this->assertEquals($expectedForm, $this->object->renderForForm($disabled = false, $this->mockScript));
 	}
 
 }

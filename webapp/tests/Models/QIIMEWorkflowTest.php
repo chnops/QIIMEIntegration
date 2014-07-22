@@ -38,12 +38,12 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetCurrentStep() {
 		$controllersInOrder = array (
-				new \Controllers\IndexController($this->database, $this->workflow), 
-				new \Controllers\LoginController($this->database, $this->workflow), 
-				new \Controllers\SelectProjectController($this->database, $this->workflow), 
-				new \Controllers\UploadController($this->database, $this->workflow), 
-				new \Controllers\RunScriptsController($this->database, $this->workflow),
-				new \Controllers\ViewResultsController($this->database, $this->workflow), 
+				new \Controllers\IndexController($this->workflow), 
+				new \Controllers\LoginController($this->workflow), 
+				new \Controllers\SelectProjectController($this->workflow), 
+				new \Controllers\UploadController($this->workflow), 
+				new \Controllers\RunScriptsController($this->workflow),
+				new \Controllers\ViewResultsController($this->workflow), 
 			);
 		$stepsInOrder = array ("login","login","select",
 			"upload","run","view",);
@@ -81,7 +81,7 @@ class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
 	 * @covers QIIMEWorkflow::getNewProject
 	 */
 	public function testGetNewProject() {
-		$expectedProject = new QIIMEProject($this->database, $this->workflow, $this->operatingSystem);
+		$expectedProject = new QIIMEProject($this->database, $this->operatingSystem);
 		$newProject = $this->workflow->getNewProject();
 		$this->assertEquals($expectedProject, $newProject);
 	}

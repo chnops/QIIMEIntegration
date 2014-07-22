@@ -4,16 +4,25 @@ namespace Models\Scripts\Parameters;
 
 class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
-	private $parameter;
+	private $object;
 	private $name = "--file_path";
 	private $value = "./file/path.ext";
+	private $mockScript = NULl;
 
 	public static function setUpBeforeClass() {
 		error_log("DefaultParameterTest");
 	}
 
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$stubGetter = new \Stubs\StubGetter();
+		$this->mockScript = $stubGetter->getScript();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+	}
+
 	public function setUp() {
-		$this->parameter = new DefaultParameter($this->name, $this->value);
+		$this->object = new DefaultParameter($this->name, $this->value);
 	}
 
 	/**
@@ -23,8 +32,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers DefaultParmeter::isRequired
 	 */
 	public function testGetters() {
-		$this->assertEquals($this->name, $this->parameter->getName());
-		$this->assertEquals($this->value, $this->parameter->getValue());
+		$this->assertEquals($this->name, $this->object->getName());
+		$this->assertEquals($this->value, $this->object->getValue());
 	}
 
 	/**
@@ -35,11 +44,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testSetters() {
 		$newName = "--new_file_path";
-		$this->parameter->setName($newName);
+		$this->object->setName($newName);
 		$newValue = "./new/file/path.ext";
-		$this->parameter->setValue($newValue);
-		$this->assertEquals($newName, $this->parameter->getName());
-		$this->assertEquals($newValue, $this->parameter->getValue());
+		$this->object->setValue($newValue);
+		$this->assertEquals($newName, $this->object->getName());
+		$this->assertEquals($newValue, $this->object->getValue());
 	}
 
 	/**
@@ -48,7 +57,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForOperatingSystem() {
 		$expectedString = $this->name . "='" . $this->value . "'";
-		$this->assertEquals($expectedString, $this->parameter->renderForOperatingSystem());
+		$this->assertEquals($expectedString, $this->object->renderForOperatingSystem());
 	}
 
 	/**
@@ -57,6 +66,6 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm() {
 		$expectedString = "<label for=\"{$this->name}\">{$this->name}<input type=\"text\" name=\"{$this->name}\" value=\"{$this->value}\"/></label>";
-		$this->assertEquals($expectedString, $this->parameter->renderForForm());
+		$this->assertEquals($expectedString, $this->object->renderForForm($disabled = false, $this->mockScript));
 	}
 }

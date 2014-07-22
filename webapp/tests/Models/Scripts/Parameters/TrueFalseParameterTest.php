@@ -5,14 +5,23 @@ namespace Models\Scripts\Parameters;
 class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 
 	private $name = "--true_false";
-	private $parameter;
+	private $object;
+	private $mockScript = NULL;
 
 	public static function setUpBeforeClass() {
 		error_log("TrueFalseParameterTest");
 	}
 
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$stubGetter = new \Stubs\StubGetter();
+		$this->mockScript = $stubGetter->getScript();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+	}
+
 	public function setUp() {
-		$this->parameter = new TrueFalseParameter($this->name);
+		$this->object = new TrueFalseParameter($this->name);
 	}
 
 	/**
@@ -20,9 +29,9 @@ class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TrueFalseParameter::__construct
 	 */
 	public function testConstructor() {
-		$this->assertFalse($this->parameter->getValue());
-		$this->parameter = new TrueFalseParameter($this->name, TRUE);
-		$this->assertFalse($this->parameter->getValue());
+		$this->assertFalse($this->object->getValue());
+		$this->object = new TrueFalseParameter($this->name, TRUE);
+		$this->assertFalse($this->object->getValue());
 	}
 
 	/**
@@ -30,9 +39,9 @@ class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TrueFalseParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
-		$this->assertEmpty($this->parameter->renderForOperatingSystem());
-		$this->parameter->setValue(TRUE);
-		$this->assertEquals($this->name, $this->parameter->renderForOperatingSystem());
+		$this->assertEmpty($this->object->renderForOperatingSystem());
+		$this->object->setValue(TRUE);
+		$this->assertEquals($this->name, $this->object->renderForOperatingSystem());
 	}
 
 	/**
@@ -41,9 +50,9 @@ class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm() {
 		$expectedIfFalse = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}</label>";
-		$this->assertEquals($expectedIfFalse, $this->parameter->renderForForm());
-		$this->parameter->setValue(TRUE);
+		$this->assertEquals($expectedIfFalse, $this->object->renderForForm($disabled = false, $this->mockScript));
+		$this->object->setValue(TRUE);
 		$expectedIfTrue = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}</label>";
-		$this->assertEquals($expectedIfTrue, $this->parameter->renderForForm());
+		$this->assertEquals($expectedIfTrue, $this->object->renderForForm($disabled = false, $this->mockScript));
 	}
 }

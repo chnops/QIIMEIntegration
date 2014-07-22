@@ -4,15 +4,24 @@ namespace Models\Scripts\Parameters;
 
 class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
 
-	private $name = "--true_false_inverted";
-	private $parameter;
-
 	public static function setUpBeforeClass() {
 		error_log("TrueFalseInvertedParameterTest");
 	}
 
+	private $name = "--true_false_inverted";
+	private $object;
+	private $mockScript = NULL;
+
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$stubGetter = new \Stubs\StubGetter();
+		$this->mockScript = $stubGetter->getScript();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+	}
+
 	public function setUp() {
-		$this->parameter = new TrueFalseInvertedParameter($this->name);
+		$this->object = new TrueFalseInvertedParameter($this->name);
 	}
 
 	/**
@@ -20,9 +29,9 @@ class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TrueFalseInvertedParameter::__construct
 	 */
 	public function testConstructor() {
-		$this->assertTrue($this->parameter->getValue());
-		$this->parameter = new TrueFalseInvertedParameter($this->name, FALSE);
-		$this->assertTrue($this->parameter->getValue());
+		$this->assertTrue($this->object->getValue());
+		$this->object = new TrueFalseInvertedParameter($this->name, FALSE);
+		$this->assertTrue($this->object->getValue());
 	}
 
 	/**
@@ -30,9 +39,9 @@ class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TrueFalseInvertedParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
-		$this->assertEmpty($this->parameter->renderForOperatingSystem());
-		$this->parameter->setValue(FALSE);
-		$this->assertEquals($this->name, $this->parameter->renderForOperatingSystem());
+		$this->assertEmpty($this->object->renderForOperatingSystem());
+		$this->object->setValue(FALSE);
+		$this->assertEquals($this->name, $this->object->renderForOperatingSystem());
 	}
 
 	/**
@@ -41,9 +50,9 @@ class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm() {
 		$expectedIfTrue = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}</label>";
-		$this->assertEquals($expectedIfTrue, $this->parameter->renderForForm());
-		$this->parameter->setValue(FALSE);
+		$this->assertEquals($expectedIfTrue, $this->object->renderForForm($disabled = false, $this->mockScript));
+		$this->object->setValue(FALSE);
 		$expectedIfFalse = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}</label>";
-		$this->assertEquals($expectedIfFalse, $this->parameter->renderForForm());
+		$this->assertEquals($expectedIfFalse, $this->object->renderForForm($disabled = false, $this->mockScript));
 	}
 }
