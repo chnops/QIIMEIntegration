@@ -48,7 +48,7 @@ abstract class DefaultProject implements ProjectI {
 	}
 	public function getScripts() {
 		if (empty($this->scripts)) {
-			$this->initializeScripts();
+			$this->scripts = $this->getInitialScripts();
 		}
 		return $this->scripts;
 	}
@@ -139,14 +139,15 @@ abstract class DefaultProject implements ProjectI {
 		$this->database->startTakingRequests();
 		$removeResult = $this->database->removeUploadedFile($this->owner, $this->id, $fileName);
 		if (!$removeResult) {
-			$this->database->forgetAllReqeusts();
+			$this->database->forgetAllRequests();
 			throw new \Exception("Unable to find/remove .zip file from the database");
 		}
 
 		try {	
 			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $isUploaded = true, $runId = -1);
 			foreach ($newFileNames as $newFileName) {
-				if(!$this->database->createuploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
+				if(!$this->database->createUploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
+					$this->database->forgetAllRequests();
 					throw new \Exception("Unable to add unzipped file to database");
 				}
 			}
@@ -270,7 +271,6 @@ abstract class DefaultProject implements ProjectI {
 			$pidResult = $this->database->giveRunPid($runId, $pid);
 			if (!$pidResult) {
 				$result .= "<br/>However, we were unable to save the run in the database.";
-				$this->database->forgetAllRequests();
 				throw new \Exception($result);
 			}
 
@@ -286,10 +286,7 @@ abstract class DefaultProject implements ProjectI {
 	public function renderOverview() {
 		$overview = "<div id=\"project_overview\">\n";
 
-		if (!$this->scriptsFormatted) {
-			$this->initializeScripts();
-		}
-		foreach ($this->scriptsFormatted as $category => $scriptArray) {
+		foreach ($this->getFormattedScripts() as $category => $scriptArray) {
 			$overview .= "<div><span>{$category}</span>";
 			foreach ($scriptArray as $script) {
 				$overview .= "<span><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></span>";
@@ -302,7 +299,8 @@ abstract class DefaultProject implements ProjectI {
 
 
 	public abstract function beginProject();
-	public abstract function initializeScripts();
+	public abstract function getInitialScripts();
+	public abstract function getFormattedScripts();
 	public abstract function getInitialFileTypes();
 	public abstract function retrieveAllBuiltInFiles();
 	public abstract function getEnvironmentSource();

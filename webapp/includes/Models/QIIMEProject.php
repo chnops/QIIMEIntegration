@@ -27,62 +27,65 @@ class QIIMEProject extends DefaultProject {
 			throw $ex;
 		}
 	}
-	public function initializeScripts() {
+	public function getInitialScripts() {
+		$scripts = array();
+
 		$script = new \Models\Scripts\QIIME\ValidateMappingFile($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Validate input'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\JoinPairedEnds($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ExtractBarcodes($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\SplitLibrariesFastq($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ConvertFastaQualFastq($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\PickOtus($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Organize into OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\PickRepSet($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Organize into OTUs'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\AssignTaxonomy($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\MakeOtuTable($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ManipulateOtuTable($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\AlignSeqs($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\FilterAlignment($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\MakePhylogeny($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
+
+		return $scripts;
+	}
+
+	public function getFormattedScripts() {
+		if (!$this->scriptsFormatted) {
+			$scriptsInOrder = array_values($this->getScripts());
+			$index = 0;
+			$this->scriptsFormatted['Validate input'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Organize into OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Organize into OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index];
+		}
+		return $this->scriptsFormatted;
 	}
 
 	public function getInitialFileTypes() {

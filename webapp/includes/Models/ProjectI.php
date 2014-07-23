@@ -17,7 +17,8 @@ interface ProjectI {
 
 	// Lazy load getters (and dependents)
 	public function getScripts();
-	public function initializeScripts();
+	public function getInitialScripts();
+	public function getFormattedScripts();
 	public function renderOverview();
 	public function getFileTypes();
 	public function getInitialFileTypes();
