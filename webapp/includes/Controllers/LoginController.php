@@ -47,18 +47,18 @@ class LoginController extends Controller {
 		}
 	}
 
-	private function logout() {
+	public function logout() {
 		$_SESSION = array();
 		$this->username = NULL;
 		$this->project = NULL;
 	}
-	private function login($username) {
+	public function login($username) {
 		$this->logout();
 		$_SESSION['username'] = $username;
 		$this->username = $username;
 		$this->result = "You have successfully logged in.";
 	}
-	private function createUser($username) {
+	public function createUser($username) {
 		try {
 			$this->roster->createUser($username);
 		}

@@ -15,6 +15,12 @@ class SelectProjectController extends Controller {
 	public function retrievePastResults() {
 		return "";
 	}
+	public function getProjects() {
+		return $this->projects;
+	}
+	public function setProjects($projects) {
+		$this->projects = $projects;
+	}
 	
 	public function parseInput() {
 		if (!$this->username) {
@@ -54,7 +60,7 @@ class SelectProjectController extends Controller {
 		}
 	}
 
-	private function projectNameExists($projectName) {
+	public function projectNameExists($projectName) {
 		foreach ($this->projects as $project) {
 			if ($project->getName() == $projectName) {
 				return true;
@@ -62,7 +68,7 @@ class SelectProjectController extends Controller {
 		}
 		return false;
 	}
-	private function projectIdExists($projectId) {
+	public function projectIdExists($projectId) {
 		foreach ($this->projects as $project) {
 			if ($project->getId() == $projectId) {
 				return true;
@@ -70,7 +76,7 @@ class SelectProjectController extends Controller {
 		}
 		return false;
 	}
-	private function createProject($projectName) {
+	public function createProject($projectName) {
 		$project = $this->workflow->getNewProject();
 		$project->setName($projectName);
 		$project->setOwner($this->username);
@@ -88,7 +94,7 @@ class SelectProjectController extends Controller {
 		$this->result = "Successfully created project: " . $this->helper->htmlentities($projectName);
 		$_SESSION['project_id'] = $project->getId();
 	}
-	private function selectProject($projectId) {
+	public function selectProject($projectId) {
 		$project = $this->workflow->findProject($this->username, $projectId);
 		$this->result = "Project selected: " . $this->helper->htmlentities($project->getName());
 		$_SESSION['project_id'] = $projectId;

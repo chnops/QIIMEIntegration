@@ -80,6 +80,13 @@ abstract class Controller {
 		$this->project = $project;
 	}
 
+	public function getDisabled() {
+		return $this->disabled;
+	}
+	public function setDisabled($disabled) {
+		$this->disabled = $disabled;
+	}
+
 	public function parseSession() {
 		if (!isset($_SESSION['username'])) {
 			return;

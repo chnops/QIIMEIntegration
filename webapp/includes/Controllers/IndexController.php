@@ -5,6 +5,12 @@ namespace Controllers;
 class IndexController extends Controller {
 
 	protected $subController = NULL;
+	public function setSubController($subController) {
+		$this->subController = $subController;
+	}
+	public function getSubController() {
+		return $this->subController;
+	}
 
 	public function parseSession() {
 		return;
@@ -12,10 +18,10 @@ class IndexController extends Controller {
 
 	public function parseInput() {
 		if (isset($_REQUEST['step'])) {
-			$this->subController = $this->workflow->getController($_REQUEST['step']);
+			$this->setSubController($this->workflow->getController($_REQUEST['step']));
 		}
 		else {
-			$this->subController = new LoginController($this->workflow);
+			$this->setSubController(new LoginController($this->getWorkflow()));
 		}
 	}
 

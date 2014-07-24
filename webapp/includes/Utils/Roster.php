@@ -4,7 +4,7 @@ namespace Utils;
 
 class Roster {
 	private static $roster = NULL;
-	public static function setDefaultRoster(Roster $roster) {
+	public static function setDefaultRoster(Roster $roster = NULL) {
 		Roster::$roster = $roster;
 	}
 	public static function getRoster() {

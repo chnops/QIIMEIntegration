@@ -179,6 +179,27 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Controllers\Controller::getDisabled
+	 */
+	public function testGetDisabled() {
+	
+		$actual = $this->object->getDisabled();
+
+		$this->assertEmpty($actual);
+	}
+	/**
+	 * @covers \Controllers\Controller::getDisabled
+	 */
+	public function testSetDisabled() {
+		$expected = " disabled";
+	
+		$this->object->setDisabled($expected);
+
+		$actual = $this->object->getDisabled();
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
 	 * @covers \Controllers\Controller::parseSession
 	 */
 	public function testParseSession_noUsername_noProject() {
