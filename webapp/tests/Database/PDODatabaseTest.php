@@ -3,6 +3,9 @@
 namespace Database;
 
 class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
+	public static function setUpBeforeClass() {
+		error_log("PDODatabaseTest");
+	}
 
 	private $testDSN = "sqlite:./data/database.sqlite";
 	private $pdo;

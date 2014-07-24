@@ -1,5 +1,8 @@
 <phpunit colors='true' bootstrap='./bootstrap.php'>
    <testsuites>
+       <testsuite name="Controllers">
+           <directory>Controllers</directory>
+       </testsuite>
        <testsuite name="Database">
            <directory>Database</directory>
        </testsuite>
