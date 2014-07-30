@@ -29,7 +29,7 @@ class RunScriptsController extends Controller {
 				continue;
 			}
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
-				$status = ($run['is_finished']) ? "ready" : "still running";
+				$status = ($run['is_finished']) ? "done" : "still running";
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">Run {$run['id']} (<em>{$status}</em>)</h4>";
 				$output .= "<div><strong>User input:</strong> " . $this->helper->htmlentities($run['input']);
 				if (!empty($run['file_names'])) {
@@ -44,10 +44,7 @@ class RunScriptsController extends Controller {
 			$output .= "</div>\n";
 		}
 
-		if ($output) {
-			return $output;
-		}
-		return "";
+		return $output;
 	}
 
 	public function parseInput() {
@@ -66,8 +63,15 @@ class RunScriptsController extends Controller {
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
-			$this->result = $ex->getMessage();
+			$this->result = "Unable to run script: " . $ex->getMessage();
 		}
+	}
+
+	public function setScriptId($scriptId) {
+		$this->scriptId = $scriptId;
+	}
+	public function getScriptId() {
+		return $this->scriptId;
 	}
 
 	public function renderInstructions() {
@@ -102,12 +106,10 @@ class RunScriptsController extends Controller {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();	
 		$help = "";
 		$scripts = $project->getScripts();
-		if ($scripts) {
-			foreach ($scripts as $script) {
-				$help .= "<div class=\"hideable\" id=\"help_{$script->getHtmlId()}\">\n";
-				$help .= $script->renderHelp();
-				$help .= "</div>\n";
-			}
+		foreach ($scripts as $script) {
+			$help .= "<div class=\"hideable\" id=\"help_{$script->getHtmlId()}\">\n";
+			$help .= $script->renderHelp();
+			$help .= "</div>\n";
 		}
 		return $help;
 	}

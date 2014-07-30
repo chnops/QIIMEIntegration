@@ -33,7 +33,7 @@ class FileUploadErrors {
 			error_log("The application did not have write permission to the tmp dir");
 		}
 
-		if ($this->errors[$errorCode]) {
+		if (isset($this->errors[$errorCode])) {
 			return $this->errors[$errorCode];
 		}
 		return "An unknown file-upload error occurred.";

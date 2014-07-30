@@ -54,30 +54,17 @@ class UploadController extends Controller {
 		}
 
 		$isDownload = isset($_POST['url']);
-		if ($isDownload) {
-			$this->url = $_POST['url'];
-			$urlParts = explode('/', $this->url);
-			$fileName = "";
-			while (!$fileName && $urlParts) {
-				$fileName = array_pop($urlParts);
-			}
-		}
-		else {
-			$fileName = $_FILES['file']['name'];
-		}
+		$fileName = $this->getFileName($isDownload);
 		if (!$fileName) {
 			$this->isResultError = true;
 			$this->result = "Unable to determine file name";
 			return;
 		}
 
-		$pastFiles = $this->project->retrieveAllUploadedFiles();
-		foreach ($pastFiles as $extantFile) {
-			if ($extantFile['name'] == $fileName) {
-				$this->isResultError = true;
-				$this->result .= "You have already uploaded a file with that file name. File names must be unique";
-				return;
-			}
+		if ($this->fileNameExists($fileName)) {
+			$this->isResultError = true;
+			$this->result .= "You have already uploaded a file with that file name. File names must be unique";
+			return;
 		}
 		
 		if ($isDownload) {
@@ -97,7 +84,40 @@ class UploadController extends Controller {
 		}
 	}
 
-	private function getFileType() {
+	public function getFileName($isDownload) {
+		$fileName = "";
+		if ($isDownload && isset($_POST['url'])) {
+			$this->url = $_POST['url'];
+			$urlParts = explode('/', $this->url);
+			while (!$fileName && $urlParts) {
+				$fileName = array_pop($urlParts);
+			}
+		}
+		else {
+			if (isset($_FILES['file']) && isset($_FILES['file']['name'])) {
+				$fileName = $_FILES['file']['name'];
+			}
+		}
+		return $fileName;
+	}
+
+	public function fileNameExists($fileName) {
+		if (!$this->project) {
+			return false;
+		}
+		$pastFiles = $this->project->retrieveAllUploadedFiles();
+		foreach ($pastFiles as $extantFile) {
+			if ($extantFile['name'] == $fileName) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function setFileType(\Models\FileType $fileType) {
+		$this->fileType = $fileType;
+	}
+	public function getFileType() {
 		if (!$this->fileType) {
 			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
 			if (isset($_POST['type'])) {
@@ -111,7 +131,7 @@ class UploadController extends Controller {
 		return $this->fileType;
 	}
 
-	private function downloadFile($url, $fileName) {
+	public function downloadFile($url, $fileName) {
 		$output = "File downloaded has started.";
 		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $this->getFileType());
 		if ($consoleOutput) {
@@ -120,7 +140,7 @@ class UploadController extends Controller {
 		return $output;
 	}
 
-	private function uploadFile(array $file) {
+	public function uploadFile(array $file) {
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
 			$fileUploadErrors = new FileUploadErrors();
@@ -147,7 +167,7 @@ class UploadController extends Controller {
 			<form method=\"POST\" action=\"index.php\" enctype=\"multipart/form-data\">
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
 				<label for=\"file\">Select a file to upload:
-				<input type=\"file\" name=\"file\"/{$this->disabled}></label>
+				<input type=\"file\" name=\"file\"{$this->disabled}/></label>
 				<label for=\"type\">File type:
 				<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
 
