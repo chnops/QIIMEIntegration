@@ -348,7 +348,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("htmlentities"))
 			->getMock();
 		$mockHelper->expects($this->any())->method("htmlentities")->will($this->returnValue(""));
-		$oldHelper = \Utils\Helper::getHelper();
 		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->objectBuilder->getMockForAbstractClass();
 		$username = "username";
@@ -364,7 +363,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 		$actual = $this->object->renderSessionData();
 
 		$this->assertEquals($expected, $actual);
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 	}
 
 	/**

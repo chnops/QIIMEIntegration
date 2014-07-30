@@ -39,7 +39,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRetrievePastResults_noProjectSelected() {
 		$expected = "<p>In order to view results, you must <a href=\"?step=login\">log in</a> and <a href=\"?step=select\">select a project</a></p>";
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -50,7 +49,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -63,7 +62,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			</ul>" .
 			"<hr/>You can see a preview of the file you wish to download here:<br/>
 			<div class=\"file_example\" id=\"file_preview\"></div>";
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -82,7 +80,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -168,7 +166,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			"result" => "An invalid action was requested: doSomething",
 		);
 		$actuals = array();
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -183,7 +180,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -203,7 +200,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("deleteUploadedFile")->will($this->throwException(new \Exception("message")));
 		$mockProject->expects($this->never())->method("deleteGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -218,7 +214,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -238,7 +234,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("deleteUploadedFile");
 		$mockProject->expects($this->never())->method("deleteGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -253,7 +248,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -273,7 +268,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("deleteUploadedFile");
 		$mockProject->expects($this->once())->method("deleteGeneratedFile")->will($this->throwException(new \Exception("message")));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -288,7 +282,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -308,7 +302,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("deleteUploadedFile");
 		$mockProject->expects($this->once())->method("deleteGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -323,7 +316,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -343,7 +336,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("unzipUploadedFile")->will($this->throwException(new \Exception("message")));
 		$mockProject->expects($this->never())->method("unzipGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -358,7 +350,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -378,7 +370,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("unzipUploadedFile");
 		$mockProject->expects($this->never())->method("unzipGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -393,7 +384,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -413,7 +404,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("unzipUploadedFile");
 		$mockProject->expects($this->once())->method("unzipGeneratedFile")->will($this->throwException(new \Exception("message")));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -428,7 +418,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -448,7 +438,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("unzipUploadedFile");
 		$mockProject->expects($this->once())->method("unzipGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -463,7 +452,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -483,7 +472,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("compressUploadedFile")->will($this->throwException(new \Exception("message")));
 		$mockProject->expects($this->never())->method("compressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -498,7 +486,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -518,7 +506,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("compressUploadedFile");
 		$mockProject->expects($this->never())->method("compressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -533,7 +520,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -553,7 +540,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("compressUploadedFile");
 		$mockProject->expects($this->once())->method("compressGeneratedFile")->will($this->throwException(new \Exception("message")));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -568,7 +554,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -588,7 +574,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("compressUploadedFile");
 		$mockProject->expects($this->once())->method("compressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -603,7 +588,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -623,7 +608,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("decompressUploadedFile")->will($this->throwException(new \Exception("message")));
 		$mockProject->expects($this->never())->method("decompressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -638,7 +622,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -658,7 +642,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("decompressUploadedFile");
 		$mockProject->expects($this->never())->method("decompressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -673,7 +656,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -693,7 +676,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("decompressUploadedFile");
 		$mockProject->expects($this->once())->method("decompressGeneratedFile")->will($this->throwException(new \Exception("message")));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -708,7 +690,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -728,7 +710,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->never())->method("decompressUploadedFile");
 		$mockProject->expects($this->once())->method("decompressGeneratedFile");
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -743,7 +724,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->parseInput();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -774,7 +755,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForm_zeroUploadedFiles_zeroGeneratedFiles() {
 		$expected = "";
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray"))
 			->getMock();
@@ -791,7 +771,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForm();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -811,7 +791,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 				array("name" => "name3", "run_id" => 2),
 			),
 		);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray"))
 			->getMock();
@@ -832,7 +811,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForm();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -852,7 +831,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 				array("name" => "name3", "status" => -1, "size" => 100),
 			),
 		);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray"))
 			->getMock();
@@ -873,7 +851,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForm();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -906,7 +884,6 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 				array("name" => "name3", "run_id" => 2),
 			),
 		);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray"))
 			->getMock();
@@ -927,7 +904,7 @@ class ViewResultsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForm();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 

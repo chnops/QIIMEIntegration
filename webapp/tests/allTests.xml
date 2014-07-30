@@ -6,6 +6,9 @@
        <testsuite name="Database">
            <directory>Database</directory>
        </testsuite>
+       <testsuite name="Utils">
+           <directory>Utils</directory>
+       </testsuite>
        <testsuite name="Models">
            <directory>Models</directory>
        </testsuite>

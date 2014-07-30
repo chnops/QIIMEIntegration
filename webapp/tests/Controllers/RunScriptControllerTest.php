@@ -39,7 +39,6 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRetrievePastResults_projectNotSet() {
 		$this->object->setProject(NULL);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -50,7 +49,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEmpty($actual);
 	}
 	/**
@@ -62,7 +61,6 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("getPastScriptRuns"))
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue(array()));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -74,7 +72,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEmpty($actual);
 	}
 	/**
@@ -102,7 +100,6 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue($scriptRuns));
 		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue($scripts));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -114,7 +111,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 

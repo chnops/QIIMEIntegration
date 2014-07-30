@@ -4,7 +4,7 @@ namespace Utils;
 
 class Helper {
 	private static $helper = NULL;
-	public static function setDefaultHelper(Helper $helper) {
+	public static function setDefaultHelper(Helper $helper = NULL) {
 		Helper::$helper = $helper;
 	}
 	public static function getHelper() {

@@ -456,7 +456,6 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\SelectProjectController::createProject
 	 */
 	public function testCreateProject_htmlentities() {
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')->setMethods(array("htmlentities"))->getMock();
 		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnValue(""));
 		\Utils\Helper::setDefaultHelper($mockHelper);
@@ -485,7 +484,7 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->createProject($projectName);
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$actuals['projects'] = $this->object->getProjects();
@@ -529,7 +528,6 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\SelectProjectController::selectProject
 	 */
 	public function testSelectProject_htmlentities() {
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->disableOriginalConstructor()
 			->setMethods(array("htmlentities"))
@@ -558,7 +556,7 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->selectProject($projectId);
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['result'] = $this->object->getResult();
 		$actuals['session'] = $_SESSION;
 		$actuals['project'] = $this->object->getProject();
@@ -766,7 +764,6 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\SelectProjectController::renderForm
 	 */
 	public function testRenderForm_htmlentitiesCalled() {
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')->setMethods(array("htmlentities"))->getMock();
 		$mockHelper->expects($this->exactly(2))->method("htmlentities")->will($this->returnValue(""));
 		\Utils\Helper::setDefaultHelper($mockHelper);
@@ -804,7 +801,7 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForm();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 

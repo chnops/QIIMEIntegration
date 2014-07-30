@@ -70,7 +70,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("retrieveAllUploadedFiles"))
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -86,7 +85,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -107,7 +106,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("retrieveAllUploadedFiles"))
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -128,7 +126,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -690,7 +688,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testDownloadFile_noConsoleOutput() {
 		$expected = "File downloaded has started.";
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -710,7 +707,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->downloadFile("url", "fileName");
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -718,7 +715,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testDownloadFile_someConsoleOutput() {
 		$expected = "File downloaded has started.<br/>The console returned the following output:<br/>message";
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -738,7 +734,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->downloadFile("url", "fileName");
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -904,7 +900,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		);
 		$actuals = array();
 		$file = array("error" => 0, "name" => "fileName", "tmp_name" => "/tmp/fileName", "size" => 100);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -924,7 +919,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->uploadFile($file);
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -939,7 +934,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		);
 		$actuals = array();
 		$file = array("error" => 0, "name" => "fileName", "tmp_name" => "/tmp/fileName", "size" => 100);
-		$oldHelper = \Utils\Helper::getHelper();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
@@ -959,7 +953,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->uploadFile($file);
 
-		\Utils\Helper::setDefaultHelper($oldHelper);
+		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
