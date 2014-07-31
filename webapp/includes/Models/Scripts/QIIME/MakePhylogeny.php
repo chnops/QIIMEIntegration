@@ -23,13 +23,13 @@ class MakePhylogeny extends DefaultScript {
 		return "make_phylogeny";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFp = new OldFileParameter("--input_fp", $this->project);
 		$inputFp->requireIf();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFp,
 
@@ -44,5 +44,6 @@ class MakePhylogeny extends DefaultScript {
 			new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
 			new NewFileParameter("--log_fp", "")
 		);
+		return $parameters;
 	}
 }

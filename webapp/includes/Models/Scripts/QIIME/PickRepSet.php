@@ -23,8 +23,8 @@ class PickRepSet extends DefaultScript {
 		return "pick_rep_set";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFile = new OldFileParameter("--input_file", $this->project);
 		$referenceSeqsFp = new OldFileParameter("--reference_seqs_fp", $this->project, 
@@ -34,7 +34,7 @@ class PickRepSet extends DefaultScript {
 		$inputFile->requireIf();
 		$fastaFile->requireIf($referenceSeqsFp, false);
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFile,
 
@@ -50,5 +50,6 @@ class PickRepSet extends DefaultScript {
 			new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
 			new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id"))
 		);
+		return $parameters;
 	}
 }

@@ -23,8 +23,8 @@ class PickOtus extends DefaultScript {
 		return "pick_otus";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
 		$inputSeqsFilePath->requireIf();
@@ -222,7 +222,7 @@ class PickOtus extends DefaultScript {
 		$threads = new TextArgumentParameter("--threads", "1.0", TextArgumentParameter::PATTERN_NUMBER);
 		$threads->excludeButAllowIf($otuPickingMethod, "usearch61");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputSeqsFilePath,
 
@@ -274,5 +274,6 @@ class PickOtus extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) // TODO dynamic default
 		);
+		return $parameters;
 	}
 }

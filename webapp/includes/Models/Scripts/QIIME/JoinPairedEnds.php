@@ -23,8 +23,8 @@ class JoinPairedEnds extends DefaultScript {
 		return "join_paired_ends";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$forwardReadsFp = new OldFileParameter("--forward_reads_fp", $this->project);
 		$reverseReadsFp = new OldFileParameter("--reverse_reads_fp", $this->project);
@@ -50,7 +50,7 @@ class JoinPairedEnds extends DefaultScript {
 		$maxGoodMismatch->excludeButAllowIf($peJoinMethod, "SeqPrep");
 		$phred64->excludeButAllowIf($peJoinMethod, "SeqPrep");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$forwardReadsFp,
 			$reverseReadsFp,
@@ -67,6 +67,6 @@ class JoinPairedEnds extends DefaultScript {
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose")
 		);
-			
+		return $parameters;
 	}
 }

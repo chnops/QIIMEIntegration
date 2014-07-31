@@ -23,8 +23,8 @@ class SplitLibraries extends DefaultScript {
 		return "split_libraries";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$map = new OldFileParameter("--map", $this->project);
 		$fasta = new OldFileParameter("--fasta", $this->project);
@@ -56,7 +56,7 @@ class SplitLibraries extends DefaultScript {
 		$qualScoreWindow->excludeButAllowIf($qual);
 		$discardBadWindows->excludeIf($qualScoreWindow, 0);
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$map, 
 			$fasta, 
@@ -92,5 +92,6 @@ class SplitLibraries extends DefaultScript {
   			new TrueFalseParameter("--keep-primer"),
 			new TrueFalseParameter("--keep-barcode")
 		);
+		return $parameters;
 	}
 }

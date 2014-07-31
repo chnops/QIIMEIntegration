@@ -23,15 +23,16 @@ class  extends DefaultScript {
 		return "";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 
 			new Label("Optional parameters"),
 
 			new Label("Output options"),
 		);
+		return $parameters;
 	}
 }

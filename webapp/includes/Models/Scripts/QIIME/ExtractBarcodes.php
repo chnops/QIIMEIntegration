@@ -23,8 +23,8 @@ class ExtractBarcodes extends DefaultScript {
 		return "extract_barcodes";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$fastq1 = new OldFileParameter("--fastq1", $this->project);
 		$fastq1->requireIf();
@@ -52,7 +52,7 @@ class ExtractBarcodes extends DefaultScript {
 		$switchBcOrder->excludeButAllowIf($inputType, "barcode_paired_stitched");
 		$attemptReadReorientation->excludeButAllowIf($mappingFp);
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$fastq1,
 
@@ -73,5 +73,6 @@ class ExtractBarcodes extends DefaultScript {
 			new TrueFalseParameter("--rev_comp_bc1"),
 			$revCompBc2
 		);
+		return $parameters;
 	}
 }

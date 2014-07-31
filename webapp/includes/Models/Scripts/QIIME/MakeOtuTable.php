@@ -23,8 +23,8 @@ class MakeOtuTable extends DefaultScript {
 		return "make_otu_table";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
 		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom"); // TODO dynamic default
@@ -32,7 +32,7 @@ class MakeOtuTable extends DefaultScript {
 		$otuMapFile->requireIf();
 		$outputBiomFp->requireIf();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$otuMapFile,
 			$outputBiomFp, 
@@ -44,5 +44,6 @@ class MakeOtuTable extends DefaultScript {
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose")
 		);
+		return $parameters;
 	}
 }

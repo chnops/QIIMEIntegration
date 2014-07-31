@@ -23,8 +23,8 @@ class ManipulateOtuTable extends DefaultScript {
 		return "manipulate_table";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFp = new OldFileParameter("--input-fp", $this->project);
 		$outputFp = new NewFileParameter("--output-fp", "");
@@ -75,7 +75,7 @@ class ManipulateOtuTable extends DefaultScript {
 		$processObsMetadata->excludeButAllowIf($action, "convert");
 		$tableType->excludeButAllowIf($action, "convert");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFp,
 			$outputFp,
@@ -97,6 +97,7 @@ class ManipulateOtuTable extends DefaultScript {
 			$qualitative,
 			$suppressMd5
 		);
+		return $parameters;
 	}
 
 	public function renderCommand() {

@@ -23,12 +23,12 @@ class ValidateMappingFile extends DefaultScript {
 		return "validate_mapping_file";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 		$mappingFp = new OldFileParameter("--mapping_fp", $this->project);
 		$mappingFp->requireIf();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			 new Label("Required Parameters"),
 			 $mappingFp,
 
@@ -44,5 +44,6 @@ class ValidateMappingFile extends DefaultScript {
 			 new TrueFalseParameter("--suppress_html"),
 			 new TextArgumentParameter("--char_replace", "_", "/^.$/")
 		);
+		return $parameters;
 	}
 }

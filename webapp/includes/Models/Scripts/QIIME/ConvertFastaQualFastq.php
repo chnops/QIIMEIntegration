@@ -23,8 +23,8 @@ class ConvertFastaQualFastq extends DefaultScript {
 		return "convert_fasta_qual_fastq";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$fastaFilePath = new OldFileParameter("--fasta_file_path", $this->project);
 		$fastaFilePath->requireIf();
@@ -37,7 +37,7 @@ class ConvertFastaQualFastq extends DefaultScript {
 		$qualFilePath->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
 		$fullFastq->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$fastaFilePath,
 			new Label("Optional parameters"),
@@ -51,5 +51,6 @@ class ConvertFastaQualFastq extends DefaultScript {
 			new NewFileParameter("--output_dir", ".", $isDir = true),
 			new TrueFalseParameter("--verbose")
 		);
+		return $parameters;
 	}
 }

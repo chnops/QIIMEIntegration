@@ -23,8 +23,8 @@ class AlignSeqs extends DefaultScript {
 		return "align_seqs";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
@@ -42,7 +42,7 @@ class AlignSeqs extends DefaultScript {
 		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
 		$muscleMaxMemory->excludeButAllowIf($alignmentMethod, "muscle");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFp,
 
@@ -60,5 +60,7 @@ class AlignSeqs extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_aligned", $isDir = true) // TODO dynamic default
 		);
+
+		return $parameters;
 	}
 }

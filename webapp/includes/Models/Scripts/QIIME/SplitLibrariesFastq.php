@@ -23,8 +23,8 @@ class SplitLibrariesFastq extends DefaultScript {
 		return "split_libraries_fastq";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$sequenceReadFps = new OldFileParameter("--sequence_read_fps", $this->project); 
 		$mappingFps = new OldFileParameter("--mapping_fps", $this->project);
@@ -34,7 +34,7 @@ class SplitLibrariesFastq extends DefaultScript {
 		$mappingFps->requireIf();
 		$outputDir->requireIf();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$sequenceReadFps,
 			$mappingFps,
@@ -65,5 +65,6 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--start_seq_id", "0", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--rev_comp")
 		);
+		return $parameters;
 	}
 }

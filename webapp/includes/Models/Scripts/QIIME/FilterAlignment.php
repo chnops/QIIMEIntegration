@@ -23,8 +23,8 @@ class FilterAlignment extends DefaultScript {
 		return "filter_alignment";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
 		$inputFastaFile->requireIf();
@@ -40,7 +40,7 @@ class FilterAlignment extends DefaultScript {
 		$suppressLaneMaskFilter->excludeIf($entropyThreshold);
 		$laneMaskFp->excludeIf($suppressLaneMaskFilter);
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFastaFile,
 
@@ -56,5 +56,6 @@ class FilterAlignment extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", ".", $isDir = true)
 		);
+		return $parameters;
 	}
 }

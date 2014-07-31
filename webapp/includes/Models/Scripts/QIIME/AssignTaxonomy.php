@@ -23,8 +23,8 @@ class AssignTaxonomy extends DefaultScript {
 		return "assign_taxonomy";
 	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$inputFastaFp->requireIf();
@@ -71,7 +71,7 @@ class AssignTaxonomy extends DefaultScript {
 		$treeFp->requireIf($assignmentMethod, "tax2tree");
 		$treeFp->excludeButAllowIf($assignmentMethod, "tax2tree");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFastaFp,
 
@@ -97,5 +97,6 @@ class AssignTaxonomy extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_assigned_taxonomy", $isDir = true) // TODO dynamic default
 			);
+		return $parameters;
 	}
 }
