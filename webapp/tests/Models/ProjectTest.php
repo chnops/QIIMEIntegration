@@ -674,7 +674,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Exception
 	 */
 	public function testReceiveDownloadedFile_databaseFails() {
-		$fileType = new MapFileType();
+		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
@@ -694,7 +694,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Models\OperatingSystemException
 	 */
 	public function testReceiveDownloadedFile_osFails() {
-		$fileType = new MapFileType();
+		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
@@ -718,7 +718,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::receiveDownloadedFile
 	 */
 	public function testReceiveUploadedFile_nothingFails() {
-		$fileType = new MapFileType();
+		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
@@ -743,7 +743,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::receiveDownloadedFile
 	 */
 	public function testReceiveUploadedFile_lazyLoaderIsReset() {
-		$fileType = new MapFileType();
+		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests", "getAllUploadedFiles"));

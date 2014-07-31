@@ -3,25 +3,16 @@
 namespace Models;
 
 abstract class FileType implements HideableI {
-	protected $name;
-	protected $htmlId;
-	protected $help;
-	protected $example;
-
-	public abstract function __construct();
-
-	public function getName() {
-		return $this->name;
-	}
-	public function getHtmlId() {
-		return $this->htmlId;
-	}
+	public abstract function getName();
+	public abstract function getHtmlId();
+	public abstract function getHelp();
+	public abstract function getExample();
 
 	public function renderHelp() {
-		$output = "<h4>{$this->name} Files</h4>
-			<p>{$this->help}</p>";
-		if ($this->example) {
-			$output .= "<div class=\"file_example\">{$this->example}</div>";
+		$output = "<h4>{$this->getName()} Files</h4>
+			<p>{$this->getHelp()}</p>";
+		if ($this->getExample()) {
+			$output .= "<div class=\"file_example\">{$this->getExample()}</div>";
 		}
 		return $output;
 	}

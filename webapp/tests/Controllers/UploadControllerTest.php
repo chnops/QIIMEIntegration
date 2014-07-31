@@ -7,6 +7,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		error_log("UploadControllerTest");
 	}
 
+	private $mockFileType = NULL;
+	private $mockWorkflow = NULL;
 	private $object = NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
@@ -16,6 +18,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("getStep"))
 			->getMock();
 		$this->mockWorkflow->expects($this->any())->method("getStep")->will($this->returnValue("upload"));
+		$this->mockFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getName", "getHtmlId", "getHelp", "getExample"))
+			->getMockForAbstractClass();
+		$this->mockFileType->expects($this->any())->method("getName")->will($this->returnValue("name"));
+		$this->mockFileType->expects($this->any())->method("getHtmlId")->will($this->returnValue("id"));
+		$this->mockFileType->expects($this->any())->method("getHelp")->will($this->returnValue("help"));
+		$this->mockFileType->expects($this->any())->method("getExample")->will($this->returnValue("example"));
 	}
 	public function setUp() {
 		$_FILES = array();
@@ -558,7 +567,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::setFileType
 	 */
 	public function testSetFileType() {
-		$expected = new \Models\MapFileType();
+		$expected = $this->mockFileType;
 
 		$this->object->setFileType($expected);
 
@@ -570,7 +579,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_fileTypeAlreadySet() {
-		$expected = new \Models\MapFileType();
+		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
@@ -594,7 +603,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectNotSet_POSTnotSet() {
-		$expected = new \Models\MapFileType();
+		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
@@ -616,8 +625,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectNotSet_POSTset() {
-		$_POST['type'] = "map";
-		$expected = new \Models\MapFileType();
+		$_POST['type'] = $this->mockFileType->getHtmlId();
+		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
@@ -639,7 +648,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectSet_POSTnotSet() {
-		$expected = new \Models\MapFileType();
+		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
@@ -662,8 +671,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectSet_POSTset() {
-		$_POST['type'] = "map";
-		$expected = new \Models\MapFileType();
+		$_POST['type'] = $this->mockFileType->getHtmlId();
+		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
@@ -702,7 +711,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
 			->getMock();
-		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue(new \Models\MapFileType()));
+		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue($this->mockFileType));
 		$this->object->setProject($mockProject);
 
 		$actual = $this->object->downloadFile("url", "fileName");
@@ -729,7 +738,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
 			->getMock();
-		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue(new \Models\MapFileType()));
+		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue($this->mockFileType));
 		$this->object->setProject($mockProject);
 
 		$actual = $this->object->downloadFile("url", "fileName");
@@ -914,7 +923,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
 			->getMock();
-		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue(new \Models\MapFileType()));
+		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue($this->mockFileType));
 		$this->object->setProject($mockProject);
 
 		$this->object->uploadFile($file);
@@ -948,7 +957,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
 			->getMock();
-		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue(new \Models\MapFileType()));
+		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue($this->mockFileType));
 		$this->object->setProject($mockProject);
 
 		$this->object->uploadFile($file);
@@ -979,7 +988,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 				<input type=\"file\" name=\"file\" disabled/></label>
 				<label for=\"type\">File type:
 				<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\" disabled>" .
-				"<option value=\"map\" selected>Map</option>" .
+				"<option value=\"id\" selected>name</option>" .
 				"</select></label>
 			<button type=\"submit\" disabled>Upload</button>
 			</form>" .
@@ -990,7 +999,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			<input type=\"text\" name=\"url\" value=\"\" placeholder=\"http://seq.center/file/path\" disabled>
 			<label for=\"type\">File type:
 			<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\" disabled>" .
-			"<option value=\"map\" selected>Map</option>" .
+			"<option value=\"id\" selected>name</option>" .
 			"</select></label>
 			<button type=\"submit\" disabled>Download</button>
 			</form>";
@@ -998,7 +1007,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array(new \Models\MapFileType())));
+		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getStep", "getNewProject"))
@@ -1023,7 +1032,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 				<input type=\"file\" name=\"file\"/></label>
 				<label for=\"type\">File type:
 				<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\">" .
-				"<option value=\"map\" selected>Map</option>" .
+				"<option value=\"id\" selected>name</option>" .
 				"</select></label>
 			<button type=\"submit\">Upload</button>
 			</form>" .
@@ -1034,7 +1043,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			<input type=\"text\" name=\"url\" value=\"\" placeholder=\"http://seq.center/file/path\">
 			<label for=\"type\">File type:
 			<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\">" .
-			"<option value=\"map\" selected>Map</option>" .
+			"<option value=\"id\" selected>name</option>" .
 			"</select></label>
 			<button type=\"submit\">Download</button>
 			</form>";
@@ -1042,7 +1051,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array(new \Models\MapFileType())));
+		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getStep", "getNewProject"))
@@ -1068,9 +1077,9 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			<li>A sequence quality file</li>
 			<li>A fastq sequence-quality file</li>
 			</ol></p>" .
-			"<div class=\"hideable\" id=\"help_type\">\n" .
+			"<div class=\"hideable\" id=\"help_id\">\n" .
 			"help</div>\n";
-		$mockFileType = $this->getMockBuilder('\Models\MapFileType')
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
 			->setMethods(array("getHtmlId", "renderHelp"))
 			->getMockForAbstractClass();
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
@@ -1081,7 +1090,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
-		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue("type"));
+		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue("id"));
 		$mockFileType->expects($this->once())->method("renderHelp")->will($this->returnValue("help"));
 		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($mockFileType)));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
@@ -1102,9 +1111,9 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			<li>A sequence quality file</li>
 			<li>A fastq sequence-quality file</li>
 			</ol></p>" .
-			"<div class=\"hideable\" id=\"help_type\">\n" .
+			"<div class=\"hideable\" id=\"help_id\">\n" .
 			"help</div>\n";
-		$mockFileType = $this->getMockBuilder('\Models\MapFileType')
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
 			->setMethods(array("getHtmlId", "renderHelp"))
 			->getMockForAbstractClass();
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
@@ -1115,7 +1124,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
-		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue("type"));
+		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue("id"));
 		$mockFileType->expects($this->once())->method("renderHelp")->will($this->returnValue("help"));
 		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($mockFileType)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
@@ -1140,7 +1149,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::renderSpecificScript
 	 */
 	public function testRenderSpecificScript() {
-		$fileType = new \Models\MapFileType();
+		$fileType = $this->mockFileType;
 		$htmlId = $fileType->getHtmlId();
 		$this->object->setFileType($fileType);
 		$expected = "window.onload=function() {window.hideableFields = ['help'];displayHideables('{$htmlId}');};";
