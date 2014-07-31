@@ -354,4 +354,47 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		system("rm -r {$outOfHomeDir}");
 		$this->assertEquals($files, $actuals);
 	}
+
+	/**
+	 * @covers MacOperatingSystem::uploadFile
+	 */
+	public function testUploadFile() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::unzipFile
+	 */
+	public function testUnzipFile() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::compressFile
+	 */
+	public function testCompressFile() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::decompressFile
+	 */
+	public function testDecompressFile() { 
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::runScript
+	 */
+	public function testRunScript() {
+		$this->markTestIncomplete();
+	}
 }

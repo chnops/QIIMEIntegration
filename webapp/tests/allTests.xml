@@ -12,8 +12,14 @@
        <testsuite name="Models">
            <directory>Models</directory>
        </testsuite>
+       <testsuite name="Parameters">
+		   <directory>Models/Scripts/Parameters</directory>
+       </testsuite>
+       <testsuite name="QIIME">
+		   <directory>Models/Scripts/QIIME</directory>
+       </testsuite>
        <testsuite name="Scripts">
-	   <directory>Models/Scripts</directory>
+		   <directory>Models/Scripts</directory>
        </testsuite>
    </testsuites>
 </phpunit>
