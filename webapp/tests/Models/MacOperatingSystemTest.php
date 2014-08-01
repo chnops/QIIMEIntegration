@@ -13,7 +13,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->object = new MacOperatingSystem();
-		system('rm -r ./projects/*');
+		system('rm -rf ./projects/*');
 	}
 
 	/**
