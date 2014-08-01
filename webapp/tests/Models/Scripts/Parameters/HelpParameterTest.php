@@ -3,34 +3,54 @@
 namespace Models\Scripts\Parameters;
 
 class HelpParameterTest extends \PHPUnit_Framework_TestCase {
-
-	private $mockScript; 
-
-	private $object;
-
-	public function __construct($name = null, array $data = array(), $dataName = '')  {
-		parent::__construct($name, $data, $dataName);
-
-		$stubGetter = new \Stubs\StubGetter();
-		$this->mockScript = $stubGetter->getScript();
-		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
-	}
-
 	public static function setUpBeforeClass() {
 		error_log("HelpParameterTest");
 	}
 
+	private $mockScript = NULL; 
+	private $object = NULL;
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$this->mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$this->mockScript->expects($this->any())->method("getHtmlId")->will($this->returnValue("script"));
+	}
+
 	public function setUp() {
-		$mockScript = $this->getMock("\\Models\\Scripts\\ScriptI");
-		$mockScript->expects($this->any())->method("getHtmlId")->will($this->returnValue("mock"));
-		$this->object = new HelpParameter($mockScript);
+		$this->object = new HelpParameter();
 	}
 
-	public function testAll() {
-		$this->assertEmpty($this->object->getName());
-		$this->assertEmpty($this->object->renderForOperatingSystem());
-		$expectedLink = "<a href=\"public/manual/mock.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
-		$this->assertEquals($expectedLink, $this->object->renderForForm($disabled = false, $this->mockScript));
+	/**
+	 * @covers \Models\Scripts\Parameters\HelpParameter::__construct
+	 */
+	public function testConstructor() {
+		$expected = "--help";
+
+
+		$actual = $this->object->getName();
+		$this->assertEquals($expected, $actual);
 	}
 
+	/**
+	 * @covers \Models\Scripts\Parameters\HelpParameter::renderForForm
+	 */
+	public function testRenderForForm() {
+		$expected = "<a href=\"public/manual/{$this->mockScript->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
+
+		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\HelpParameter::renderForOperatingSystem
+	 */
+	public function testRenderForOperatingSystem() {
+
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertEmpty($actual);
+	}
 }

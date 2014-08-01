@@ -20,4 +20,11 @@ class VersionParameter extends DefaultParameter {
 	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		return "<a class=\"button\" onclick=\"alert('{$this->versionString}');\">Version</a>";
 	}
+
+	public function getVersionString() {
+		return $this->versionString;
+	}
+	public function setVersionString($versionString) {
+		$this->versionString = $versionString;
+	}
 }

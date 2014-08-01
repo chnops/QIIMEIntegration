@@ -1,2 +1,1 @@
-Version X.Y.ZZ
-
+File: public/versions/script.txt

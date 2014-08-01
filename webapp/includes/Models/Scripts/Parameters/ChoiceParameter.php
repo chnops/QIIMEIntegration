@@ -29,4 +29,11 @@ class ChoiceParameter extends DefaultParameter {
 		}
 		return in_array($value, $this->options);
 	}
+
+	public function setOptions(array $options) {
+		$this->options = $options;
+	}
+	public function getOptions() {
+		return $this->options;
+	}
 }

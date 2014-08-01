@@ -22,6 +22,29 @@ class DefaultParameter implements ParameterI {
 		$this->value = $value;
 	}
 
+	public function setValue($value) {
+		if (!$this->isValueValid($value)) {
+			throw new ScriptException("An invalid value was provided for the parameter: {$this->name}");
+		}
+		$this->value = $value;
+	}
+	public function getValue() {
+		return $this->value;
+	}
+	public function setName($name) {
+		$this->name = $name;
+	}
+	public function getName() {
+		return $this->name;
+	}
+	public function isValueValid($value) {
+		return true;
+	}
+
+	public function getJsVar($formJsVar) {
+		return $formJsVar . "_" . preg_replace("/-/", "_", preg_replace("/--/", "", $this->name));
+	}
+
 	public function renderForOperatingSystem() {
 		if ($this->value) {
 			$separator = (strlen($this->name) == 2) ? " " : "=";
@@ -110,27 +133,6 @@ class DefaultParameter implements ParameterI {
 		}
 
 		return $code . $relationshipCode . "\n";
-	}
-	public function getJsVar($formJsVar) {
-		return $formJsVar . "_" . preg_replace("/-/", "_", preg_replace("/--/", "", $this->name));
-	}
-	public function setValue($value) {
-		if (!$this->isValueValid($value)) {
-			throw new ScriptException("An invalid value was provided for the parameter: {$this->name}");
-		}
-		$this->value = $value;
-	}
-	public function getValue() {
-		return $this->value;
-	}
-	public function setName($name) {
-		$this->name = $name;
-	}
-	public function getName() {
-		return $this->name;
-	}
-	public function isValueValid($value) {
-		return true;
 	}
 
 	public function acceptInput(array $input) {

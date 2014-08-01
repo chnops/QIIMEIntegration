@@ -9,6 +9,17 @@ class NewFileParameter extends DefaultParameter {
 		$this->value = $value;
 		$this->isDir = $isDir;
 	}
+	public function setIsDir($isDir) {
+		if($isDir) {
+			$this->isDir = true;
+		}
+		else {
+			$this->isDir = false;
+		}
+	}
+	public function isDir() {
+		return $this->isDir;
+	}
 	public function isValueValid($value) {
 		return !preg_match("/\"/", $value);
 	}

@@ -5,8 +5,6 @@ use \Models\Scripts\ScriptException;
 
 class HelpParameter extends DefaultParameter {
 
-	private $script;
-
 	public function __construct() {
 		$this->name = "--help";
 	}

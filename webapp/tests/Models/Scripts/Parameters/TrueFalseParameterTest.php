@@ -3,21 +3,22 @@
 namespace Models\Scripts\Parameters;
 
 class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
-
-	private $name = "--true_false";
-	private $object;
-	private $mockScript = NULL;
-
 	public static function setUpBeforeClass() {
 		error_log("TrueFalseParameterTest");
 	}
 
+	private $jsVar = "js_script";
+	private $mockScript = NULL;
+	private $name = "--name";
+	private $object;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
 
-		$stubGetter = new \Stubs\StubGetter();
-		$this->mockScript = $stubGetter->getScript();
-		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+		$this->mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("getJsVar"))
+			->getMockForAbstractClass();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue($this->jsVar));
 	}
 
 	public function setUp() {
@@ -25,34 +26,111 @@ class TrueFalseParameterTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @test
-	 * @covers TrueFalseParameter::__construct
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::__construct
 	 */
 	public function testConstructor() {
-		$this->assertFalse($this->object->getValue());
-		$this->object = new TrueFalseParameter($this->name, TRUE);
-		$this->assertFalse($this->object->getValue());
+		$expecteds = array(
+			"name" => $this->name,
+			"value" => false,
+		);
+		$actuals = array();
+
+		$this->object = new TrueFalseParameter($this->name);
+
+		$actuals['name'] = $this->object->getName();
+		$actuals['value'] = $this->object->getValue();
+		$this->assertEquals($expecteds, $actuals);
 	}
 
 	/**
-	 * @test
-	 * @covers TrueFalseParameter::renderForOperatingSystem
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForOperatingSystem
 	 */
-	public function testRenderForOperatingSystem() {
-		$this->assertEmpty($this->object->renderForOperatingSystem());
-		$this->object->setValue(TRUE);
-		$this->assertEquals($this->name, $this->object->renderForOperatingSystem());
+	public function testRenderForOperatingSystem_valueTrue() {
+		$expected = $this->name;
+		$this->object->setValue(true);
+
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForOperatingSystem
+	 */
+	public function testRenderForOperatingSystem_valueFalse() {
+		$expected = "";
+		$this->object->setValue(false);
+
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
-	 * @test
-	 * @covers TrueFalseParameter::renderForForm
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForForm
 	 */
-	public function testRenderForForm() {
-		$expectedIfFalse = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}</label>";
-		$this->assertEquals($expectedIfFalse, $this->object->renderForForm($disabled = false, $this->mockScript));
-		$this->object->setValue(TRUE);
-		$expectedIfTrue = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}</label>";
-		$this->assertEquals($expectedIfTrue, $this->object->renderForForm($disabled = false, $this->mockScript));
+	public function testRenderForForm_disabled_valueTrue() {
+		$expected = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked disabled/> {$this->name}
+			<a class=\"param_help\" id=\"{$this->jsVar}\">&amp;</a></label>";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\TrueFalseParameter')
+			->setConstructorArgs(array($this->name))
+			->setMethods(array("getJsVar"))
+			->getMock();
+		$this->object->expects($this->once())->method("getJsVar")->will($this->returnArgument(0));
+		$this->object->setValue(true);
+
+		$actual = $this->object->renderForForm($disabled = true, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForForm
+	 */
+	public function testRenderForForm_disabled_valueFalse() {
+		$expected = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" disabled/> {$this->name}
+			<a class=\"param_help\" id=\"{$this->jsVar}\">&amp;</a></label>";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\TrueFalseParameter')
+			->setConstructorArgs(array($this->name))
+			->setMethods(array("getJsVar"))
+			->getMock();
+		$this->object->expects($this->once())->method("getJsVar")->will($this->returnArgument(0));
+		$this->object->setValue(false);
+
+		$actual = $this->object->renderForForm($disabled = true, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForForm
+	 */
+	public function testRenderForForm_notDisabled_valueTrue() {
+		$expected = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}
+			<a class=\"param_help\" id=\"{$this->jsVar}\">&amp;</a></label>";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\TrueFalseParameter')
+			->setConstructorArgs(array($this->name))
+			->setMethods(array("getJsVar"))
+			->getMock();
+		$this->object->expects($this->once())->method("getJsVar")->will($this->returnArgument(0));
+		$this->object->setValue(true);
+
+		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\TrueFalseParameter::renderForForm
+	 */
+	public function testRenderForForm_notDisabled_valueFalse() {
+		$expected = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}
+			<a class=\"param_help\" id=\"{$this->jsVar}\">&amp;</a></label>";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\TrueFalseParameter')
+			->setConstructorArgs(array($this->name))
+			->setMethods(array("getJsVar"))
+			->getMock();
+		$this->object->expects($this->once())->method("getJsVar")->will($this->returnArgument(0));
+		$this->object->setValue(false);
+
+		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
 	}
 }

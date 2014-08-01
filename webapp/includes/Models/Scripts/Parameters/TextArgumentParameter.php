@@ -17,15 +17,18 @@ class TextArgumentParameter extends DefaultParameter {
 		$this->value = $defaultValue;
 		$this->expectedPattern = $expectedPattern;
 	}
+	public function setExpectedPattern($expectedPattern) {
+		$this->expectedPattern = $expectedPattern;
+	}
+	public function getExpectedPattern() {
+		return $this->expectedPattern;
+	}
 
 	public function isValueValid($value) {
 		if (!$value) {
 			return true;
 		}
 		$match = preg_match($this->expectedPattern, $value);
-		if ($match === false) {
-			throw new ScriptException("Unable to verify input pattern.");
-		}
 		return $match;
 	}
 }
