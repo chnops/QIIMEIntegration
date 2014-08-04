@@ -29,8 +29,8 @@ class AssignTaxonomy extends DefaultScript {
 		$inputFastaFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$inputFastaFp->requireIf();
 
-		$assignmentMethod = new ChoiceParameter("--assignment_method", "rdp", 
-			array("rdp", "blast", "rtax", "mothur", "tax2tree"));
+		$assignmentMethod = new ChoiceParameter("--assignment_method", "uclust", 
+			array("rdp", "blast", "rtax", "mothur", "tax2tree", "uclust"));
 		$read1SeqsFp = new OldFileParameter("--read_1_seqs_fp", $this->project);
 		$read2SeqsFp = new OldFileParameter("--read_2_seqs_fp", $this->project);
 		$singleOk = new TrueFalseParameter("--single_ok");
@@ -86,6 +86,9 @@ class AssignTaxonomy extends DefaultScript {
 			$headerIdRegex,
 			$confidence,
 			$rdpMaxMemory,
+			$uclustMinConsensusFraction,
+			$uclustSimilarity,
+			$uclustMaxAccepts,
 			$idToTaxonomyFp,
 			$eitherBlastDatabase,
 			$treeFp,
