@@ -1,12 +1,22 @@
 <?php
 
 namespace Models\Scripts\QIIME;
+use Models\Scripts\ScriptException;
 
 class MakeOtuTableTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("MakeOtuTableTest");
 	}
 
+	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
+	private $errorMessageOutro = "</ul>\n";
+	private $emptyInput = array(
+		"--otu_map_fp" => "",
+		"--output_biom_fp" => "",
+		"--taxonomy" => "",
+		"--exclude_otus_fp" => "",
+		"--verbose" => "",
+	);
 	private $mockProject = NULL;
 	private $object = NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
@@ -21,9 +31,68 @@ class MakeOtuTableTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Models\Scripts\QIIME\
+	 * @covers \Models\Scripts\QIIME\MakeOtuTable::getScriptName
 	 */
-	public function testIncludes() {
-		$this->assertTrue(false);
+	public function testGetScriptName() {
+		$expected = "make_otu_table.py";
+
+		$actual = $this->object->getScriptName();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\Scripts\QIIME\MakeOtuTable::getScriptTitle
+	 */
+	public function testGetScriptTitle() {
+		$expected = "Make OTU table";
+
+		$actual = $this->object->getScriptTitle();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\Scripts\QIIME\MakeOtuTable::getHtmlId
+	 */
+	public function testGetHtmlId() {
+		$expected = "make_otu_table";
+
+		$actual = $this->object->getHtmlId();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testRequireds_present() {
+		$expected = "";
+		$input = $this->emptyInput;
+		$input['--otu_map_fp'] = true;
+		$input['--output_biom_fp'] = true;
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$this->fail("acceptInput should not have thrown an exception");
+		}
+	}
+	public function testRequireds_notPresent() {
+		$expected = $this->errorMessageIntro .
+			"<li>The parameter --otu_map_fp is required</li>" .
+			"<li>The parameter --output_biom_fp is required</li>" .
+			$this->errorMessageOutro;
+		$input = $this->emptyInput;
+		unset($input['--otu_map_fp']);
+		unset($input['--output_biom_fp']);
+		try {
+
+			$this->object->acceptInput($input);
+
+			$this->fail("acceptInput should have thrown an exception");
+		}
+		catch(ScriptException $ex) {
+			$this->assertEquals($expected, $ex->getMessage());
+		}
 	}
 }

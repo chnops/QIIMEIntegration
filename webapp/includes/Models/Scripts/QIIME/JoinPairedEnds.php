@@ -34,8 +34,6 @@ class JoinPairedEnds extends DefaultScript {
 		$reverseReadsFp->requireIf();
 		$outputDir->requireIf();
 
-		$indexReadsFp = new OldFileParameter("--index_reads_fp", $this->project);
-		$minOverlap = new TextArgumentParameter("--min_overlap", "", TextArgumentParameter::PATTERN_DIGIT);
 		$peJoinMethod = new ChoiceParameter("--pe_join_method", "fastq-join",
 			array("fastq-join", "SeqPrep"));
 		$percMaxDiff = new TextArgumentParameter("--perc_max_diff", "", TextArgumentParameter::PATTERN_DIGIT);
@@ -56,8 +54,8 @@ class JoinPairedEnds extends DefaultScript {
 			$reverseReadsFp,
 			$outputDir,
 			new Label("Optional Parameters"),
-			$indexReadsFp,
-			$minOverlap,
+			new OldFileParameter("--index_reads_fp", $this->project),
+			new TextArgumentParameter("--min_overlap", "", TextArgumentParameter::PATTERN_DIGIT),
 			$peJoinMethod,
 			$percMaxDiff,
 			$maxAsciiScore,

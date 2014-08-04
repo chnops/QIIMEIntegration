@@ -36,8 +36,8 @@ class FilterAlignment extends DefaultScript {
 		$suppressLaneMaskFilter = new TrueFalseParameter("--suppress_lane_mask_filter");
 
 		$threshold->excludeButAllowIf($removeOutliers);
-		$laneMaskFp->excludeIf($entropyThreshold);
 		$suppressLaneMaskFilter->excludeIf($entropyThreshold);
+		$laneMaskFp->excludeIf($entropyThreshold);
 		$laneMaskFp->excludeIf($suppressLaneMaskFilter);
 
 		array_push($parameters,

@@ -472,59 +472,28 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
 	 */
-	public function testAcceptInput_paramPresent_neverExcluded() {
+	public function testAcceptInput_paramPresent_manyActiveExcluders() {
 		$expecteds = array(
 			"object_value" => $this->otherValue,
+			"error_message" => "The parameter {$this->name} cannot be used when:<br/>&nbsp;- {$this->otherName} is set",
 		);
 		$actuals = array();
-		$excluders = array(1, 2, 3);
+		$excluders = array(array("parameter" => $this->mockParameter, "value" => true));
 		$allowers = array();
 		$input = array($this->object->getName() => $this->otherValue);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->setConstructorArgs(array($this->name, $this->value))
-			->setMethods(array("getActiveTriggers"))
+			->setMethods(array("getActiveTriggers", "isExcludedByDefault"))
 			->getMock();
-		$this->object->expects($this->never())->method("getActiveTriggers")->will($this->returnArgument(0));
-		$this->object->setIsEverExcluded(false);
-		$this->object->setExcludingTriggers($excluders);
-		$this->object->setAllowingTriggers($excluders);
-		try {
-
-			$this->object->acceptInput($input);
-
-		}
-		catch(ScriptException $ex) {
-			throw $ex;
-		}
-		$actuals['object_value'] = $this->object->getValue();
-		$this->assertEquals($expecteds, $actuals);
-	}
-	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
-	 */
-	public function testAcceptInput_paramPresent_zeroActiveExcluders_zeroActiveAllowers() {
-		$expecteds = array(
-			"object_value" => $this->otherValue,
-			"error_message" => "The parameter {$this->name} can only be used when:<br/>&nbsp;- {$this->otherName} is set to {$this->otherValue}",
-		);
-		$actuals = array();
-		$excluders = array();
-		$allowers = array(
-			array("parameter" => $this->mockParameter, "value" => $this->otherValue),
-		);
-		$input = array($this->object->getName() => $this->otherValue);
-		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
-			->setConstructorArgs(array($this->name, $this->value))
-			->setMethods(array("getActiveTriggers"))
-			->getMock();
-		$this->object->expects($this->exactly(2))->method("getActiveTriggers")->will($this->onConsecutiveCalls($excluders, array()));
-		$this->object->setIsEverExcluded(true);
+		$this->object->expects($this->once())->method("getActiveTriggers")->will($this->returnArgument(0));
+		$this->object->expects($this->never())->method("isExcludedByDefault")->will($this->returnValue(true));
 		$this->object->setExcludingTriggers($excluders);
 		$this->object->setAllowingTriggers($allowers);
 		try {
 
 			$this->object->acceptInput($input);
 
+			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
 			$actuals['error_message'] = $ex->getMessage();
@@ -535,22 +504,82 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
 	 */
-	public function testAcceptInput_paramPresent_zeroActiveExcluders_someActiveAllowers() {
+	public function testAcceptInput_paramPresent_zeroActiveExcluders_notExcludedByDefault() {
 		$expecteds = array(
 			"object_value" => $this->otherValue,
 		);
 		$actuals = array();
 		$excluders = array();
-		$allowers = array(
-			array("parameter" => $this->mockParameter, "value" => $this->otherValue),
-		);
+		$allowers = array();
 		$input = array($this->object->getName() => $this->otherValue);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->setConstructorArgs(array($this->name, $this->value))
-			->setMethods(array("getActiveTriggers"))
+			->setMethods(array("getActiveTriggers", "isExcludedByDefault"))
+			->getMock();
+		$this->object->expects($this->once())->method("getActiveTriggers")->will($this->returnArgument(0));
+		$this->object->expects($this->once())->method("isExcludedByDefault")->will($this->returnValue(false));
+		$this->object->setExcludingTriggers($excluders);
+		$this->object->setAllowingTriggers($allowers);
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$this->fail("acceptInput should not have thrown an exception: {$ex->getMessage()}");
+		}
+		$actuals['object_value'] = $this->object->getValue();
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
+	 */
+	public function testAcceptInput_paramPresent_zeroActiveExcluders_excludedByDefault_zeroActiveAllowers() {
+		$expecteds = array(
+			"object_value" => $this->otherValue,
+			"error_message" => "The parameter {$this->name} can only be used when:<br/>&nbsp;- --other_name is set",
+		);
+		$actuals = array();
+		$excluders = array();
+		$allowers = array(array("parameter" => $this->mockParameter, "value" => true));
+		$input = array($this->object->getName() => $this->otherValue);
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
+			->setConstructorArgs(array($this->name, $this->value))
+			->setMethods(array("getActiveTriggers", "isExcludedByDefault"))
+			->getMock();
+		$this->object->expects($this->exactly(2))->method("getActiveTriggers")->will($this->returnValue(array()));
+		$this->object->expects($this->once())->method("isExcludedByDefault")->will($this->returnValue(true));
+		$this->object->setExcludingTriggers($excluders);
+		$this->object->setAllowingTriggers($allowers);
+		try {
+
+			$this->object->acceptInput($input);
+
+			$this->fail("acceptInput should have thrown an exception");
+		}
+		catch(ScriptException $ex) {
+			$actuals['error_message'] = $ex->getMessage();
+		}
+		$actuals['object_value'] = $this->object->getValue();
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
+	 */
+	public function testAcceptInput_paramPresent_zeroActiveExcluders_excludedByDefault_manyActiveAllowers() {
+		$expecteds = array(
+			"object_value" => $this->otherValue,
+		);
+		$actuals = array();
+		$excluders = array();
+		$allowers = array(array("parameter" => $this->mockParameter, "value" => true));
+		$input = array($this->object->getName() => $this->otherValue);
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
+			->setConstructorArgs(array($this->name, $this->value))
+			->setMethods(array("getActiveTriggers", "isExcludedByDefault"))
 			->getMock();
 		$this->object->expects($this->exactly(2))->method("getActiveTriggers")->will($this->returnArgument(0));
-		$this->object->setIsEverExcluded(true);
+		$this->object->expects($this->once())->method("isExcludedByDefault")->will($this->returnValue(true));
 		$this->object->setExcludingTriggers($excluders);
 		$this->object->setAllowingTriggers($allowers);
 		try {
@@ -559,43 +588,57 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
 		}
 		catch(ScriptException $ex) {
-			throw $ex;
+			$this->fail("acceptInput should not have thrown an exception: {$ex->getMessage()}");
 		}
 		$actuals['object_value'] = $this->object->getValue();
 		$this->assertEquals($expecteds, $actuals);
 	}
+
 	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::acceptInput
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::convertTriggerToWhenClause
 	 */
-	public function testAcceptInput_paramPresent_someActiveExcluders_someActiveAllowers() {
-		$expecteds = array(
-			"object_value" => $this->otherValue,
-			"error_message" => "The parameter {$this->name} cannot be used when:<br/>&nbsp;- {$this->otherName} is set to {$this->otherValue}",
-		);
-		$actuals = array();
-		$excluders = array(
-			array("parameter" => $this->mockParameter, "value" => $this->otherValue),
-		);
-		$allowers = array(1, 2, 3);
-		$input = array($this->object->getName() => $this->otherValue);
-		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
-			->setConstructorArgs(array($this->name, $this->value))
-			->setMethods(array("getActiveTriggers"))
-			->getMock();
-		$this->object->expects($this->once(1))->method("getActiveTriggers")->will($this->returnArgument(0));
-		$this->object->setIsEverExcluded(true);
-		$this->object->setExcludingTriggers($excluders);
-		$this->object->setAllowingTriggers($allowers);
-		try {
+	public function testConvertTriggerToWhenClause_valueFalse() {
+		$expected = "<br/>&nbsp;- --other_name is not set";
+		$trigger = array("parameter" => $this->mockParameter, "value" => false);
 
-			$this->object->acceptInput($input);
+		$actual = $this->object->convertTriggerToWhenClause($trigger);
 
-		}
-		catch(ScriptException $ex) {
-			$actuals['error_message'] = $ex->getMessage();
-		}
-		$actuals['object_value'] = $this->object->getValue();
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::convertTriggerToWhenClause
+	 */
+	public function testConvertTriggerToWhenClause_valueTrue() {
+		$expected = "<br/>&nbsp;- --other_name is set";
+		$trigger = array("parameter" => $this->mockParameter, "value" => true);
+
+		$actual = $this->object->convertTriggerToWhenClause($trigger);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::convertTriggerToWhenClause
+	 */
+	public function testConvertTriggerToWhenClause_valueOtherTruthy() {
+		$expectedValue = $this->otherValue;
+		$expected = "<br/>&nbsp;- --other_name is set to {$expectedValue}";
+		$trigger = array("parameter" => $this->mockParameter, "value" => $expectedValue);
+
+		$actual = $this->object->convertTriggerToWhenClause($trigger);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::convertTriggerToWhenClause
+	 */
+	public function testConvertTriggerToWhenClause_valueOtherFalsy() {
+		$expectedValue = 0;
+		$expected = "<br/>&nbsp;- --other_name is set to {$expectedValue}";
+		$trigger = array("parameter" => $this->mockParameter, "value" => $expectedValue);
+
+		$actual = $this->object->convertTriggerToWhenClause($trigger);
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	private function getTestTriggers() {
@@ -803,14 +846,14 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testExcludeButAllowIf_noTrigger_noValue() {
 		$expecteds = array(
-			"is_ever_excluded" => true,
+			"is_excluded_by_default" => true,
 			"allowing_triggers" => array(),
 		);
 		$actuals = array();
 
 		$this->object->excludeButAllowIf();
 
-		$actuals['is_ever_excluded'] = $this->object->isEverExcluded();
+		$actuals['is_excluded_by_default'] = $this->object->isExcludedByDefault();
 		$actuals['allowing_triggers'] = $this->object->getAllowingTriggers();
 		$this->assertEquals($expecteds, $actuals);
 	}
@@ -819,7 +862,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testExcludeButAllowIf_trigger_noValue() {
 		$expecteds = array(
-			"is_ever_excluded" => true,
+			"is_excluded_by_default" => true,
 			"allowing_triggers" => array(
 				array("parameter" => $this->mockParameter, "value" => true),
 			),
@@ -829,7 +872,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->excludeButAllowIf($this->mockParameter);
 
-		$actuals['is_ever_excluded'] = $this->object->isEverExcluded();
+		$actuals['is_excluded_by_default'] = $this->object->isExcludedByDefault();
 		$actuals['allowing_triggers'] = $this->object->getAllowingTriggers();
 		$actuals['is_a_trigger'] = $this->mockParameter->isATrigger();
 		$this->assertEquals($expecteds, $actuals);
@@ -840,7 +883,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testExcludeButAllowIf_trigger_value() {
 		$expectedValue = "value";
 		$expecteds = array(
-			"is_ever_excluded" => true,
+			"is_excluded_by_default" => true,
 			"allowing_triggers" => array(
 				array("parameter" => $this->mockParameter, "value" => $expectedValue),
 			),
@@ -850,7 +893,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->excludeButAllowIf($this->mockParameter, $expectedValue);
 
-		$actuals['is_ever_excluded'] = $this->object->isEverExcluded();
+		$actuals['is_excluded_by_default'] = $this->object->isExcludedByDefault();
 		$actuals['allowing_triggers'] = $this->object->getAllowingTriggers();
 		$actuals['is_a_trigger'] = $this->mockParameter->isATrigger();
 		$this->assertEquals($expecteds, $actuals);
@@ -861,7 +904,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testExcludeIf_noValue() {
 		$expecteds = array(
-			"is_ever_excluded" => true,
+			"is_excluded_by_default" => false,
 			"excluding_triggers" => array(
 				array("parameter" => $this->mockParameter, "value" => true),
 			),
@@ -871,7 +914,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->excludeIf($this->mockParameter);
 
-		$actuals['is_ever_excluded'] = $this->object->isEverExcluded();
+		$actuals['is_excluded_by_default'] = $this->object->isExcludedByDefault();
 		$actuals['excluding_triggers'] = $this->object->getExcludingTriggers();
 		$actuals['is_trigger'] = $this->mockParameter->isATrigger();
 		$this->assertEquals($expecteds, $actuals);
@@ -882,7 +925,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testExcludeIf_value() {
 		$expectedValue = "value";
 		$expecteds = array(
-			"is_ever_excluded" => true,
+			"is_excluded_by_default" => false,
 			"excluding_triggers" => array(
 				array("parameter" => $this->mockParameter, "value" => $expectedValue),
 			),
@@ -892,7 +935,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->excludeIf($this->mockParameter, $expectedValue);
 
-		$actuals['is_ever_excluded'] = $this->object->isEverExcluded();
+		$actuals['is_excluded_by_default'] = $this->object->isExcludedByDefault();
 		$actuals['excluding_triggers'] = $this->object->getExcludingTriggers();
 		$actuals['is_trigger'] = $this->mockParameter->isATrigger();
 		$this->assertEquals($expecteds, $actuals);
@@ -1019,35 +1062,35 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::isEverExcluded
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::isExcludedByDefault
 	 */
-	public function testIsEverExcluded() {
-		$actual = $this->object->isEverExcluded();
+	public function testIsExcludedByDefault() {
+		$actual = $this->object->isExcludedByDefault();
 
 		$this->assertFalse($actual);
 	}
 	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsEverExcluded
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsExcludedByDefault
 	 */
-	public function testSetIsEverExcluded_true() {
+	public function testSetIsExcludedByDefault_true() {
 		$expected = true;
 		$input = 1;
 
-		$this->object->setIsEverExcluded($input);
+		$this->object->setIsExcludedByDefault($input);
 
-		$actual = $this->object->isEverExcluded();
+		$actual = $this->object->isExcludedByDefault();
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsEverExcluded
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsExcludedByDefault
 	 */
-	public function testSetIsEverExcluded_false() {
+	public function testSetIsExcludedByDefault_false() {
 		$expected = false;
 		$input = 0;
 
-		$this->object->setIsEverExcluded($input);
+		$this->object->setIsExcludedByDefault($input);
 
-		$actual = $this->object->isEverExcluded();
+		$actual = $this->object->isExcludedByDefault();
 		$this->assertEquals($expected, $actual);
 	}
 

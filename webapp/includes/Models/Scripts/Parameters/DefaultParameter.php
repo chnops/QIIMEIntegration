@@ -11,7 +11,7 @@ class DefaultParameter implements ParameterI {
 	private $requiringTriggers = array();
 	private $dismissingTriggers = array();
 
-	private $isEverExcluded = false;
+	private $isExcludedByDefault = false;
 	private $allowingTriggers = array();
 	private $excludingTriggers = array();
 
@@ -149,7 +149,7 @@ class DefaultParameter implements ParameterI {
 				if($activeRequirers) {
 					$errorMessage = "The parameter {$this->name} is required when:";
 					foreach ($activeRequirers as $requirer) {
-						$errorMessage .= "<br/>&nbsp;- {$requirer['parameter']->getName()} is set to {$requirer['value']}";
+						$errorMessage .= $this->convertTriggerToWhenClause($requirer); 
 					}
 					throw new ScriptException($errorMessage);
 				}
@@ -157,25 +157,36 @@ class DefaultParameter implements ParameterI {
 		}
 		else {
 			$this->setValue($input[$this->name]);
-			if ($this->isEverExcluded()) {
-				$activeExcluders = $this->getActiveTriggers($this->getExcludingTriggers(), $input);
-				if (!empty($activeExcluders)) {
-					$errorMessage = "The parameter {$this->name} cannot be used when:";
-					foreach($activeExcluders as $excluder) {
-						$errorMessage .= "<br/>&nbsp;- {$excluder['parameter']->getName()} is set to {$excluder['value']}";
-					}
-					throw new ScriptException($errorMessage);
+			$activeExcluders = $this->getActiveTriggers($this->getExcludingTriggers(), $input);
+			if (!empty($activeExcluders)) {
+				$errorMessage = "The parameter {$this->name} cannot be used when:";
+				foreach($activeExcluders as $excluder) {
+					$errorMessage .= $this->convertTriggerToWhenClause($excluder);
 				}
+				throw new ScriptException($errorMessage);
+			}
+			if ($this->isExcludedByDefault()) {
 				$activeAllowers = $this->getActiveTriggers($this->getAllowingTriggers(), $input);
 				if (empty($activeAllowers)) {
 					$errorMessage = "The parameter {$this->name} can only be used when:";
 					foreach($this->getAllowingTriggers() as $potentialAllower) {
-						$errorMessage .= "<br/>&nbsp;- {$potentialAllower['parameter']->getName()} is set to {$potentialAllower['value']}";
+						$errorMessage .= $this->convertTriggerToWhenClause($potentialAllower);
 					}
 					throw new ScriptException($errorMessage);
 				}
 			}
 		}
+	}
+
+	public function convertTriggerToWhenClause($trigger) {
+		$setClause = "is set to {$trigger['value']}";
+		if ($trigger['value'] === false) {
+			$setClause = "is not set";
+		}
+		else if ($trigger['value'] === true) {
+			$setClause = "is set";
+		}
+		return "<br/>&nbsp;- {$trigger['parameter']->getName()} {$setClause}";
 	}
 
 	public function getActiveTriggers(array $allTriggers, array $input) {
@@ -210,14 +221,13 @@ class DefaultParameter implements ParameterI {
 		$trigger->isATrigger(true);
 	}
 	public function excludeButAllowIf(ParameterI $trigger = NULL, $value = true) {
-		$this->isEverExcluded = true;
+		$this->isExcludedByDefault = true;
 		if ($trigger) {
 			$this->allowingTriggers[] = array("parameter" => $trigger, "value" => $value);
 			$trigger->isATrigger(true);
 		}
 	}
 	public function excludeIf(ParameterI $trigger, $value = true) {
-		$this->isEverExcluded = true;
 		$this->excludingTriggers[] = array("parameter" => $trigger, "value" => $value);
 		$trigger->isATrigger(true);
 	}
@@ -262,15 +272,15 @@ class DefaultParameter implements ParameterI {
 		$this->dismissingTriggers = $triggers;
 	}
 
-	public function isEverExcluded() {
-		return $this->isEverExcluded;
+	public function isExcludedByDefault() {
+		return $this->isExcludedByDefault;
 	}
-	public function setIsEverExcluded($isIt) {
+	public function setIsExcludedByDefault($isIt) {
 		if ($isIt) {
-			$this->isEverExcluded = true;
+			$this->isExcludedByDefault = true;
 		}
 		else {
-			$this->isEverExcluded = false;
+			$this->isExcludedByDefault = false;
 		}
 	}
 
