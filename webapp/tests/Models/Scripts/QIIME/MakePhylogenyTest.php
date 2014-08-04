@@ -68,29 +68,25 @@ class MakePhylogenyTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input = $this->emptyInput;
 		$input['--input_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown an exception");
-		}
 	}
 	public function testRequireds_notPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --input_fp is required</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		unset($input['--input_fp']);
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 }

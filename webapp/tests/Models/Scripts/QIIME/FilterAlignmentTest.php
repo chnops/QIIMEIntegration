@@ -71,28 +71,24 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown exception: {$ex->getMessage()}");
-		}
 	}
 	public function testInputFastaFile_notPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --input_fasta_file is required</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		unset($input['--input_fasta_file']);
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testThreshold_removeOutliersPresent() {
@@ -101,17 +97,13 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_file'] = true;
 		$input['--remove_outliers'] = true;
 		$input['--threshold'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown exception: {$ex->getMessage()}");
-		}
 	}
 	public function testThreshold_removeOutliersNotPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --threshold can only be used when:<br/>&nbsp;- --remove_outliers is set</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		unset($input['--remove_outliers']);
@@ -120,17 +112,18 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testSuppressLaneMaskFilter_entropyThresholdPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --suppress_lane_mask_filter cannot be used when:<br/>&nbsp;- --entropy_threshold is set</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		unset($input['--lane_mask_fp']);
@@ -140,11 +133,11 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInpt should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testSuppressLaneMaskFilter_entropyThresholdNotPresent() {
 		$expected = "";
@@ -153,20 +146,16 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--lane_mask_fp']);
 		unset($input['--entropy_threshold']);
 		$input['--suppress_lane_mask_filter'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInpt should not have thrown exception: {$ex->getMessage()}");
-		}
 	}
 
 	public function testLaneMaskFp_entropyThresholdPresent_suppressLaneMaskNotPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --lane_mask_fp cannot be used when:<br/>&nbsp;- --entropy_threshold is set</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		$input['--entropy_threshold'] = true;
@@ -176,16 +165,17 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInpt should have thrown exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testLaneMaskFp_entropyThresholdNotPresent_suppressLaneMaskPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --lane_mask_fp cannot be used when:<br/>&nbsp;- --suppress_lane_mask_filter is set</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		unset($input['--entropy_threshold']);
@@ -195,11 +185,11 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInpt should have thrown exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testLaneMaskFp_entropyThresholdNotPresent_suppressLaneMaskNotPresent() {
 		$expected = "";
@@ -208,13 +198,8 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--entropy_threshold']);
 		unset($input['--suppress_lane_mask_filter']);
 		$input['--lane_mask_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInpt should not have thrown exception: {$ex->getMessage()}");
-		}
 	}
 }

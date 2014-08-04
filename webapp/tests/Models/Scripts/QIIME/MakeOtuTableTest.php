@@ -68,20 +68,16 @@ class MakeOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--otu_map_fp'] = true;
 		$input['--output_biom_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown an exception");
-		}
 	}
 	public function testRequireds_notPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --otu_map_fp is required</li>" .
 			"<li>The parameter --output_biom_fp is required</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		unset($input['--otu_map_fp']);
 		unset($input['--output_biom_fp']);
@@ -89,10 +85,10 @@ class MakeOtuTableTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 }

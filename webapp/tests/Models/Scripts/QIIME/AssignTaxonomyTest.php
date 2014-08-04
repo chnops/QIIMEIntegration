@@ -87,30 +87,25 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 	public function testInputFastaFp_notPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --input_fasta_fp is required</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testInputFastaFp_present() {
 		$expected = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 
 	public function testRead1SeqsFp_allowed() {
@@ -119,17 +114,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--read_1_seqs_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testRead1SeqsFp_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --read_1_seqs_fp can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -138,12 +129,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	
 	public function testRead2SeqsFp_allowed() {
@@ -152,17 +142,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--read_2_seqs_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testRead2SeqsFp_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --read_2_seqs_fp can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -171,12 +157,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testSingleOk_allowed() {
@@ -185,17 +170,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--single_ok'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testSingleOk_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --single_ok can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -204,12 +185,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testNoSingleOkGeneric_allowed() {
@@ -218,17 +198,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--no_single_ok_generic'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testNoSingleOkGeneric_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --no_single_ok_generic can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -237,12 +213,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testReadIdRegex_allowed() {
@@ -251,17 +226,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--read_id_regex'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testReadIdRegex_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --read_id_regex can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -270,12 +241,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testAmpliconIdRegex_allowed() {
@@ -284,17 +254,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--amplicon_id_regex'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testAmpliconIdRegex_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --amplicon_id_regex can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -303,12 +269,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testHeaderIdRegex_allowed() {
@@ -317,17 +282,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
 		$input['--header_id_regex'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testHeaderIdRegex_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --header_id_regex can only be used when:<br/>&nbsp;- --assignment_method is set to rtax</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -336,12 +297,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testConfidence_allowed_mothur() {
@@ -350,14 +310,9 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "mothur";
 		$input['--confidence'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testConfidence_allowed_rdp() {
 		$expected = "";
@@ -365,17 +320,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
 		$input['--confidence'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testConfidence_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --confidence can only be used when:<br/>&nbsp;- --assignment_method is set to mothur<br/>&nbsp;- --assignment_method is set to rdp</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
@@ -384,12 +335,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testRdpMaxMemory_allowed() {
@@ -398,17 +348,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
 		$input['--rdp_max_memory'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testRdpMaxMemory_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --rdp_max_memory can only be used when:<br/>&nbsp;- --assignment_method is set to rdp</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
@@ -417,12 +363,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testUclustMinConsensusFraction_allowed() {
@@ -431,17 +376,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
 		$input['--uclust_min_consensus_fraction'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testUclustMinConsensusFraction_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --uclust_min_consensus_fraction can only be used when:<br/>&nbsp;- --assignment_method is set to uclust</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -450,12 +391,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testUclustSimilarity_allowed() {
@@ -464,17 +404,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
 		$input['--uclust_similarity'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testUclustSimilarity_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --uclust_similarity can only be used when:<br/>&nbsp;- --assignment_method is set to uclust</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -483,12 +419,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testUclustMaxAccepts_allowed() {
@@ -497,17 +432,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
 		$input['--uclust_max_accepts'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testUclustMaxAccepts_notAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --uclust_max_accepts can only be used when:<br/>&nbsp;- --assignment_method is set to uclust</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -516,12 +447,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown this exception");
 		}
 		catch(ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testIdToTaxonomyFp_notRequired_present() {
@@ -530,44 +460,37 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
 		$input['--id_to_taxonomy_fp'] = "built_in_file";
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testIdToTaxonomyFp_notRequired_notPresent() {
 		$expected = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testIdToTaxonomyFp_required_present() {
-		$expected = $this->errorMessageIntro . "<li>The parameter --id_to_taxonomy_fp is required when --assignment_method is set to blast</li>" . $this->errorMessageOutro;
+		$expected = $this->errorMessageIntro . "<li>The parameter --id_to_taxonomy_fp is required when:<br/>&nbsp;- --assignment_method is set to blast</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "blast";
 		$input['__--reference_seqs_fp__--blast_db__'] = "--blast_db";
+		unset($input['--reference_seqs_fp']);
 		$input['--blast_db'] = true;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testIdToTaxonomyFp_requireed_present() {
 		$expected = "";
@@ -578,14 +501,9 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--blast_db'] = true;
 		unset($input['--reference_seqs_fp']);
 		$input['--id_to_taxonomy_fp'] = "built_in_file";
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 
 	public function testReferenceSeqsFpOrBlastDB_shouldBeSeqs_isSeqs() {
@@ -595,17 +513,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['__--reference_seqs_fp__--blast_db__'] = "--reference_seqs_fp";
 		$input['--reference_seqs_fp'] = true;
 		unset($input['--blast_db']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testReferenceSeqsFpOrBlastDB_shouldBeSeqs_isBlastDb() {
 		$expected = $this->errorMessageIntro . "<li>Since __--reference_seqs_fp__--blast_db__ is set to --reference_seqs_fp, that parameter must be specified.</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['__--reference_seqs_fp__--blast_db__'] = "--reference_seqs_fp";
@@ -615,14 +529,15 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testReferenceSeqsFpOrBlastDB_shouldBeSeqs_isNeither() {
 		$expected = $this->errorMessageIntro . "<li>Since __--reference_seqs_fp__--blast_db__ is set to --reference_seqs_fp, that parameter must be specified.</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['__--reference_seqs_fp__--blast_db__'] = "--reference_seqs_fp";
@@ -632,14 +547,15 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testReferenceSeqsFpOrBlastDB_shouldBeSeqs_isBoth() {
 		$expected = $this->errorMessageIntro . "<li>Since __--reference_seqs_fp__--blast_db__ is set to --reference_seqs_fp, --blast_db is not allowed.</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['__--reference_seqs_fp__--blast_db__'] = "--reference_seqs_fp";
@@ -649,11 +565,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testTreeFp_assignmentMethodIsTax2Tree_isPresent() {
@@ -662,17 +578,13 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "tax2tree";
 		$input['--tree_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testTreeFp_assignmentMethodIsTax2Tree_isNotPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --tree_fp is required when:<br/>&nbsp;- --assignment_method is set to tax2tree</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "tax2tree";
@@ -681,14 +593,15 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testTreeFp_assignmentMethodIsNotTax2Tree_isPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --tree_fp can only be used when:<br/>&nbsp;- --assignment_method is set to tax2tree</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
@@ -697,11 +610,11 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testTreeFp_assignmentMethodIsNotTax2Tree_isNotPresent() {
 		$expected = "";
@@ -709,13 +622,8 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
 		unset($input['--tree_fp']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 }

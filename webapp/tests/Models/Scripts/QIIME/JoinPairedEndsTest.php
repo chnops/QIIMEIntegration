@@ -76,14 +76,9 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		$input['--forward_reads_fp'] = true;
 		$input['--reverse_reads_fp'] = true;
 		$input['--output_dir'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown an exception: {$ex->getMessage()}");
-		}
 	}
 	public function testRequired_notPresent() {
 		$expected = $this->errorMessageIntro . 
@@ -91,6 +86,7 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 			"<li>The parameter --reverse_reads_fp is required</li>" .
 			"<li>The parameter --output_dir is required</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		unset($input['--forward_reads_fp']);
 		unset($input['--reverse_reads_fp']);
@@ -99,11 +95,11 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testPeJoinMethod_fastqJoin_someDependentsPresent() {
@@ -114,6 +110,7 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 			"<li>The parameter --max_good_mismatch can only be used when:<br/>&nbsp;- --pe_join_method is set to SeqPrep</li>" .
 			"<li>The parameter --phred_64 can only be used when:<br/>&nbsp;- --pe_join_method is set to SeqPrep</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--forward_reads_fp'] = true;
 		$input['--reverse_reads_fp'] = true;
@@ -128,11 +125,11 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testPeJoinMethod_fastqJoin_noDependentsPresent() {
 		$expected = "";
@@ -146,14 +143,9 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--min_frac_match']);
 		unset($input['--max_good_mismatch']);
 		unset($input['--phred_64']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown an exception: {$ex->getMessage()}");
-		}
 	}
 	public function testPeJoinMethod_seqPrep_someDependentsPresent() {
 		$expected = $this->errorMessageIntro .
@@ -163,6 +155,7 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 //			"<li>The parameter --max_good_mismatch can only be used when:<br/>&nbsp;- --pe_join_method is set to SeqPrep</li>" .
 //			"<li>The parameter --phred_64 can only be used when:<br/>&nbsp;- --pe_join_method is set to SeqPrep</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--forward_reads_fp'] = true;
 		$input['--reverse_reads_fp'] = true;
@@ -177,11 +170,11 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch(ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testPeJoinMethod_seqPrep_noDependentsPresent() {	
 		$expected = "";
@@ -195,13 +188,8 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--min_frac_match']);
 		unset($input['--max_good_mismatch']);
 		unset($input['--phred_64']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch(ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown an exception: {$ex->getMessage()}");
-		}
 	}
 }

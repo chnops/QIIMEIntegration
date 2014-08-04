@@ -71,27 +71,23 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input = $this->emptyInput;
 		$input['--fasta_file_path'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testFastaFilePath_notPresent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --fasta_file_path is required</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testConversionType_fastaqualToFastq_dependentsPresent() {
@@ -101,14 +97,9 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 		$input['--conversion_type'] = "fastaqual_to_fastq";
 		$input['--qual_file_path'] = true;
 		$input['--full_fastq'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testConversionType_fastaqualToFastq_dependentsNotPresent() {
 		$expected = "";
@@ -117,20 +108,16 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 		$input['--conversion_type'] = "fastaqual_to_fastq";
 		unset($input['--qual_file_path']);
 		unset($input['--full_fastq']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 	public function testConversionType_fastqToFastaqual_dependentsPresent() {
 		$expected = $this->errorMessageIntro .
 			"<li>The parameter --qual_file_path can only be used when:<br/>&nbsp;- --conversion_type is set to fastaqual_to_fastq</li>" .
 			"<li>The parameter --full_fastq can only be used when:<br/>&nbsp;- --conversion_type is set to fastaqual_to_fastq</li>" .
 			$this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		$input['--fasta_file_path'] = true;
 		$input['--conversion_type'] = "fastq_to_fastaqual";
@@ -140,11 +127,11 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
-			$this->assertEquals($expected, $ex->getMessage());
+			$actual = $ex->getMessage();
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testConversionType_fastqToFastaqual_dependentsNotPresent() {
 		$expected = "";
@@ -153,13 +140,8 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 		$input['--conversion_type'] = "fastq_to_fastaqual";
 		unset($input['--qual_file_path']);
 		unset($input['--full_fastq']);
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown this exception: {$ex->getMessage()}");
-		}
 	}
 }

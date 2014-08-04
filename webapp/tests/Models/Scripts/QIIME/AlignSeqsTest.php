@@ -70,61 +70,56 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 
 	public function testInputFp_absent() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --input_fasta_fp is required</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input = $this->emptyInput;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	public function testInputFp_present() {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should not have thrown exception");
-		}
 	}
 
 	public function testVersion_present() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --version can only be used when:</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--version'] = true;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testHelp_present() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --help can only be used when:</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--help'] = true;
 		try {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testBlastDb_whileAllowed() {
@@ -132,17 +127,13 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "pynast";
 		$input['--blast_db'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should have not thrown an exception");
-		}
 	}
 	public function testBlastDb_whileNotAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --blast_db can only be used when:<br/>&nbsp;- --alignment_method is set to pynast</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
 		$input['--blast_db'] = true;
@@ -150,12 +141,11 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testPairwiseAlignmentMethod_whileAllowed() {
@@ -163,17 +153,13 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "pynast";
 		$input['--pairwise_alignment_method'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should have not thrown an exception");
-		}
 	}
 	public function testPairwiseAlignmentMethod_whileNotAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --pairwise_alignment_method can only be used when:<br/>&nbsp;- --alignment_method is set to pynast</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
 		$input['--pairwise_alignment_method'] = true;
@@ -181,12 +167,11 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testMinPercentId_whileAllowed() {
@@ -194,17 +179,13 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "pynast";
 		$input['--min_percent_id'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should have not thrown an exception");
-		}
 	}
 	public function testMinPercentId_whileNotAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --min_percent_id can only be used when:<br/>&nbsp;- --alignment_method is set to pynast</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
 		$input['--min_percent_id'] = true;
@@ -212,12 +193,11 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testMuscleMaxMemory_whileAllowed() {
@@ -225,17 +205,13 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "muscle";
 		$input['--muscle_max_memory'] = true;
-		try {
 
-			$this->object->acceptInput($input);
+		$this->object->acceptInput($input);
 
-		}
-		catch (ScriptException $ex) {
-			$this->fail("acceptInput should have not thrown an exception");
-		}
 	}
 	public function testMuscleMaxMemory_whileNotAllowed() {
 		$expected = $this->errorMessageIntro . "<li>The parameter --muscle_max_memory can only be used when:<br/>&nbsp;- --alignment_method is set to muscle</li>" . $this->errorMessageOutro;
+		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
 		$input['--muscle_max_memory'] = true;
@@ -243,11 +219,10 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 
 			$this->object->acceptInput($input);
 
-			$this->fail("acceptInput should have thrown an exception");
 		}
 		catch (ScriptException $ex) {
 			$actual = $ex->getMessage();
-			$this->assertEquals($expected, $actual);
 		}
+		$this->assertEquals($expected, $actual);
 	}
 }
