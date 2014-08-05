@@ -113,11 +113,14 @@ class MacOperatingSystem implements OperatingSystemI {
 
 	public function uploadFile(ProjectI $project, $givenName, $tmpName) {
 			$targetName = $this->home . $project->getProjectDir() . "/uploads/" . $givenName;
-			$result = move_uploaded_file($tmpName, $targetName);
+			$result = $this->moveUploadedFile($tmpName, $targetName);
 			if (!$result) {
 				throw new OperatingSystemException("Unable to move file from temporary upload to operating system");
 			}
 			return true;
+	}
+	public function moveUploadedFile($tmpName, $targetName) {
+		return move_uploaded_file($tmpName, $targetName);
 	}
 	public function downloadFile(ProjectI $project, $url, $outputName, \Database\DatabaseI $database) {
 		ob_start();
@@ -127,8 +130,7 @@ class MacOperatingSystem implements OperatingSystemI {
 		$onSuccess = $database->renderCommandUploadSuccess($project->getOwner(), $project->getId(), $outputName, $size = "\$size");
 		$onFail = $database->renderCommandUploadFailure($project->getOwner(), $project->getId(), $outputName, $size = "\$size");
 
-		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . ";
-			if [ $? != 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
+		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . " 2>&1;
 			cd {$this->home}{$project->getProjectDir()}/uploads;
 			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
 			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];

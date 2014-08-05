@@ -3,14 +3,22 @@
 namespace Models;
 
 class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
-
-	private $projectHome = "./projects/";
-	private $object = NULL;
-
 	public static function setUpBeforeClass() {
 		error_log("MacOperatingSystemTest");
 	}
 
+	private $projectBuilder = NULL;
+	private $databaseBuilder = NULL;
+	private $projectHome = "./projects/";
+	private $object = NULL;
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$this->projectBuilder = $this->getMockBuilder('\Models\DefaultProject')
+			->disableOriginalConstructor();
+		$this->databaseBuilder = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor();
+	}
 	public function setUp() {
 		$this->object = new MacOperatingSystem();
 		system('rm -rf ./projects/*');
@@ -358,15 +366,93 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::uploadFile
 	 */
-	public function testUploadFile() {
-		$this->markTestIncomplete();
+	public function testUploadFile_moveFails() {
+		$expected = "Unable to move file from temporary upload to operating system";
+		$actual = "";
+		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
+			->disableOriginalConstructor()
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1/p1"));
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("moveUploadedFile"))
+			->getMock();
+		$this->object->expects($this->once())->method("moveUploadedFile")->will($this->returnValue(false));
+		try {
+	
+			$this->object->uploadFile($mockProject, "givenName", "tmpName");
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::uploadFile
+	 */
+	public function testUploadFile_moveDoesNotFail() {
+		$expected = true;
+		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
+			->disableOriginalConstructor()
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1/p1"));
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("moveUploadedFile"))
+			->getMock();
+		$this->object->expects($this->once())->method("moveUploadedFile")->will($this->returnValue(true));
+	
+		$actual = $this->object->uploadFile($mockProject, "givenName", "tmpName");
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testMoveDownloadedFile() {
+
+		$actual = $this->object->moveUploadedFile("notAnUploadedFile", "notAPathway");
+
+		$this->assertFalse($actual);
+	}
+
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile_sourceFails() {
+		$expected = new OperatingSystemException("Unable to download file");
+		$expected->setConsoleOutput("sh: line 1: /tmp/file_that_does_not_exist.fake: No such file or directory\n");
+		$actual = NULL;
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
+		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/tmp/file_that_does_not_exist.fake'));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
+			->getMock();
+		$url = "http://localhost/";
+		$outputName = "localhost.html";
+		try {
+
+			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::downloadFile
 	 */
-	public function testDownloadFile() {
+	public function testDownloadFile_sourceFails() {
 		$this->markTestIncomplete();
 	}
+
 	/**
 	 * @covers MacOperatingSystem::deleteFile
 	 */
