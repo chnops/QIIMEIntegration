@@ -123,6 +123,7 @@ class ManipulateOtuTable extends DefaultScript {
 			}
 		}
 		if (!$action) {
+			// "true" will be executed as a bash command
 			return "true";
 		}
 		return $this->getScriptName() . " " . $action . " --version";

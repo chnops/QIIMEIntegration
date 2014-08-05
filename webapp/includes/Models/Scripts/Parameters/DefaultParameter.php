@@ -136,7 +136,7 @@ class DefaultParameter implements ParameterI {
 	}
 
 	public function acceptInput(array $input) {
-		if (!isset($input[$this->name]) || !$input[$this->name]) {
+		if (!isset($input[$this->name]) || $input[$this->name] === "") {
 			$this->setValue(false);
 
 			if ($this->isAlwaysRequired()) {
@@ -193,16 +193,24 @@ class DefaultParameter implements ParameterI {
 		$activeTriggers = array();
 		foreach ($allTriggers as $trigger) {
 			$triggerParam = $trigger['parameter'];
+			$triggerName = $triggerParam->getName();
 			$triggerValue = $trigger['value'];
+			$isParamSet = isset($input[$triggerName]);
 
-			if ($triggerValue === false && !isset($input[$triggerParam->getName()])) {
+			if ($triggerValue === false) {
+				if (!$isParamSet || $input[$triggerName] === "") {
 					$activeTriggers[] = $trigger;
+				}
 			}
-			else if ($triggerValue === true && isset($input[$triggerParam->getName()])) {
+			else if ($triggerValue === true) {
+				if ($isParamSet && $input[$triggerName] !== "") {
 					$activeTriggers[] = $trigger;
+				}
 			}
-			else if (isset($input[$triggerParam->getName()]) && ($input[$triggerParam->getName()] === $triggerValue)) {
+			else {
+				if ($isParamSet && $input[$triggerName] === $triggerValue) {
 					$activeTriggers[] = $trigger;
+				}
 			}
 		}
 		return $activeTriggers;

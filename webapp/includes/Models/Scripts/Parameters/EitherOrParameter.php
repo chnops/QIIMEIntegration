@@ -138,12 +138,10 @@ class EitherOrParameter extends DefaultParameter {
 
 	public function acceptInput(array $input) {
 		parent::acceptInput($input);
-		if (!isset($input[$this->name]) || !$input[$this->name]) {
-			$this->setValue("");
+		if (!$this->getValue()) {
 			return;
 		}
 
-		$this->setValue($input[$this->name]);
 		if (!isset($input[$this->value])) {
 			throw new ScriptException("Since {$this->name} is set to {$this->value}, that parameter must be specified.");
 		}

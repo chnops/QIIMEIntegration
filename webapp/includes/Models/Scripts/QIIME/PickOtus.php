@@ -39,7 +39,7 @@ class PickOtus extends DefaultScript {
 
 		$clusteringAlgorithm = new ChoiceParameter("--clustering_algorithm", "furthest",
 			array("furthest", "nearest", "average"));
-		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mother");
+		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mothur");
 
 		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", TextArgumentParameter::PATTERN_DIGIT); // TODO units = Mbyte
 		$maxCdhitMemory->excludeButAllowIf($otuPickingMethod, "cdhit");
@@ -88,9 +88,9 @@ class PickOtus extends DefaultScript {
 		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
 
-		$suppressPresortByAbundanceUclut = new TrueFalseParameter("--suppress_presort_by_abundance_uclust");
-		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust");
-		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$suppressPresortByAbundanceUclust = new TrueFalseParameter("--suppress_presort_by_abundance_uclust");
+		$suppressPresortByAbundanceUclust->excludeButAllowIf($otuPickingMethod, "uclust");
+		$suppressPresortByAbundanceUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$optimalUclust = new TrueFalseParameter("--optimal_uclust");
 		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust");
 		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
@@ -128,7 +128,6 @@ class PickOtus extends DefaultScript {
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
 		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); // TODO forces usearch61_sort_method = long
-				// TODO has different exclude criteria than its linked parameter
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -242,7 +241,7 @@ class PickOtus extends DefaultScript {
 			$suppressNewClusters,
 			$similarity,
 			$wordLength,
-			$suppressPresortByAbundanceUclut,
+			$suppressPresortByAbundanceUclust,
 			$optimalUclust,
 			$exactUclust,
 			$userSort,

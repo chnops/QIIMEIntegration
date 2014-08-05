@@ -641,53 +641,12 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $actual);
 	}
 
-	private function getTestTriggers() {
-		$falseOneParameter = new DefaultParameter("falseOne", "value");
-		$falseTwoParameter = new DefaultParameter("falseTwo", "value");
-		$trueOneParameter = new DefaultParameter("trueOne", "value");
-		$trueTwoParameter = new DefaultParameter("trueTwo", "value");
-		$valueOneParameter = new DefaultParameter("valueOne", "value");
-		$valueTwoParameter = new DefaultParameter("valueTwo", "value");
-
-		return array(
-			array("parameter" => $falseOneParameter, "value" => false),
-			array("parameter" => $falseTwoParameter, "value" => false),
-			array("parameter" => $trueOneParameter, "value" => true),
-			array("parameter" => $trueTwoParameter, "value" => true),
-			array("parameter" => $valueOneParameter, "value" => "one"),
-			array("parameter" => $valueTwoParameter, "value" => "two"),
-		);
-	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
 	 */
 	public function testGetActiveTriggers_triggersEmpty() {
 		$expected = array();
 		$triggers = array();
-		$input = array(
-			"falseOne" => true,
-			"falseTwo" => true,
-			"trueOne" => true,
-			"trueTwo" => true,
-			"valueOne" => true,
-			"valueTwo" => true,
-		);
-
-		$actual = $this->object->getActiveTriggers($triggers, $input);
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
-	 */
-	public function testGetActiveTriggers_inputEmpty() {
-		$falseOneParameter = new DefaultParameter("falseOne", "value");
-		$falseTwoParameter = new DefaultParameter("falseTwo", "value");
-		$expected = array(
-			array("parameter" => $falseOneParameter, "value" => false),
-			array("parameter" => $falseTwoParameter, "value" => false),
-		);
-		$triggers = $this->getTestTriggers();
 		$input = array();
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -697,22 +656,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
 	 */
-	public function testGetActiveTriggers_inputFull() {
-		$trueOneParameter = new DefaultParameter("trueOne", "value");
-		$trueTwoParameter = new DefaultParameter("trueTwo", "value");
-		$expected = array(
-			array("parameter" => $trueOneParameter, "value" => true),
-			array("parameter" => $trueTwoParameter, "value" => true),
-		);
-		$triggers = $this->getTestTriggers();
-		$input = array(
-			"falseOne" => true,
-			"falseTwo" => true,
-			"trueOne" => true,
-			"trueTwo" => true,
-			"valueOne" => true,
-			"valueTwo" => true,
-		);
+	public function testGetActiveTriggers_valueFalse_paramIsNotSet() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
+		$expected = $triggers;
+		$input = array();
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
 
@@ -721,24 +669,206 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
 	 */
-	public function testGetActiveTriggers_specificValues() {
-		$trueOneParameter = new DefaultParameter("trueOne", "value");
-		$trueTwoParameter = new DefaultParameter("trueTwo", "value");
-		$valueTwoParameter = new DefaultParameter("valueTwo", "value");
-		$expected = array(
-			array("parameter" => $trueOneParameter, "value" => true),
-			array("parameter" => $trueTwoParameter, "value" => true),
-			array("parameter" => $valueTwoParameter, "value" => "two"),
-		);
-		$triggers = $this->getTestTriggers();
-		$input = array(
-			"falseOne" => "two",
-			"falseTwo" => "two",
-			"trueOne" => "two",
-			"trueTwo" => "two",
-			"valueOne" => "two",
-			"valueTwo" => "two",
-		);
+	public function testGetActiveTriggers_valueFalse_paramIsEmptyString() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
+		$expected = $triggers;
+		$input = array($this->name => "");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalse_paramIs0() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
+		$expected = array();
+		$input = array($this->name => "0");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalse_paramIsTruthy() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
+		$expected = array();
+		$input = array($this->name => $this->value);
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTrue_paramIsNotSet() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
+		$expected = array();
+		$input = array();
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTrue_paramIsEmptyString() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
+		$expected = array();
+		$input = array($this->name => "");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTrue_paramIs0() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
+		$expected = $triggers;
+		$input = array($this->name => "0");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTrue_paramIsTruthy() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
+		$expected = $triggers;
+		$input = array($this->name => $this->value);
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalsey_paramIsNotSet() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
+		$expected = array();
+		$input = array();
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalsey_paramIsEmptyString() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
+		$expected = array();
+		$input = array($this->name => "");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalsey_paramIs0() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => "0"));
+		$expected = $triggers;
+		$input = array($this->name => "0");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueFalsey_paramIsTruthy() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
+		$expected = array();
+		$input = array($this->name => $this->value);
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTruthy_paramIsNotSet() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
+		$expected = array();
+		$input = array();
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTruthy_paramIsEmptyString() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
+		$expected = array();
+		$input = array($this->name => "");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTruthy_paramIs0() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
+		$expected = array();
+		$input = array($this->name => "0");
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTruthy_paramIsCorrectTruthy() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
+		$expected = $triggers;
+		$input = array($this->name => $this->value);
+
+		$actual = $this->object->getActiveTriggers($triggers, $input);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\DefaultParameter::getActiveTriggers
+	 */
+	public function testGetActiveTriggers_valueTruthy_paramIsIncorrectTruthy() {
+		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
+		$expected = array();
+		$input = array($this->name => "not_" . $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
 

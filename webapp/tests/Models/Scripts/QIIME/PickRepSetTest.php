@@ -1,12 +1,16 @@
 <?php
 
 namespace Models\Scripts\QIIME;
+use Models\Scripts\ScriptException;
+use Models\Scripts\Parameters\DefaultParameter;
 
 class PickRepSetTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("PickRepSetTest");
 	}
 
+	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
+	private $errorMessageOutro = "</ul>\n";
 	private $mockProject = NULL;
 	private $object = NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
@@ -21,9 +25,140 @@ class PickRepSetTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Models\Scripts\QIIME\
+	 * @covers \Models\Scripts\QIIME\PickRepSet::getScriptName
 	 */
-	public function testIncludes() {
-		$this->assertTrue(false);
+	public function testGetScriptName() {
+		$expected = "pick_rep_set.py";
+
+		$actual = $this->object->getScriptName();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\Scripts\QIIME\PickRepSet::getScriptTitle
+	 */
+	public function testGetScriptTitle() {
+		$expected = "Pick representative sequences";
+
+		$actual = $this->object->getScriptTitle();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\Scripts\QIIME\PickRepSet::getHtmlId
+	 */
+	public function testGetHtmlId() {
+		$expected = "pick_rep_set";
+
+		$actual = $this->object->getHtmlId();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testRequireds_present() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --fasta_file is required when:<br/>&nbsp;- --reference_seqs_fp is not set</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		$input['--input_file'] = true;
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	public function testRequireds_notPresent() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --input_file is required</li>" .
+			"<li>The parameter --fasta_file is required when:<br/>&nbsp;- --reference_seqs_fp is not set</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testReferenceSeqsFp_triggerIsPresent_valueIsPresent() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --input_file is required</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		$input['--reference_seqs_fp'] = true;
+		$input['--fasta_file'] = true;
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	public function testReferenceSeqsFp_triggerIsPresent_valueIsNotPresent() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --input_file is required</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		$input['--reference_seqs_fp'] = true;
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	public function testReferenceSeqsFp_triggerIsNotPresent_valueIsPresent() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --input_file is required</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		$input['--fasta_file'] = true;
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	public function testReferenceSeqsFp_triggerIsNotPresent_valueIsNotPresent() {
+		$expected = $this->errorMessageIntro . 
+			"<li>The parameter --input_file is required</li>" .
+			"<li>The parameter --fasta_file is required when:<br/>&nbsp;- --reference_seqs_fp is not set</li>" .
+			$this->errorMessageOutro;
+		$actual = "";
+		$input = array();
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
 	}
 }
