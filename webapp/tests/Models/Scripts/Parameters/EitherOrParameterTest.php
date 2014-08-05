@@ -1,6 +1,7 @@
 <?php
 
 namespace Models\Scripts\Parameter;
+use Models\Scripts\ScriptException;
 
 class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
@@ -472,7 +473,144 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
 	 */
-	public function testAcceptInput() {
-		$this->markTestIncomplete();
+	public function testAcceptInput_parentThrowsException() {
+		$expected = "The parameter {$this->object->getName()} can only be used when:";
+		$actual = "";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$this->object->expects($this->never())->method("getUnselectedValue");
+		$input = array($this->object->getName() => $this->defaultName);
+		$this->object->setIsExcludedByDefault(true);
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentDoesNotThrowsException_parentDoesNotSetTruthyValue() {
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$this->object->expects($this->never())->method("getUnselectedValue");
+		$input = array($this->object->getName() => "");
+
+		$this->object->acceptInput($input);
+
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentPasses_failsBecauseSelectedValueIsNotSet() {
+		$expected = "Since {$this->object->getName()} is set to {$this->defaultName}, that parameter must be specified.";
+		$actual = "";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$input = array($this->object->getName() => $this->defaultName);
+		$this->object->expects($this->never())->method("getUnselectedValue");
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentPasses_failsBecauseSelectedValueIsSetButToEmptyString() {
+		$expected = "Since {$this->object->getName()} is set to {$this->defaultName}, that parameter must be specified.";
+		$actual = "";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$input = array($this->object->getName() => $this->defaultName, $this->defaultName => "");
+		$this->object->expects($this->never())->method("getUnselectedValue");
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentPasses_failsBecauseUnselectedValueIsSet() {
+		$expected = "Since {$this->object->getName()} is set to {$this->defaultName}, {$this->alternativeName} is not allowed.";
+		$actual = "";
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$input = array($this->object->getName() => $this->defaultName, $this->defaultName => true, $this->alternativeName => true);
+		$this->object->expects($this->exactly(3))->method("getUnselectedValue")->will($this->returnValue($this->alternativeName));
+		try {
+
+			$this->object->acceptInput($input);
+
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex->getMessage();
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentPasses_passesBecauseUnselectedValueIsSetButEmptyString() {
+		$expected = "";
+		$mockDefault = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
+			->setConstructorArgs(array($this->defaultName, "defaultValue"))
+			->setMethods(array("acceptInput"))
+			->getMock();
+		$mockDefault->expects($this->once())->method("acceptInput");
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$input = array($this->object->getName() => $this->defaultName, $this->defaultName => true, $this->alternativeName => "");
+		$this->object->expects($this->exactly(2))->method("getUnselectedValue")->will($this->returnValue($this->alternativeName));
+
+		$this->object->acceptInput($input);
+
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
+	 */
+	public function testAcceptInput_parentPasses_childPasses() {
+		$expected = "";
+		$mockDefault = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
+			->setConstructorArgs(array($this->defaultName, "defaultValue"))
+			->setMethods(array("acceptInput"))
+			->getMock();
+		$mockDefault->expects($this->once())->method("acceptInput");
+		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
+			->setConstructorArgs(array($mockDefault, $this->mockAlternative))
+			->setMethods(array("getUnselectedValue"))
+			->getMock();
+		$input = array($this->object->getName() => $this->defaultName, $this->defaultName => true);
+		$this->object->expects($this->once())->method("getUnselectedValue")->will($this->returnValue($this->alternativeName));
+
+		$this->object->acceptInput($input);
+
 	}
 }

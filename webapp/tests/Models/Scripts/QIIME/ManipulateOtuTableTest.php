@@ -322,6 +322,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--qualitative']);
 		unset($input['--suppress-md5']);
 		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = "--biom-to-classic-table";
+		$input['--biom-to-classic-table'] = true;
 		$input['--header-key'] = true;
 		$input['--output-metadata-id'] = true;
 		unset($input['--sample-metadata-fp']);
@@ -346,6 +347,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--qualitative']);
 		unset($input['--suppress-md5']);
 		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = "--biom-to-classic-table";
+		$input['--biom-to-classic-table'] = true;
 		unset($input['--header-key']);
 		unset($input['--output-metadata-id']);
 		$input['--sample-metadata-fp'] = true;
@@ -379,6 +381,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--suppress-md5']);
 		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = "__--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom__";
 		$input['__--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom__'] = "--sparse-biom-to-dense-biom";
+		$input['--sparse-biom-to-dense-biom'] = true;
 		unset($input['--biom-to-classic-table']);
 		unset($input['--dense-biom-to-sparse-biom']);
 		$input['--header-key'] = true;
