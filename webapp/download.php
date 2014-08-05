@@ -1,7 +1,7 @@
 <?php
 require_once './includes/setup.php';
 
-// Verify request parameters
+// Verify that the user is logged in and has selected a project
 if (!isset($_SESSION['username']) || !isset($_SESSION['project_id'])) {
 	header('HTTP/1.0 403 Forbidden');
 	echo "<p>You must <a href=\"index.php\">login</a> and select a project</p>";
@@ -14,6 +14,7 @@ if (!is_numeric($projectId)) {
 	exit;
 }
 
+// Verify request parameters
 if (!isset($_GET['run']) || !isset($_GET['file_name'])) {
 	header('HTTP/1.1 400 Bad request');
 	echo "<p>You must provide a run id and file name to download (url)</p>";
@@ -34,7 +35,7 @@ if(preg_match("/\//", $fileName) || preg_match("/\n/", $fileName)) {
 	exit;
 }
 
-// Download the file
+// Find the actual path for the file
 $operatingSystem = new \Models\MacOperatingSystem();
 $database = new \Database\PDODatabase($operatingSystem);
 $actualPath = "./projects/u" . $database->getUserRoot($_SESSION['username']) . "/p" . $projectId;
@@ -45,6 +46,7 @@ else {
 	$actualPath .= "/r{$runId}/" . $_GET['file_name'];
 }
 
+// Send just a preview of the file, as text
 if (isset($_GET['as_text']) && $_GET['as_text']) {
 	try {
 		$maxLen = 2000;
@@ -66,6 +68,7 @@ if (isset($_GET['as_text']) && $_GET['as_text']) {
 		echo "<div style=\"font-family: 'Comic Sans MS', cursive, sans-serif\">	Error accessing file: Please see the error log or contact the system administrator</div>";
 	}
 }
+// Send the whole file, as a download
 else {
 	ob_end_clean();
 	header('Content-Type: application/octet-stream');
