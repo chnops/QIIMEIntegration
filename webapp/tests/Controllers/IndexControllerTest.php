@@ -6,6 +6,9 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("IndexControllerTest");
 	}
+	public static function tearDownAfterClass() {
+		\Utils\Helper::setDefaultHelper(NULL);
+	}
 
 	private $mockWorkflow = NULL;
 	private $object = NULL;
@@ -20,6 +23,7 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 		$_SESSION = array();
 		$_REQUEST = array();
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->object = new IndexController($this->mockWorkflow);
 	}
 
@@ -27,31 +31,34 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\IndexController::getSubController
 	 */
 	public function testGetSubController() {
+		$expected = NULL;
+		
 		$actual = $this->object->getSubController();
 
-		$this->assertNull($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::setSubController
 	 */
 	public function testSetSubController() {
-		$mockController = $this->getMockBuilder('\Controllers\Controller')->disableOriginalConstructor()->getMockForAbstractClass();
+		$expected = $this->getMockBuilder('\Controllers\Controller')->disableOriginalConstructor()->getMockForAbstractClass();
 
-		$this->object->setSubController($mockController);
+		$this->object->setSubController($expected);
 
 		$actual = $this->object->getSubController();
-		$this->assertEquals($mockController, $actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::parseSession
 	 */
 	public function testParseSession_sessionDoesNothing() {
+		$expected = NULL;
 		$_SESSION['username'] = "username";
 		$_SESSION['project_id'] = "1";
 
 		$actual = $this->object->parseSession();
 
-		$this->assertNull($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::parseInput
@@ -61,8 +68,8 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getController"))
 			->getMock();
-		$expected = new LoginController($mockWorkflow);
 		$mockWorkflow->expects($this->never())->method("getController");
+		$expected = new LoginController($mockWorkflow);
 		$this->object = new IndexController($mockWorkflow);
 
 		$this->object->parseInput();
@@ -80,8 +87,8 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$expected = new SelectProjectController($mockWorkflow);
 		$mockWorkflow->expects($this->once())->method("getController")->will($this->returnValue($expected));
-		$this->object = new IndexController($mockWorkflow);
 		$_REQUEST['step'] = true;
+		$this->object = new IndexController($mockWorkflow);
 
 		$this->object->parseInput();
 
@@ -93,82 +100,92 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\IndexController::retrievePastResults
 	 */
 	public function testRetrievePastResults() {
+		$expected = "";
 
 		$actual = $this->object->retrievePastResults();
 
-		$this->assertEmpty($actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderInstructions
 	 */
 	public function testRenderInstructions() {
+		$expected = "";
 
 		$actual = $this->object->renderInstructions();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderForm
 	 */
 	public function testRenderForm() {
+		$expected = "";
 
 		$actual = $this->object->renderForm();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderHelp
 	 */
 	public function testRenderHelp() {
+		$expected = "";
 
 		$actual = $this->object->renderHelp();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::getSubTitle
 	 */
 	public function testGetSubTitle() {
+		$expected = "";
 
 		$actual = $this->object->getSubTitle();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderSpecificStyle
 	 */
 	public function testRenderSpecificStyle() {
+		$expected = "";
 
 		$actual = $this->object->renderSpecificStyle();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderSpecificScript
 	 */
 	public function testRenderSpecificScript() {
+		$expected = "";
 
 		$actual = $this->object->renderSpecificScript();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::getScriptLibraries
 	 */
 	public function testGetScriptLibraries() {
+		$expected = array();
 
 		$actual = $this->object->getScriptLibraries();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	
 	/**
 	 * @covers \Controllers\IndexController::renderOutput
 	 */
 	public function testRenderOutput_subNotSet() {
+		$this->markTestIncomplete();
 
 		$this->object->renderOutput();
 
+		//assert error log written to
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderOutput
@@ -180,5 +197,6 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->setSubController($mockController);
 
 		$this->object->renderOutput();
+
 	}
 }

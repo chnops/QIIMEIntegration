@@ -69,8 +69,8 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::categorizeArray
 	 */
 	public function testCategorizeArray_emptyArray() {
+		$expected = array();
 		$raw = array();
-		$expected = $raw;
 
 		$actual = $this->object->categorizeArray($raw, "category");
 
@@ -80,17 +80,17 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::categorizeArray
 	 */
 	public function testCategorizeArray_fieldNotSet_allOneCategory() {
-		$raw = array(
-			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
-			array("category" => "cat1", "field" => "elem2", "other_field" => "other2"),
-			array("category" => "cat1", "field" => "elem3", "other_field" => "other3"),
-		);
 		$expected = array(
 			"cat1" => array(
 				array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
 				array("category" => "cat1", "field" => "elem2", "other_field" => "other2"),
 				array("category" => "cat1", "field" => "elem3", "other_field" => "other3"),
 			),
+		);
+		$raw = array(
+			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
+			array("category" => "cat1", "field" => "elem2", "other_field" => "other2"),
+			array("category" => "cat1", "field" => "elem3", "other_field" => "other3"),
 		);
 
 		$actual = $this->object->categorizeArray($raw, "category");
@@ -101,11 +101,6 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::categorizeArray
 	 */
 	public function testCategorizeArray_fieldNotSet_allDifferentCategories() {
-		$raw = array(
-			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
-			array("category" => "cat2", "field" => "elem2", "other_field" => "other2"),
-			array("category" => "cat3", "field" => "elem3", "other_field" => "other3"),
-		);
 		$expected = array(
 			"cat1" => array(
 				array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
@@ -117,6 +112,11 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 				array("category" => "cat3", "field" => "elem3", "other_field" => "other3"),
 			),
 		);
+		$raw = array(
+			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
+			array("category" => "cat2", "field" => "elem2", "other_field" => "other2"),
+			array("category" => "cat3", "field" => "elem3", "other_field" => "other3"),
+		);
 
 		$actual = $this->object->categorizeArray($raw, "category");
 
@@ -126,13 +126,13 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::categorizeArray
 	 */
 	public function testCategorizeArray_fieldSet_allOneCategory() {
+		$expected = array(
+			"cat1" => array("elem1", "elem2", "elem3"),
+		);
 		$raw = array(
 			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
 			array("category" => "cat1", "field" => "elem2", "other_field" => "other2"),
 			array("category" => "cat1", "field" => "elem3", "other_field" => "other3"),
-		);
-		$expected = array(
-			"cat1" => array("elem1", "elem2", "elem3"),
 		);
 
 		$actual = $this->object->categorizeArray($raw, "category", "field");
@@ -143,15 +143,15 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::categorizeArray
 	 */
 	public function testCategorizeArray_fieldSet_allDifferentCategories() {
-		$raw = array(
-			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
-			array("category" => "cat2", "field" => "elem2", "other_field" => "other2"),
-			array("category" => "cat3", "field" => "elem3", "other_field" => "other3"),
-		);
 		$expected = array(
 			"cat1" => array("elem1"),
 			"cat2" => array("elem2"),
 			"cat3" => array("elem3"),
+		);
+		$raw = array(
+			array("category" => "cat1", "field" => "elem1", "other_field" => "other1"),
+			array("category" => "cat2", "field" => "elem2", "other_field" => "other2"),
+			array("category" => "cat3", "field" => "elem3", "other_field" => "other3"),
 		);
 
 		$actual = $this->object->categorizeArray($raw, "category", "field");
@@ -163,8 +163,8 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::htmlentities
 	 */
 	public function testHtmlentities_stringIsZero() {
+		$expected = 0;
 		$input = 0;
-		$expected = $input;
 
 		$actual = $this->object->htmlentities($input);
 
@@ -174,11 +174,18 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Utils\Helper::htmlentities
 	 */
 	public function testHtmlentities_stringIsEmpty() {
+		$expected = "";
 		$input = "";
-		$expected = $input;
 
 		$actual = $this->object->htmlentities($input);
 
 		$this->assertSame($expected, $actual);
+	}
+
+	/**
+	 * @covers \Utils\Helper::htmlentities
+	 */
+	public function testHtmlentities_stringIsNotEmpty() {
+		$this->markTestIncomplete();
 	}
 }

@@ -6,6 +6,10 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("LoginControllerTest");
 	}
+	public static function tearDownAfterClass() {
+		\Utils\Helper::setDefaultHelper(NULL);
+		\Utils\Roster::setDefaultRoster(NULL);
+	}
 
 	private $mockWorkflow = NULL;
 	private $object = NULL;
@@ -20,28 +24,28 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	}
 	public function setUp() {
 		$_POST = array();
-		$this->object = new LoginController($this->mockWorkflow);
-	}
-	public function tearDown() {
+		\Utils\Helper::setDefaultHelper(NULL);
 		\Utils\Roster::setDefaultRoster(NULL);
+		$this->object = new LoginController($this->mockWorkflow);
 	}
 
 	/**
 	 * @covers \Controllers\LoginController::retrievePastResults
 	 */
 	public function testRetrievePastResults() {
+		$expected = "";
 
 		$actual = $this->object->retrievePastResults();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_logoutIsSet() {
-		$_POST['logout'] = 1;
 		$expected = "Logout successful";
+		$_POST['logout'] = 1;
 		$this->object = $this->getMockBuilder('\Controllers\LoginController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("logout", "createUser", "login"))
@@ -59,6 +63,7 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_usernameIsNotSet() {
+		$expected = "";
 		$this->object = $this->getMockBuilder('\Controllers\LoginController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("logout", "createUser", "login"))
@@ -70,12 +75,17 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->parseInput();
 
 		$actual = $this->object->getResult();
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_create_userExists() {
+		$expecteds = array(
+			"is_result_error" => true,
+			"result" => "That username is already taken.  Did you mean to log in?",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("userExists"))
@@ -91,11 +101,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->never())->method("logout");
 		$this->object->expects($this->never())->method("createUser");
 		$this->object->expects($this->never())->method("login");
-		$expecteds = array(
-			"is_result_error" => true,
-			"result" => "That username is already taken.  Did you mean to log in?",
-		);
-		$actuals = array();
 
 		$this->object->parseInput();
 
@@ -107,6 +112,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_create_userDoesNotExist() {
+		$expecteds = array(
+			"is_result_error" => false,
+			"result" => "",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("userExists"))
@@ -122,11 +132,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->never())->method("logout");
 		$this->object->expects($this->once())->method("createUser");
 		$this->object->expects($this->never())->method("login");
-		$expecteds = array(
-			"is_result_error" => false,
-			"result" => "",
-		);
-		$actuals = array();
 
 		$this->object->parseInput();
 
@@ -138,6 +143,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_login_userExists() {
+		$expecteds = array(
+			"is_result_error" => false,
+			"result" => "",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("userExists"))
@@ -153,11 +163,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->never())->method("logout");
 		$this->object->expects($this->never())->method("createUser");
 		$this->object->expects($this->once())->method("login");
-		$expecteds = array(
-			"is_result_error" => false,
-			"result" => "",
-		);
-		$actuals = array();
 
 		$this->object->parseInput();
 
@@ -169,6 +174,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::parseInput
 	 */
 	public function testParseInput_login_userDoesNotExist() {
+		$expecteds = array(
+			"is_result_error" => true,
+			"result" => "We found no record of your username.  Would you like to create one?",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("userExists"))
@@ -184,11 +194,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->never())->method("logout");
 		$this->object->expects($this->never())->method("createUser");
 		$this->object->expects($this->never())->method("login");
-		$expecteds = array(
-			"is_result_error" => true,
-			"result" => "We found no record of your username.  Would you like to create one?",
-		);
-		$actuals = array();
 
 		$this->object->parseInput();
 
@@ -222,10 +227,10 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::login
 	 */
 	public function testLogin() {
-		$username = "username";
+		$expectedUsername = "username";
 		$expecteds = array(
-			"session" => array("username" => $username),
-			"username" => $username,
+			"session" => array("username" => $expectedUsername),
+			"username" => $expectedUsername,
 			"result" => "You have successfully logged in.",
 		);
 		$actuals = array();
@@ -236,7 +241,7 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("logout");
 		$this->object->setUsername("notusername");
 
-		$this->object->login($username);
+		$this->object->login($expectedUsername);
 
 		$actuals['session'] = $_SESSION;
 		$actuals['username'] = $this->object->getUsername();
@@ -247,6 +252,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::createUser
 	 */
 	public function testCreateUser_createUserFails() {
+		$expecteds = array(
+			"is_result_error" => true,
+			"result" => "We were unable to create a new user.  Please see the error log or contact your system administrator",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("createUser"))
@@ -258,11 +268,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("login"))
 			->getMock();
 		$this->object->expects($this->never())->method("login");
-		$expecteds = array(
-			"is_result_error" => true,
-			"result" => "We were unable to create a new user.  Please see the error log or contact your system administrator",
-		);
-		$actuals = array();
 
 		$this->object->createUser("username");
 
@@ -274,6 +279,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::createUser
 	 */
 	public function testCreateUser_nothingFails() {
+		$expecteds = array(
+			"is_result_error" => false,
+			"result" => "You have successfully created a new user.",
+		);
+		$actuals = array();
 		$mockRoster = $this->getMockBuilder('\Utils\Roster')
 			->disableOriginalConstructor()
 			->setMethods(array("createUser"))
@@ -285,11 +295,6 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("login"))
 			->getMock();
 		$this->object->expects($this->once())->method("login");
-		$expecteds = array(
-			"is_result_error" => false,
-			"result" => "You have successfully created a new user.",
-		);
-		$actuals = array();
 
 		$this->object->createUser("username");
 
@@ -312,10 +317,11 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::renderInstructions
 	 */
 	public function testRenderInstructions() {
+		$expected = "";
 		
 		$actual = $this->object->renderInstructions();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\LoginController::renderForm
@@ -351,13 +357,13 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::renderForm
 	 */
 	public function testRenderForm_usernameIsSet() {
-		$username = "username";
+		$expectedUsername = "username";
 		$expected = "
 			<form method=\"POST\">
 			<p>Log in (existing user)<br/>
 			<input type=\"hidden\" name=\"step\" value=\"login\">
 			<input type=\"hidden\" name=\"create\" value=\"0\">
-			<label for=\"username\">User name: <input type=\"text\" name=\"username\" value=\"{$username}\"></label>
+			<label for=\"username\">User name: <input type=\"text\" name=\"username\" value=\"{$expectedUsername}\"></label>
 			<button type=\"submit\">Log In</button></p>
 			</form><strong>-OR-</strong><br/>
 			<form method=\"POST\">
@@ -373,7 +379,7 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 			<input type=\"hidden\" name=\"create\" value=\"0\">
 			<button type=\"submit\" name=\"logout\" value=\"1\">Log out</button>
 			</form>";
-		$this->object->setUsername($username);
+		$this->object->setUsername($expectedUsername);
 
 		$actual = $this->object->renderForm();
 
@@ -395,27 +401,30 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\LoginController::renderSpecificStyle
 	 */
 	public function testRenderSpecificStyle() {
+		$expected = "";
 		
 		$actual = $this->object->renderSpecificStyle();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\LoginController::renderSpecificScript
 	 */
 	public function testRenderSpecificScript() {
+		$expected = "";
 		
 		$actual = $this->object->renderSpecificScript();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\LoginController::getScriptLibraries
 	 */
 	public function testGetScriptLibraries() {
+		$expected = array();
 		
 		$actual = $this->object->getScriptLibraries();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 }

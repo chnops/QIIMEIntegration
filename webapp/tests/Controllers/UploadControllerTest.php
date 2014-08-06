@@ -6,6 +6,9 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("UploadControllerTest");
 	}
+	public static function tearDownAfterClass() {
+		\Utils\Helper::setDefaultHelper(NULL);
+	}
 
 	private $mockFileType = NULL;
 	private $mockWorkflow = NULL;
@@ -29,6 +32,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 		$_FILES = array();
 		$_POST = array();
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->object = new UploadController($this->mockWorkflow);
 	}
 
@@ -47,15 +51,17 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::retrievePastResults
 	 */
 	public function testRetrievePastResults_noProjectSelected() {
+		$expected = "";
 
 		$actual = $this->object->retrievePastResults();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::retrievePastResults
 	 */
 	public function testRetrievePastResults_noPreviousFiles() {
+		$expected = "";
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles"))
@@ -65,12 +71,16 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		
 		$actual = $this->object->retrievePastResults();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::retrievePastResults
 	 */
 	public function testRetrievePastResults_onePreviousFile() {
+		$expected = "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n" .
+			"<h4 onclick=\"hideMe($(this).next())\">type1 files</h4><div><ul>\n" .
+			"<li>fileName1 (fileStatus1)</li>\n" .
+			"</ul></div>\n</div>";
 		$files = array(
 			"type1" => array(array("name" => "fileName1", "status" => "fileStatus1"),),
 		);
@@ -78,29 +88,33 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
+		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
 		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
 		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = new UploadController($this->mockWorkflow);
 		$this->object->setProject($mockProject);
-		$expected = "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n" .
-			"<h4 onclick=\"hideMe($(this).next())\">type1 files</h4><div><ul>\n" .
-			"<li>fileName1 (fileStatus1)</li>\n" .
-			"</ul></div>\n</div>";
 		
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper(NULL);
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::retrievePastResults
 	 */
 	public function testRetrievePastResults_manyPreviousFiles() {
+		$expected = "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n" .
+			"<h4 onclick=\"hideMe($(this).next())\">type1 files</h4><div><ul>\n" .
+			"<li>fileName1 (fileStatus1)</li>\n" .
+			"<li>fileName2 (fileStatus2)</li>\n" .
+			"</ul></div>\n" .
+			"<h4 onclick=\"hideMe($(this).next())\">type2 files</h4><div><ul>\n" .
+			"<li>fileName3 (fileStatus3)</li>\n" .
+			"</ul></div>\n" .
+			"</div>";
 		$files = array(
 			"type1" => array(
 				array("name" => "fileName1", "status" => "fileStatus1"),
@@ -114,28 +128,18 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
+		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($files));
 		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
 		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = new UploadController($this->mockWorkflow);
 		$this->object->setProject($mockProject);
-		$expected = "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n" .
-			"<h4 onclick=\"hideMe($(this).next())\">type1 files</h4><div><ul>\n" .
-			"<li>fileName1 (fileStatus1)</li>\n" .
-			"<li>fileName2 (fileStatus2)</li>\n" .
-			"</ul></div>\n" .
-			"<h4 onclick=\"hideMe($(this).next())\">type2 files</h4><div><ul>\n" .
-			"<li>fileName3 (fileStatus3)</li>\n" .
-			"</ul></div>\n" .
-			"</div>";
 		
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -209,6 +213,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => true,
 			"result" => "The file you uploaded had an unrecognized type.",
 		);
+		$_POST['step'] = "upload";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
@@ -216,7 +221,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("getFileType")->will($this->returnValue(false));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
 
 		$this->object->parseInput();
 
@@ -234,6 +238,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => true,
 			"result" => "Unable to determine file name",
 		);
+		$_POST['step'] = "upload";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName"))
@@ -242,7 +247,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("getFileName")->will($this->returnValue(false));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
 
 		$this->object->parseInput();
 
@@ -260,6 +264,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => true,
 			"result" => "You have already uploaded a file with that file name. File names must be unique",
 		);
+		$_POST['step'] = "upload";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName","fileNameExists"))
@@ -269,7 +274,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("fileNameExists")->will($this->returnValue(true));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
 
 		$this->object->parseInput();
 
@@ -287,6 +291,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => false,
 			"result" => "",
 		);
+		$_POST['step'] = "upload";
+		$_FILES['file'] = array();
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName","fileNameExists","uploadFile"))
@@ -297,8 +303,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("uploadFile");
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
-		$_FILES['file'] = array();
 
 		$this->object->parseInput();
 
@@ -316,6 +320,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => true,
 			"result" => "message",
 		);
+		$_POST['step'] = "upload";
+		$_POST['url'] = "http://domain.com";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName","fileNameExists","uploadFile","downloadFile"))
@@ -327,8 +333,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("downloadFile")->will($this->throwException(new \Exception("message")));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
-		$_POST['url'] = "http://domain.com";
 
 		$this->object->parseInput();
 
@@ -343,6 +347,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => true,
 			"result" => "message",
 		);
+		$_POST['step'] = "upload";
+		$_POST['url'] = "http://domain.com";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName","fileNameExists","uploadFile","downloadFile"))
@@ -354,8 +360,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("downloadFile")->will($this->throwException(new \Models\OperatingSystemException("message")));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
-		$_POST['url'] = "http://domain.com";
 
 		$this->object->parseInput();
 
@@ -373,6 +377,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			"is_result_error" => false,
 			"result" => "message",
 		);
+		$_POST['step'] = "upload";
+		$_POST['url'] = "http://domain.com";
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType","getFileName","fileNameExists","uploadFile","downloadFile"))
@@ -384,8 +390,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->once())->method("downloadFile")->will($this->returnValue("message"));
 		$this->object->setUsername("username");
 		$this->object->setProject("project");
-		$_POST['step'] = "upload";
-		$_POST['url'] = "http://domain.com";
 
 		$this->object->parseInput();
 
@@ -399,11 +403,11 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileName
 	 */
 	public function testGetFileName_notDownload_FILESnotSet() {
-		$isDownload = false;
+		$expected = "";
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = false);
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::getFileName
@@ -411,9 +415,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileName_notDownload_FILESset() {
 		$expected = "fileName";
 		$_FILES['file'] = array("name" => $expected);
-		$isDownload = false;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = false);
 
 		$this->assertEquals($expected, $actual);
 	}
@@ -422,9 +425,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetFileName_downloaded_urlNotSet() {
 		$expected = "";
-		$isDownload = true;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = true);
 
 		$this->assertequals($expected, $actual);
 	}
@@ -434,9 +436,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileName_downloaded_noNameInUrl() {
 		$expected = "";
 		$_POST['url'] = "///";
-		$isDownload = true;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = true);
 
 		$this->assertequals($expected, $actual);
 	}
@@ -446,9 +447,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileName_downloaded_nameInUrlFirstPop() {
 		$expected = "file.html";
 		$_POST['url'] = "http://domain.com/file.html";
-		$isDownload = true;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = true);
 
 		$this->assertequals($expected, $actual);
 	}
@@ -458,9 +458,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileName_downloaded_nameInUrlSecondPop() {
 		$expected = "domain.com";
 		$_POST['url'] = "http://domain.com/";
-		$isDownload = true;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = true);
 
 		$this->assertequals($expected, $actual);
 	}
@@ -470,9 +469,8 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileName_downloaded_nameInUrlThirdPop() {
 		$expected = "domain.com";
 		$_POST['url'] = "http://domain.com//";
-		$isDownload = true;
 
-		$actual = $this->object->getFileName($isDownload);
+		$actual = $this->object->getFileName($isDownload = true);
 
 		$this->assertequals($expected, $actual);
 	}
@@ -481,15 +479,17 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::fileNameExists
 	 */
 	public function testFileNameExists_projectNotSet() {
+		$expected = false;
 
 		$actual = $this->object->fileNameExists("fileName");
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::fileNameExists
 	 */
 	public function testFileNameExists_noUploadedFiles() {
+		$expected = false;
 		$projects = array();
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
@@ -500,12 +500,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->fileNameExists("fileName");
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::fileNameExists
 	 */
 	public function testFileNameExists_manyUploadedFiles_nameDoesNotExist() {
+		$expected = false;
 		$projects = array(
 			array("name" => "fileName1"),
 			array("name" => "fileName2"),
@@ -520,12 +521,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->fileNameExists("fileName");
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::fileNameExists
 	 */
 	public function testFileNameExists_manyUploadedFiles_nameIsFirst() {
+		$expected = true;
 		$projects = array(
 			array("name" => "fileName1"),
 			array("name" => "fileName2"),
@@ -540,12 +542,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->fileNameExists("fileName1");
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::fileNameExists
 	 */
 	public function testFileNameExists_manyUploadedFiles_nameIsLast() {
+		$expected = true;
 		$projects = array(
 			array("name" => "fileName1"),
 			array("name" => "fileName2"),
@@ -560,7 +563,7 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->fileNameExists("fileName3");
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
@@ -584,12 +587,12 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
-		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
+		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new UploadController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -608,12 +611,12 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
-		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
+		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new UploadController($mockWorkflow);
 
@@ -625,19 +628,19 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectNotSet_POSTset() {
-		$_POST['type'] = $this->mockFileType->getHtmlId();
 		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
-		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
+		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
+		$_POST['type'] = $this->mockFileType->getHtmlId();
 		$this->object = new UploadController($mockWorkflow);
 
 		$actual = $this->object->getFileType();
@@ -653,12 +656,12 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
-		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->never())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
+		$mockProject->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new UploadController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -671,19 +674,19 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getFileType
 	 */
 	public function testGetFileType_projectSet_POSTset() {
-		$_POST['type'] = $this->mockFileType->getHtmlId();
 		$expected = $this->mockFileType;
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypeFromHtmlId", "getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
-		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getFileTypeFromHtmlId")->will($this->returnValue($expected));
+		$mockProject->expects($this->never())->method("getFileTypes")->will($this->returnValue(array($expected)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
+		$_POST['type'] = $this->mockFileType->getHtmlId();
 		$this->object = new UploadController($mockWorkflow);
 		$this->object->setProject($mockProject);
 
@@ -700,13 +703,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->never())->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("receiveDownloadedFile"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->never())->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("receiveDownloadedFile")->will($this->returnValue(""));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
@@ -716,7 +719,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->downloadFile("url", "fileName");
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -727,13 +729,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("receiveDownloadedFile"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("receiveDownloadedFile")->will($this->returnValue("message"));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
@@ -743,7 +745,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->downloadFile("url", "fileName");
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -912,13 +913,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("receiveUploadedFile"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("receiveUploadedFile");
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
@@ -928,7 +929,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->uploadFile($file);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -946,13 +946,13 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->never())->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("receiveUploadedFile"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->never())->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("receiveUploadedFile")->will($this->throwException(new \Exception("message")));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Controllers\UploadController')
 			->setConstructorArgs(array($this->mockWorkflow))
 			->setMethods(array("getFileType"))
@@ -962,7 +962,6 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->object->uploadFile($file);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
@@ -972,10 +971,11 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::renderInstructions
 	 */
 	public function testRenderInstructions() {
+		$expected = "";
 
 		$actual = $this->object->renderInstructions();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::renderForm
@@ -1007,11 +1007,11 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getStep", "getNewProject"))
 			->getMock();
+		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow->expects($this->any())->method("getStep")->will($this->returnValue("upload"));
 		$mockWorkflow->expects($this->exactly(2))->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new UploadController($mockWorkflow);
@@ -1051,11 +1051,11 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getFileTypes"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getStep", "getNewProject"))
 			->getMock();
+		$mockProject->expects($this->exactly(2))->method("getFileTypes")->will($this->returnValue(array($this->mockFileType)));
 		$mockWorkflow->expects($this->any())->method("getStep")->will($this->returnValue("upload"));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new UploadController($mockWorkflow);
@@ -1140,19 +1140,20 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::renderSpecificStyle
 	 */
 	public function testRenderSpecificStyle() {
+		$expected = "";
 
 		$actual = $this->object->renderSpecificStyle();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\UploadController::renderSpecificScript
 	 */
 	public function testRenderSpecificScript() {
-		$fileType = $this->mockFileType;
-		$htmlId = $fileType->getHtmlId();
-		$this->object->setFileType($fileType);
-		$expected = "window.onload=function() {window.hideableFields = ['help'];displayHideables('{$htmlId}');};";
+		$expectedFileType = $this->mockFileType;
+		$expectedHtmlId = $expectedFileType->getHtmlId();
+		$expected = "window.onload=function() {window.hideableFields = ['help'];displayHideables('{$expectedHtmlId}');};";
+		$this->object->setFileType($expectedFileType);
 
 		$actual = $this->object->renderSpecificScript();
 
@@ -1162,9 +1163,10 @@ class UploadControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\UploadController::getScriptLibraries
 	 */
 	public function testGetScriptLibraries() {
+		$expected = array();
 
 		$actual = $this->object->getScriptLibraries();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 }

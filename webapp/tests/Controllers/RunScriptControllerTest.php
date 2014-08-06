@@ -6,6 +6,9 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("RunScriptsControllerTest");
 	}
+	public static function tearDownAfterClass() {
+		\Utils\Helper::setDefaultHelper(NULL);
+	}
 
 	private $mockWorkflow = NULL;
 	private $object = NULL;
@@ -20,6 +23,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	}
 	public function setUp() {
 		$_POST = array();
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->object = new RunScriptsController($this->mockWorkflow);
 	}
 
@@ -38,7 +42,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\RunScriptsController::retrievePastResults
 	 */
 	public function testRetrievePastResults_projectNotSet() {
-		$this->object->setProject(NULL);
+		$expected = "";
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
@@ -46,24 +50,25 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper->expects($this->never())->method("categorizeArray")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = new RunScriptsController($this->mockWorkflow);
+		$this->object->setProject(NULL);
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper(NULL);
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\RunScriptsController::retrievePastResults
 	 */
 	public function testRetrievePastResults_zeroPastScriptRuns() {
+		$expected = "";
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getPastScriptRuns"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue(array()));
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue(array()));
 		$mockHelper->expects($this->never())->method("categorizeArray")->will($this->returnArgument(0));
 		$mockHelper->expects($this->never())->method("categorizeArray")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
@@ -72,8 +77,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper(NULL);
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\RunScriptsController::retrievePastResults
@@ -86,23 +90,23 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			"<div><strong>User input:</strong> run.py --no_result_files=T --run_for_a_long_time=T</div>" . 
 			"<h4 onclick=\"hideMe($(this).next())\">Run 3 (<em>done</em>)</h4>" .
 			"<div><strong>User input:</strong> run.py<br/><strong>Generated files</strong><ul><li>File1</li><li>File2</li></ul></div></div>\n";
-		$scriptRuns = array(
+		$expectedScriptRuns = array(
 			"run" => array(
 				array("is_finished" => true, "id" => 1, "input" => "run.py --no_result_files=T", "file_names" => array()),
 				array("is_finished" => false, "id" => 2, "input" => "run.py --no_result_files=T --run_for_a_long_time=T", "file_names" => array()),
 				array("is_finished" => true, "id" => 3, "input" => "run.py", "file_names" => array("File1", "File2")),
 			),
 		);
-		$scripts = array("unrun" => NULL, "run" => NULL);
+		$expectedScripts = array("unrun" => NULL, "run" => NULL);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getPastScriptRuns", "getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue($scriptRuns));
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue($scripts));
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getPastScriptRuns")->will($this->returnValue($expectedScriptRuns));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue($expectedScripts));
 		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
 		$mockHelper->expects($this->exactly(3 + 2))->method("htmlentities")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
@@ -111,7 +115,6 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->retrievePastResults();
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 
@@ -186,10 +189,10 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("runScript"))
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("runScript")->will($this->throwException(new \Exception("message")));
-		$this->object->setUsername("username");
-		$this->object->setProject($mockProject);
 		$_POST['step'] = "run";
 		$_POST['script'] = $expecteds['script_id'];
+		$this->object->setUsername("username");
+		$this->object->setProject($mockProject);
 
 		$this->object->parseInput();
 		
@@ -213,10 +216,10 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("runScript"))
 			->getMockForAbstractClass();
 		$mockProject->expects($this->once())->method("runScript")->will($this->returnValue("message"));
-		$this->object->setUsername("username");
-		$this->object->setProject($mockProject);
 		$_POST['step'] = "run";
 		$_POST['script'] = $expecteds['script_id'];
+		$this->object->setUsername("username");
+		$this->object->setProject($mockProject);
 
 		$this->object->parseInput();
 		
@@ -258,11 +261,11 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("renderOverview"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("renderOverview")->will($this->returnValue("overview"));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("renderOverview")->will($this->returnValue("overview"));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 
@@ -280,11 +283,11 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("renderOverview"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("renderOverview")->will($this->returnValue("overview"));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("renderOverview")->will($this->returnValue("overview"));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -303,11 +306,11 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 
@@ -325,17 +328,17 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getHtmlId", "renderAsForm"))
 			->getMockForAbstractClass();
-		$mockScript->expects($this->exactly(2))->method("renderAsForm")->will($this->returnArgument(0));
-		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockScript->expects($this->exactly(2))->method("renderAsForm")->will($this->returnArgument(0));
+		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 
@@ -352,17 +355,17 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getHtmlId", "renderAsForm"))
 			->getMockForAbstractClass();
-		$mockScript->expects($this->never())->method("renderAsForm")->will($this->returnArgument(0));
-		$mockScript->expects($this->never())->method("getHtmlId")->will($this->returnValue("script"));
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockScript->expects($this->never())->method("renderAsForm")->will($this->returnArgument(0));
+		$mockScript->expects($this->never())->method("getHtmlId")->will($this->returnValue("script"));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -381,17 +384,17 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getHtmlId", "renderAsForm"))
 			->getMockForAbstractClass();
-		$mockScript->expects($this->exactly(2))->method("renderAsForm")->will($this->returnArgument(0));
-		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockScript->expects($this->exactly(2))->method("renderAsForm")->will($this->returnArgument(0));
+		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -410,11 +413,11 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 
@@ -432,17 +435,17 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getHtmlId", "renderHelp"))
 			->getMockForAbstractClass();
-		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
-		$mockScript->expects($this->exactly(2))->method("renderHelp")->will($this->returnValue("help"));
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
+		$mockScript->expects($this->exactly(2))->method("renderHelp")->will($this->returnValue("help"));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 
@@ -459,11 +462,11 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array()));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -482,17 +485,17 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getHtmlId", "renderHelp"))
 			->getMockForAbstractClass();
-		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
-		$mockScript->expects($this->exactly(2))->method("renderHelp")->will($this->returnValue("help"));
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("getScripts"))
 			->getMockForAbstractClass();
-		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
 			->disableOriginalConstructor()
 			->setMethods(array("getNewProject"))
 			->getMock();
+		$mockScript->expects($this->exactly(2))->method("getHtmlId")->will($this->returnValue("script"));
+		$mockScript->expects($this->exactly(2))->method("renderHelp")->will($this->returnValue("help"));
+		$mockProject->expects($this->once())->method("getScripts")->will($this->returnValue(array($mockScript, $mockScript)));
 		$mockWorkflow->expects($this->never())->method("getNewProject")->will($this->returnValue($mockProject));
 		$this->object = new RunScriptsController($mockWorkflow);
 		$this->object->setProject($mockProject);
@@ -538,10 +541,10 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\RunScriptsController::renderSpecificScript
 	 */
 	public function testRenderSpecificScript_scriptIdSet() {
-		$id = "scriptId";
-		$expected = "$(function() {hideableFields=['form', 'help', 'past_results'];displayHideables('{$id}');;$('.param_help').click(function() {
+		$expectedId = "scriptId";
+		$expected = "$(function() {hideableFields=['form', 'help', 'past_results'];displayHideables('{$expectedId}');;$('.param_help').click(function() {
 			$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });;$('.accordion div').css('display', 'none')});";
-		$this->object->setScriptId($id);
+		$this->object->setScriptId($expectedId);
 
 		$actual = $this->object->renderSpecificScript();
 
