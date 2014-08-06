@@ -26,29 +26,25 @@ class QIIMEWorkflow implements WorkflowI {
 	public function getCurrentStep($controller) {
 		$objectName = get_class($controller);
 		switch ($objectName) {
-			case "Controllers\\TestController":
-				return "test";
-			case "Controllers\\Controller":
-				return "login";
-			case "Controllers\\IndexController":
-				return "login";
-			case "Controllers\\LoginController":
-				return "login";
-			case "Controllers\\SelectProjectController":
-				return "select";
-			case "Controllers\\UploadController":
-				return "upload";
-			case "Controllers\\RunScriptsController":
-				return "run";
-			case "Controllers\\ViewResultsController":
-				return "view";
+			case 'Controllers\Controller':
+				return 'login';
+			case 'Controllers\IndexController':
+				return 'login';
+			case 'Controllers\LoginController':
+				return 'login';
+			case 'Controllers\SelectProjectController':
+				return 'select';
+			case 'Controllers\UploadController':
+				return 'upload';
+			case 'Controllers\RunScriptsController':
+				return 'run';
+			case 'Controllers\ViewResultsController':
+				return 'view';
 		}
 	}
 
 	public function getController($step) {
 			switch($step) {
-			case "test":
-				return new \Controllers\TestController($this);
 			case "login":
 				return new \Controllers\LoginController($this);
 			case "select":

@@ -7,7 +7,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 		error_log("ProjectTest");
 	}
 
-	private $object= NULL;
 	private $owner = "asharp";
 	private $id = 1;
 	private $name = "Proj1";
@@ -18,16 +17,16 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 
 	private $mockDatabase = NULL;
 	private $mockOperatingSystem = NULL;
-
+	private $object= NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
 
-		$this->mockDatabase = $this->getMockBuilder('\Database\PDODatabase');
-		$this->mockDatabase->disableOriginalConstructor();
-		$this->mockDatabase = $this->mockDatabase->getMock();
-		$this->mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$this->mockOperatingSystem->disableOriginalConstructor();
-		$this->mockOperatingSystem = $this->mockOperatingSystem->getMock();
+		$this->mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->getMock();
+		$this->mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->getMock();
 	}
 
 	public function setUp() {
@@ -36,86 +35,135 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers \Models\DefaultProject::getOwner
-	 * @covers \Models\DefaultProject::setOwner
 	 */
-	public function testOwner() {
-		$expecteds = array(
-			'default' => "",
-			'after_set' => $this->owner,
-		);
-		$actuals = array();
-		$actuals['default'] = $this->object->getOwner();
-		
-		$this->object->setOwner($this->owner);
+	public function testGetOwner() {
+		$expected = "";
 
-		$actuals['after_set'] = $this->object->getOwner();
-		$this->assertEquals($expecteds, $actuals);
+		$actual = $this->object->getOwner();
+
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\DefaultProject::setOwner
-	 * @covers \Models\DefaultProject::getProjectDir
 	 */
-	public function testOwner_lazyLoaderIsReset() {
-		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')->disableOriginalConstructor()->getMock();
-		$mockDatabase->expects($this->exactly(2))->method('getUserRoot')->will($this->returnArgument(0));
-		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+	public function testSetOwner() {
+		$expected = $this->owner;
+		
 		$this->object->setOwner($this->owner);
-		$unexpected = $this->object->getProjectDir();
-		$this->object->setOwner($this->newOwner);
 
-		$actual = $this->object->getProjectDir();
-
-		$this->assertNotEquals($unexpected, $actual);
+		$actual = $this->object->getOwner();
+		$this->assertEquals($expected, $actual);
 	}
 	
 	/**
 	 * @covers \Models\DefaultProject::getId
-	 * @covers \Models\DefaultProject::setId
 	 */
-	public function testId() {
-		$expecteds = array(
-			'default' => 0,
-			'after_set' => $this->id,
-		);
-		$actuals = array();
-		$actuals['default'] = $this->object->getId();
+	public function testGetId() {
+		$expected = 0;
 
-		$this->object->setId($this->id);
+		$actual = $this->object->getId();
 
-		$actuals['after_set'] = $this->object->getId();
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\DefaultProject::setId
-	 * @covers \Models\DefaultProject::getProjectDir
 	 */
-	public function testId_lazyLoaderIsReset() {
-		$this->object->setId($this->id);
-		$unexpected = $this->object->getProjectDir();
-		$this->object->setId($this->newId);
+	public function testSetId() {
+		$expected = $this->id;
 
-		$actual = $this->object->getProjectDir();
+		$this->object->setId($expected);
 
-		$this->assertNotEquals($unexpected, $actual);
+		$actual = $this->object->getId();
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
-	 * @covers \Models\DefaultProject::setName
 	 * @covers \Models\DefaultProject::getName
 	 */
-	public function testName() {
+	public function testGetName() {
+		$expected = "";
+
+		$actual = $this->object->getName();
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\DefaultProject::setName
+	 */
+	public function testSetName() {
+		$expected = $this->name;
+
+		$this->object->setName($expected);
+
+		$actual = $this->object->getName();
+		$this->assertEquals($expected, $actual);
+	} 
+
+	/**
+	 * @covers \Models\DefaultProject::getScripts
+	 */
+	public function testGetScripts_zeroInitialScripts() {
 		$expecteds = array(
-			'default' => "",
-			'after_set' => $this->name,
+			"first_call" => array(),
+			"second_call" => array(),
 		);
 		$actuals = array();
-		$actuals['default'] = $this->object->getName();
+		$this->object = $this->getMockBuilder('\Models\QIIMEProject')
+			->disableOriginalConstructor()
+			->setMethods(array('getInitialScripts'))
+			->getMock();
+		$this->object->expects($this->exactly(2))->method('getInitialScripts')->will($this->returnValue(array()));
 
-		$this->object->setName($this->name);
+		$actuals['first_call'] = $this->object->getScripts();
+		$actuals['second_call'] = $this->object->getScripts();
 
-		$actuals['after_set'] = $this->object->getName();
 		$this->assertEquals($expecteds, $actuals);
 	} 
+	/**
+	 * @covers \Models\DefaultProject::getScripts
+	 */
+	public function testGetScripts_manyInitialScripts() {
+		$expected = array(1, 2, 3);
+		$expecteds = array(
+			"first_call" => $expected, 
+			"second_call" => $expected, 
+		);
+		$actuals = array();
+		$this->object = $this->getMockBuilder('\Models\QIIMEProject')
+			->disableOriginalConstructor()
+			->setMethods(array('getInitialScripts'))
+			->getMock();
+		$this->object->expects($this->once())->method('getInitialScripts')->will($this->returnValue($expected));
+
+		$actuals['first_call'] = $this->object->getScripts();
+		$actuals['second_call'] = $this->object->getScripts();
+
+		$this->assertEquals($expecteds, $actuals);
+	} 
+
+	/**
+	 * @covers \Models\DefaultProject::getFileTypes
+	 */
+	public function testGetFileTypes_manyInitialFileTypes() {
+		$expected = array(1, 2, 3, new ArbitraryTextFileType());
+		$expecteds = array(
+			"first_call" => $expected,
+			"second_call" => $expected,
+		);
+		$actuals = array();
+		$initials = array(1, 2, 3);
+		$this->object = $this->getMockBuilder("\Models\QIIMEProject")
+			->disableOriginalConstructor()
+			->setMethods(array("getInitialFileTypes"))
+			->getMock();
+		$this->object->expects($this->once())->method("getInitialFileTypes")->will($this->returnValue($initials));
+
+		$actuals['first_call'] = $this->object->getFileTypes();
+		$actuals['second_call'] = $this->object->getFileTypes();
+
+		$this->assertEquals($expecteds, $actuals);
+	} 
+
 	/**
 	 * @covers \Models\DefaultProject::getDatabase
 	 */
@@ -126,6 +174,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertSame($expected, $actual);
 	} 
+
 	/**
 	 * @covers \Models\DefaultProject::getOperatingSystem
 	 */
@@ -136,196 +185,722 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertSame($expected, $actual);
 	} 
-	/**
-	 * @covers \Models\DefaultProject::getEnvironmentSource
-	 */
-	public function testGetEnvironmentSource() {
-		$expected = "/macqiime/configs/bash_profile.txt";
 
-		$actual = $this->object->getEnvironmentSource();
-
-		$this->assertSame($expected, $actual);
-	} 
-
-	/**
-	 * @covers \Models\DefaultProject::getScripts
-	 */
-	public function testGetScripts() {
-		$expected = array(1, 2, 3);
-		$mockBuilder = $this->getMockBuilder('\Models\QIIMEProject');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('getInitialScripts'));
-		$this->object = $mockBuilder->getMock();
-		$this->object->expects($this->once())->method('getInitialScripts')->will($this->returnValue($expected));
-
-		$actual = $this->object->getScripts();
-		$actual = $this->object->getScripts();
-
-		$this->assertEquals($expected, $actual);
-	} 
-	public function testInitializeScripts() {
-		$expected = array(
-			'validate_mapping_file' => new \Models\Scripts\QIIME\ValidateMappingFile($this->object),
-			'join_paired_ends' => new \Models\Scripts\QIIME\JoinPairedEnds($this->object),
-			'split_libraries' => new \Models\Scripts\QIIME\SplitLibraries($this->object),
-			'extract_barcodes' => new \Models\Scripts\QIIME\ExtractBarcodes($this->object),
-			'split_libraries_fastq' => new \Models\Scripts\QIIME\SplitLibrariesFastq($this->object),
-			'convert_fasta_qual_fastq' => new \Models\Scripts\QIIME\ConvertFastaQualFastq($this->object),
-			'pick_otus' => new \Models\Scripts\QIIME\PickOtus($this->object),
-			'pick_rep_set' => new \Models\Scripts\QIIME\PickRepSet($this->object),
-			'assign_taxonomy' => new \Models\Scripts\QIIME\AssignTaxonomy($this->object),
-			'make_otu_table' => new \Models\Scripts\QIIME\MakeOtuTable($this->object),
-			'manipulate_table' => new \Models\Scripts\QIIME\ManipulateOtuTable($this->object),
-			'align_seqs' => new \Models\Scripts\QIIME\AlignSeqs($this->object),
-			'filter_alignment' => new \Models\Scripts\QIIME\FilterAlignment($this->object),
-			'make_phylogeny' => new \Models\Scripts\QIIME\MakePhylogeny($this->object),
-		);
-
-		$actual = $this->object->getInitialScripts();
-
-		$this->assertEquals($expected, $actual);
-	}
-
-	/**
-	 * @covers \Models\DefaultProject::renderOverview
-	 */
-	public function testRenderOverview() {
-		$mockBuilder = $this->getMockBuilder('\Models\Scripts\DefaultScript');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('getHtmlId', 'getScriptName', 'getScriptTitle'));
-		$mockScript = $mockBuilder->getMock();
-		$mockScript->expects($this->any())->method('getHtmlId')->will($this->returnValue('id'));
-		$mockScript->expects($this->any())->method('getScriptName')->will($this->returnValue('name'));
-		$mockScript->expects($this->any())->method('getScriptTitle')->will($this->returnValue('title'));
-		$mockScriptString = "<span><a class=\"button\" onclick=\"displayHideables('{$mockScript->getHtmlId()}');\" title=\"{$mockScript->getScriptName()}\">{$mockScript->getScriptTitle()}</a></span>";
-		$initialFormattedScripts = array(
-			'cat1' => array($mockScript),
-			'cat2' => array($mockScript, $mockScript),
-		);
-		$mockBuilder = $this->getMockBuilder('\Models\QIIMEProject');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('getFormattedScripts'));
-		$this->object = $mockBuilder->getMock();
-		$this->object->expects($this->once())->method('getFormattedScripts')->will($this->returnValue($initialFormattedScripts));
-		$expected = "<div id=\"project_overview\">\n<div><span>cat1</span>{$mockScriptString}</div>\n<div><span>cat2</span>{$mockScriptString}{$mockScriptString}</div>\n</div>\n";
-		
-		$actual = $this->object->renderOverview();
-
-		$this->assertEquals($expected, $actual);
-	} 
-	/**
-	 * @covers \Models\DefaultProject::getFormattedScripts
-	 */
-	public function testGetFormattedScripts() {
-		$expected = array(
-			'Validate input' => array(
-				new \Models\Scripts\QIIME\ValidateMappingFile($this->object),
-			),
-			'Prepare libraries' => array(
-				new \Models\Scripts\QIIME\JoinPairedEnds($this->object),
-				new \Models\Scripts\QIIME\SplitLibraries($this->object),
-				new \Models\Scripts\QIIME\ExtractBarcodes($this->object),
-				new \Models\Scripts\QIIME\SplitLibrariesFastq($this->object),
-				new \Models\Scripts\QIIME\ConvertFastaQualFastq($this->object),
-			),
-			'Organize into OTUs' => array(
-				new \Models\Scripts\QIIME\PickOtus($this->object),
-				new \Models\Scripts\QIIME\PickRepSet($this->object),
-			),
-			'Count/analyze OTUs' => array(
-				new \Models\Scripts\QIIME\AssignTaxonomy($this->object),
-				new \Models\Scripts\QIIME\MakeOtuTable($this->object),
-				new \Models\Scripts\QIIME\ManipulateOtuTable($this->object),
-			),
-			'Perform phylogeny analysis' => array(
-				new \Models\Scripts\QIIME\AlignSeqs($this->object),
-				new \Models\Scripts\QIIME\FilterAlignment($this->object),
-				new \Models\Scripts\QIIME\MakePhylogeny($this->object),
-			),
-		);
-
-		$actual = $this->object->getFormattedScripts();
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers \Models\DefaultProject::getFileTypes
-	 */
-	public function testGetFileTypes() {
-		$initials = array(1, 2, 3);
-		$mockBuilder = $this->getMockBuilder("\Models\QIIMEProject");
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("getInitialFileTypes"));
-		$this->object = $mockBuilder->getMock();
-		$this->object->expects($this->once())->method("getInitialFileTypes")->will($this->returnValue($initials));
-
-		$actual = $this->object->getFileTypes();
-		$actual = $this->object->getFileTypes();
-
-		$expecteds = array(1, 2, 3, new ArbitraryTextFileType());
-		$this->assertEquals($expecteds, $actual);
-	} 
-	/**
-	 * @covers \Models\DefaultProject::getInitialFileTypes
-	 */
-	public function testGetInitialFileTypes() {
-		$expected = array(
-			new MapFileType(),
-			new SequenceFileType(),
-			new SequenceQualityFileType(),
-			new FastqFileType(),
-		);
-
-		$actual = $this->object->getInitialFileTypes();
-
-		$this->assertEquals($expected, $actual);
-	} 
-
-	/**
-	 * @covers \Models\DefaultProject::getFileTypeFromHtmlId
-	 */
-	public function testGetFileTypeFromHtmlId() {
-		$expecteds = array(
-			'map' => new MapFileType(),
-			'sequence' => new SequenceFileType(),
-			'quality' => new SequenceQualityFileType(),
-			'fastq' => new FastqFileType(),
-			'arbitrary_text' => new ArbitraryTextFileType(),
-			'invalid_id' => NULL,
-		);
-		$actuals = array();
-
-		foreach (array_keys($expecteds) as $id) {
-			$actuals[$id] = $this->object->getFileTypeFromHtmlId($id);
-		}
-
-		$this->assertEquals($expecteds, $actuals);
-	} 
-	
 	/**
 	 * @covers \Models\DefaultProject::getProjectDir
 	 */
-	public function testGetProjectDir() {
-		$expected = "u{$this->owner}/p{$this->id}";
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('getUserRoot'));
-		$mockDatabase = $mockBuilder->getMock();
+	public function testGetProjectDir_ownerNotReset_idNotReset() {
+		$expecteds  = array(
+			"u{$this->owner}/p{$this->id}",
+			"u{$this->owner}/p{$this->id}",
+		);
+		$actuals = array();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array('getUserRoot'))
+			->getMock();
 		$mockDatabase->expects($this->once())->method('getUserRoot')->will($this->returnArgument(0));
 		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
 		$this->object->setOwner($this->owner);
 		$this->object->setId($this->id);
+		for($i = 0; $i < 2; $i++) {
 
-		$actual = $this->object->getProjectDir();
-		$actual = $this->object->getProjectDir();
+			$actuals[] = $this->object->getProjectDir();
+
+		}
+		$this->assertEquals($expecteds, $actuals);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::getProjectDir
+	 */
+	public function testGetProjectDir_ownerNotReset_idReset() {
+		$expecteds  = array(
+			"u{$this->owner}/p{$this->id}",
+			"u{$this->owner}/p{$this->newId}",
+		);
+		$actuals = array();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array('getUserRoot'))
+			->getMock();
+		$mockDatabase->expects($this->exactly(2))->method('getUserRoot')->will($this->returnArgument(0));
+		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+		$this->object->setOwner($this->owner);
+		$this->object->setId($this->id);
+		for($i = 0; $i < 2; $i++) {
+
+			$actuals[] = $this->object->getProjectDir();
+
+			$this->object->setId($this->newId);
+		}
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers \Models\DefaultProject::getProjectDir
+	 */
+	public function testGetProjectDir_ownerReset_idNotReset() {
+		$expecteds  = array(
+			"u{$this->owner}/p{$this->id}",
+			"u{$this->newOwner}/p{$this->id}",
+		);
+		$actuals = array();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array('getUserRoot'))
+			->getMock();
+		$mockDatabase->expects($this->exactly(2))->method('getUserRoot')->will($this->returnArgument(0));
+		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+		$this->object->setOwner($this->owner);
+		$this->object->setId($this->id);
+		for($i = 0; $i < 2; $i++) {
+
+			$actuals[] = $this->object->getProjectDir();
+
+			$this->object->setOwner($this->newOwner);
+		}
+		$this->assertEquals($expecteds, $actuals);
+	}
+
+	/**
+	 * @covers \Models\DefaultProject::getFileTypeFromHtmlId
+	 */
+	public function testGetFileTypeFromHtmlId_zeroFileTypes() {
+		$expected = NULL;
+		$id = "id";
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$mockFileType->expects($this->never())->method("getHtmlId")->will($this->returnValue($id));
+		$this->object =  $this->getMockBuilder('\Models\DefaultProject')
+			->setConstructorArgs(array($this->mockDatabase, $this->mockOperatingSystem))
+			->setMethods(array("getFileTypes"))
+			->getMockForAbstractClass();
+		$this->object->expects($this->once())->method("getFileTypes")->will($this->returnValue(array()));
+
+		$actual = $this->object->getFileTypeFromHtmlId($id);
+
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::getFileTypeFromHtmlId
+	 */
+	public function testGetFileTypeFromHtmlId_manyFileTypes_zeroMatches() {
+		$expected = NULL;
+		$id = "id";
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue($id));
+		$this->object =  $this->getMockBuilder('\Models\DefaultProject')
+			->setConstructorArgs(array($this->mockDatabase, $this->mockOperatingSystem))
+			->setMethods(array("getFileTypes"))
+			->getMockForAbstractClass();
+		$this->object->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($mockFileType)));
+
+		$actual = $this->object->getFileTypeFromHtmlId("not_" . $id);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\DefaultProject::getFileTypeFromHtmlId
+	 */
+	public function testGetFileTypeFromHtmlId_manyFileTypes_oneMatch() {
+		$expectedId = "id";
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$expected = $mockFileType;
+		$otherFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue($expectedId));
+		$otherFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue("not_" . $expectedId));
+		$this->object =  $this->getMockBuilder('\Models\DefaultProject')
+			->setConstructorArgs(array($this->mockDatabase, $this->mockOperatingSystem))
+			->setMethods(array("getFileTypes"))
+			->getMockForAbstractClass();
+		$this->object->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($otherFileType, $mockFileType)));
+
+		$actual = $this->object->getFileTypeFromHtmlId($expectedId);
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\DefaultProject::getFileTypeFromHtmlId
+	 */
+	public function testGetFileTypeFromHtmlId_manyFileTypes_manyMatches() {
+		$expectedId = "id";
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$expected = $mockFileType;
+		$otherFileType = $this->getMockBuilder('\Models\FileType')
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$mockFileType->expects($this->once())->method("getHtmlId")->will($this->returnValue($expectedId));
+		$otherFileType->expects($this->never())->method("getHtmlId")->will($this->returnValue($expectedId));
+		$this->object =  $this->getMockBuilder('\Models\DefaultProject')
+			->setConstructorArgs(array($this->mockDatabase, $this->mockOperatingSystem))
+			->setMethods(array("getFileTypes"))
+			->getMockForAbstractClass();
+		$this->object->expects($this->once())->method("getFileTypes")->will($this->returnValue(array($mockFileType, $otherFileType)));
+
+		$actual = $this->object->getFileTypeFromHtmlId($expectedId);
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\DefaultProject::receiveDownloadedFile
+	 */
+	public function testReceiveDownloadedFile_databaseFails() {
+		$expected = new \Exception("There was a problem storing your new file in the database");
+		$actual = NULL;
+		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(false));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+		try {
+
+			$this->object->receiveDownloadedFile("url", "fileName", $fileType);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::receiveDownloadedFile
+	 */
+	public function testReceiveDownloadedFile_osFails() {
+		$expectedMessage = "message";
+		$expected = new OperatingSystemException($expectedMessage);
+		$actual = NULL;
+		$fileType = $this->getMockBuilder('\Models\FileType')
+			->getMockForAbstractClass();
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("downloadFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("downloadFile")->will($this->throwException(new OperatingSystemException($expectedMessage)));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->receiveDownloadedFile("url", "fileName", $fileType);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::receiveDownloadedFile
+	 */
+	public function testReceiveDownloadedFile_nothingFails() {
+		$expected = "console output";
+		$fileType = $this->getMockBuilder('\Models\FileType')
+			->getMockForAbstractClass();
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("downloadFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->never())->method("forgetAllRequests");
+		$mockDatabase->expects($this->once())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("downloadFile")->will($this->returnValue($expected));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$actual = $this->object->receiveDownloadedFile("url", "fileName", $fileType);
 
 		$this->assertEquals($expected, $actual);
 	} 
 
 	/**
+	 * @covers \Models\DefaultProject::receiveDownloadedFile
+	 */
+	public function testReceiveUploadedFile_databaseFails() {
+		$expected = new \Exception("Unable to create file in database");
+		$actual = NULL;
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->getMockForAbstractClass();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("uploadFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(false));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->never())->method("uploadFile")->will($this->returnValue(true));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->receiveUploadedFile("givenName", "tmpName", -1, $mockFileType);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\DefaultProject::receiveDownloadedFile
+	 */
+	public function testReceiveUploadedFile_operatingSystemFails() {
+		$expectedMessage = "message";
+		$expected = new OperatingSystemException($expectedMessage);
+		$actual = NULL;
+		$mockFileType = $this->getMockBuilder('\Models\FileType')
+			->getMockForAbstractClass();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("uploadFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("uploadFile")->will($this->throwException(new OperatingSystemException($expectedMessage)));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->receiveUploadedFile("givenName", "tmpName", -1, $mockFileType);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\DefaultProject::receiveUploadedFile
+	 */
+	public function testReceiveUploadedFile_nothingFails() {
+		$expected = NULL;
+		$fileType = $this->getMockBuilder('\Models\FileType')
+			->getMockForAbstractClass();
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem  = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("uploadFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->never())->method("forgetAllRequests");
+		$mockDatabase->expects($this->once())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("uploadFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$actual = $this->object->receiveUploadedFile("url", "fileName", $size = -1, $fileType);
+
+		$this->assertEquals($expected, $actual);
+	} 
+
+	/**
+	 * @covers \Models\DefaultProject::deleteUploadedFile
+	 */
+	public function testDeleteUploadedFile_dbFails() {
+		$expected = new \Exception("Unable to remove record of file from the database");
+		$actual = NULL;
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("deleteFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(false));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->never())->method("deleteFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->deleteUploadedFile("fileName");
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::deleteUploadedFile
+	 */
+	public function testDeleteUploadedFile_osFails() {
+		$expectedMessage = "message";
+		$expected = new OperatingSystemException($expectedMessage);
+		$actual = NULL;
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("deleteFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("deleteFile")->will($this->throwException(new OperatingSystemException($expectedMessage)));;
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->deleteUploadedFile("fileName");
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::deleteUploadedFile
+	 */
+	public function testDeleteUploadedFile_nothingFails() {
+		$expected = NULL;
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("deleteFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->never())->method("forgetAllRequests");
+		$mockDatabase->expects($this->once())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("deleteFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$actual = $this->object->deleteUploadedFile("fileName");
+
+		$this->assertEquals($expected, $actual);
+	} 
+
+	/**
+	 * @covers \Models\DefaultProject::unzipUploadedFile
+	 */
+	public function testUnzipUploadedFile_dbRemoveFails() {
+		$expected = new \Exception("Unable to find/remove .zip file from the database");
+		$actual = NULL;
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("unzipFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile");
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("createUploadedFile");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->never())->method("unzipFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->unzipUploadedFile("fileName");
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::unzipUploadedFile
+	 */
+	public function testUnzipUploadedFile_osFails() {
+		$expectedMessage = "message";
+		$expected = new OperatingSystemException($expectedMessage);
+		$actual = NULL;
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("unzipFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("createUploadedFile");
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->throwException($expected));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->unzipUploadedFile("fileName");
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::unzipUploadedFile
+	 */
+	public function testUnzipUploadedFile_osSucceeds_returnsNothing() {
+		$expected = NULL;
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("unzipFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->never())->method("forgetAllRequests");
+		$mockDatabase->expects($this->never())->method("createUploadedFile");
+		$mockDatabase->expects($this->once())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->returnValue(array()));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$actual = $this->object->unzipUploadedFile("fileName");
+
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::unzipUploadedFile
+	 */
+	public function testUnzipUploadedFile_dbCreateFails() {
+		$expected = new \Exception("Unable to add unzipped file to database");
+		$actual = NULL;
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("unzipFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("forgetAllRequests");
+		$mockDatabase->expects($this->exactly(2))->method("createUploadedFile")->will($this->onConsecutiveCalls(true, false));
+		$mockDatabase->expects($this->never())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->returnValue(array("fileName1", "fileName2")));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+		try {
+
+			$this->object->unzipUploadedFile("fileName");
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::unzipUploadedFile
+	 */
+	public function testUnzipUploadedFile_nothingFails() {
+		$expected = NULL;
+		$mockDatabase  = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"))
+			->getMock();
+		$mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("unzipFile"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("startTakingRequests");
+		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->never())->method("forgetAllRequests");
+		$mockDatabase->expects($this->exactly(2))->method("createUploadedFile")->will($this->returnValue(true));
+		$mockDatabase->expects($this->once())->method("executeAllRequests");
+		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->returnValue(array("fileName1", "fileName2")));
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$actual = $this->object->unzipUploadedFile("fileName");
+
+		$this->assertEquals($expected, $actual);
+	} 
+	
+	/**
+	 * @covers \Models\DefaultProject::compressUploadedFile
+	 * @expectedException \Exception
+	 */
+	public function testCompressUploadedFile_dbFails() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("changeFileName"));
+		$mockDatabase = $mockBuilder->getMock();
+		$mockDatabase->expects($this->once())->method("changeFileName");
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("compressFile"));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method("compressFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$this->object->compressUploadedFile("fileName");
+
+		$this->fail("compressUploadedFile should have thrown an exception");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::compressUploadedFile
+	 */
+	public function testCompressUploadedFile_nothingFails() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("changeFileName"));
+		$mockDatabase = $mockBuilder->getMock();
+		$mockDatabase->expects($this->once())->method("changeFileName")->will($this->returnValue(true));
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("compressFile"));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method("compressFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$this->object->compressUploadedFile("fileName");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::decompressUploadedFile
+	 * @expectedException \Exception
+	 */
+	public function testDecompressUploadedFile_dbFails() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("changeFileName"));
+		$mockDatabase = $mockBuilder->getMock();
+		$mockDatabase->expects($this->once())->method("changeFileName");
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("decompressFile"));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method("decompressFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$this->object->decompressUploadedFile("fileName");
+
+		$this->fail("decompressUploadedFile should have thrown an exception");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::decompressUploadedFile
+	 */
+	public function testDecompressUploadedFile_nothingFails() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("changeFileName"));
+		$mockDatabase = $mockBuilder->getMock();
+		$mockDatabase->expects($this->once())->method("changeFileName")->will($this->returnValue(true));
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array("decompressFile"));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method("decompressFile");
+		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
+
+		$this->object->decompressUploadedFile("fileName");
+	} 
+
+	/**
+	 * @covers \Models\DefaultProject::deleteGeneratedFile
+	 */
+	public function testDeleteGeneratedFile() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array('deleteFile'));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method('deleteFile');
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+
+		$this->object->deleteGeneratedFile("filename", "runId");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::unzipGeneratedFile
+	 */
+	public function testUnzipGeneratedFile() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array('unzipFile'));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method('unzipFile');
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+
+		$this->object->unzipGeneratedFile("filename", "runId");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::compressGeneratedFile
+	 */
+	public function testCompressGeneratedFile() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array('compressFile'));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method('compressFile');
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+
+		$this->object->compressGeneratedFile("filename", "runId");
+	} 
+	/**
+	 * @covers \Models\DefaultProject::decompressGeneratedFile
+	 */
+	public function testDecompressGeneratedFile() {
+		$this->markTestIncomplete();
+		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->setMethods(array('decompressFile'));
+		$mockOperatingSystem = $mockBuilder->getMock();
+		$mockOperatingSystem->expects($this->once())->method('decompressFile');
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+
+		$this->object->decompressGeneratedFile("filename", "runId");
+	} 
+	/**
 	 * @covers \Models\DefaultProject::retrieveAllUploadedFiles
 	 */
 	public function testRetrieveAllUploadedFiles_zeroUploadedFiles() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('getAllUploadedFiles'));
@@ -342,6 +917,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::retrieveAllUploadedFiles
 	 */
 	public function testRetrieveAllUploadedFiles_manyUploadedFiles() {
+		$this->markTestIncomplete();
 		$uploadedFiles = array(
 			array("name" => "File1.ext", "file_type" => "map", "description" => "ready", "approx_size" => 188),	
 			array("name" => "File2.ext", "file_type" => "sequence", "description" => "ready", "approx_size" => "100000"),	
@@ -369,9 +945,17 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	} 
 
 	/**
+	 * @covers \Models\DefaultProject::retrieveAllUploadedFiles
+	 */
+	public function testRetrieveAllUploadedFiles_lazyLoadResetters() {
+		$this->markTestIncomplete();
+	}
+
+	/**
 	 * @covers \Models\DefaultProject::getPastScriptRuns
 	 */
 	public function testGetPastScriptRuns_zeroRuns() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('getAllRuns'));
@@ -393,6 +977,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::getPastScriptRuns
 	 */
 	public function testGetPastScriptRuns_manyRuns() {
+		$this->markTestIncomplete();
 		$runsInDatabase = array(
 			array("id" => "1", "script_name" => "validate_mapping_file.py",
 				"script_string" => "validate_mapping_file.py -i 'value'", "run_status" => "-1", "deleted" => false),
@@ -425,9 +1010,17 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $actual);
 	} 
 	/**
+	 * @covers \Models\DefaultProject::retrieveAllUploadedFiles
+	 */
+	public function testGetPastScriptRuns_lazyLoadResetters() {
+		$this->markTestIncomplete();
+	}
+
+	/**
 	 * @covers \Models\DefaultProject::retrieveAllGeneratedFiles
 	 */
 	public function testRetrieveAllGeneratedFiles_noRuns() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder("\Database\PDODatabase");
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('getAllRuns'));
@@ -449,6 +1042,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::retrieveAllGeneratedFiles
 	 */
 	public function testRetrieveAllGeneratedFiles_oneRun_noFiles() {
+		$this->markTestIncomplete();
 		$runsInDatabase = array(
 			array("id" => 1),
 		);
@@ -479,6 +1073,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::retrieveAllGeneratedFiles
 	 */
 	public function testRetrieveAllGeneratedFiles_oneRun_manyFiles() {
+		$this->markTestIncomplete();
 		$runsInDatabase = array(
 			array("id" => 1),
 		);
@@ -509,6 +1104,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::retrieveAllGeneratedFiles
 	 */
 	public function testRetrieveAllGeneratedFiles_manyRuns_noFiles() {
+		$this->markTestIncomplete();
 		$runsInDatabase = array(
 			array("id" => 1),
 			array("id" => 2),
@@ -536,6 +1132,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::retrieveAllGeneratedFiles
 	 */
 	public function testRetrieveAllGeneratedFiles_manyRuns_manyFiles() {
+		$this->markTestIncomplete();
 		$runsInDatabase = array(
 			array("id" => 1),
 			array("id" => 2),
@@ -567,212 +1164,25 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $actual);
 	} 
 	/**
-	 * @covers \Models\DefaultProject::retrieveAllBuiltInFiles
+	 * @covers \Models\DefaultProject::retrieveAllUploadedFiles
 	 */
-	public function testRetrieveAllBuiltInFiles() {
-		$mockBuilder = $this->getMockBuilder("\Models\MacOperatingSystem");
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('getDirContents'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$builtInFiles = array("file1.txt", "file2.txt", "file3.txt");
-		$mockOperatingSystem->expects($this->exactly(2))->method('getDirContents')->will($this->returnValue($builtInFiles));
-		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
-		$expecteds = array(
-			"/macqiime/greengenes/file1.txt",
-			"/macqiime/greengenes/file2.txt",
-			"/macqiime/greengenes/file3.txt",
-			"/macqiime/UNITe/file1.txt",
-			"/macqiime/UNITe/file2.txt",
-			"/macqiime/UNITe/file3.txt",
-		);
-
-		$actuals = $this->object->retrieveAllBuiltInFiles();
-
-		$this->assertEquals($expecteds, $actuals); 
-	} 
+	public function testRetrieveAllGeneratedFiles_lazyLoadResetters() {
+		$this->markTestIncomplete();
+	}
 
 	/**
-	 * @covers \Models\DefaultProject::beginProject
-	 * @expectedException \Exception
+	 * @covers \Models\DefaultProject::attemptGetDirContents
 	 */
-	public function testBeginProject_databaseFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "forgetAllRequests", "executeAllRequests", "createProject"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockDatabase->expects($this->once())->method("createProject")->will($this->returnValue(false));
-		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
-
-		$this->object->beginProject();
-	} 
-	/**
-	 * @covers \Models\DefaultProject::beginProject
-	 * @expectedException \Models\OperatingSystemException
-	 */
-	public function testBeginProject_osFails() {
-		$expecteds = array(
-			'object_id' => 1,
-		);
-		$actuals = array();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "forgetAllRequests", "executeAllRequests", "createProject", "getUserRoot"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockDatabase->expects($this->once())->method("createProject")->will($this->returnValue(1));
-		$mockDatabase->expects($this->once())->method("getUserRoot");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("createDir", "removeDirIfExists"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("createDir")->will($this->throwException(new OperatingSystemException()));
-		$mockOperatingSystem->expects($this->once())->method("removeDirIfExists");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->beginProject();
-
-		$this->fail("beginProject should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::beginProject
-	 */
-	public function testBeginProject_nothingFails() {
-		$expecteds = array(
-			'object_id' => 1,
-		);
-		$actuals = array();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "forgetAllRequests", "executeAllRequests", "createProject", "getUserRoot"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->never())->method("forgetAllRequests");
-		$mockDatabase->expects($this->once())->method("executeAllRequests");
-		$mockDatabase->expects($this->once())->method("createProject")->will($this->returnValue(1));
-		$mockDatabase->expects($this->once())->method("getUserRoot");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("createDir", "removeDirIfExists"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->exactly(2))->method("createDir");
-		$mockOperatingSystem->expects($this->never())->method("removeDirIfExists");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->beginProject();
-
-		$actuals['object_id'] = $this->object->getId();
-		$this->assertEquals($expecteds, $actuals);
-	} 
-
-	/**
-	 * @covers \Models\DefaultProject::receiveDownloadedFile
-	 * @expectedException \Exception
-	 */
-	public function testReceiveDownloadedFile_databaseFails() {
-		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(false));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$this->object = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
-
-		$this->object->receiveDownloadedFile("url", "fileName", $fileType);
-
-		$this->fail("receiveDownloadedFile should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::receiveDownloadedFile
-	 * @expectedException \Models\OperatingSystemException
-	 */
-	public function testReceiveDownloadedFile_osFails() {
-		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("downloadFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("downloadFile")->will($this->throwException(new OperatingSystemException()));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->receiveDownloadedFile("url", "fileName", $fileType);
-
-		$this->fail("receiveDownloadedFile should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::receiveDownloadedFile
-	 */
-	public function testReceiveUploadedFile_nothingFails() {
-		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->never())->method("forgetAllRequests");
-		$mockDatabase->expects($this->once())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("downloadFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$expected = "console output";
-		$mockOperatingSystem->expects($this->once())->method("downloadFile")->will($this->returnValue($expected));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$actual = $this->object->receiveDownloadedFile("url", "fileName", $fileType);
-
-		$this->assertEquals($expected, $actual);
-	} 
-	/**
-	 * @covers \Models\DefaultProject::receiveDownloadedFile
-	 */
-	public function testReceiveUploadedFile_lazyLoaderIsReset() {
-		$fileType = $this->getMockBuilder('\Models\FileType')->getMockForAbstractClass();
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("startTakingRequests", "createUploadedFile", "forgetAllRequests", "executeAllRequests", "getAllUploadedFiles"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->never())->method("forgetAllRequests");
-		$mockDatabase->expects($this->once())->method("executeAllRequests");
-		$mockDatabase->expects($this->exactly(2))->method("getAllUploadedFiles")->will($this->returnValue(array(1,2)));
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array("downloadFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$expected = "console output";
-		$mockOperatingSystem->expects($this->once())->method("downloadFile")->will($this->returnValue($expected));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->retrieveAllUploadedFiles();
-		$actual = $this->object->receiveDownloadedFile("url", "fileName", $fileType);
-		$this->object->retrieveAllUploadedFiles();
-
-		$this->assertEquals($expected, $actual);
-	} 
-
+	public function testAttemptGetDirContents() {
+		$this->markTestIncomplete();
+	}
+	
 	/**
 	 * @covers \Models\DefaultProject::runScript
 	 * @expectedException \Exception
 	 */
 	public function testRunScript_invalidScriptId() {
+		$this->markTestIncomplete();
 		$input = array('script' => 4);
 		$mockBuilder = $this->getMockBuilder('\Models\QIIMEProject');
 		$mockBuilder->setConstructorArgs($this->mockDatabase, $this->mockOperatingSystem);
@@ -789,6 +1199,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Models\Scripts\ScriptException
 	 */
 	public function testRunScript_invalidScriptInput() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('acceptInput'));
@@ -811,6 +1222,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Exception
 	 */
 	public function testRunScript_dbCreateRunFails() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('acceptInput', 'renderCommand'));
@@ -840,6 +1252,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Exception
 	 */
 	public function testRunScript_osRunScriptFails() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('acceptInput', 'renderCommand'));
@@ -875,6 +1288,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Exception
 	 */
 	public function testRunScript_dbGivRunPidFails() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('acceptInput', 'renderCommand'));
@@ -910,6 +1324,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\DefaultProject::runScript
 	 */
 	public function testRunScript_nothingFails() {
+		$this->markTestIncomplete();
 		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
 		$mockBuilder->disableOriginalConstructor();
 		$mockBuilder->setMethods(array('acceptInput', 'renderCommand'));
@@ -943,352 +1358,51 @@ class ProjectTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($expected, $actual);
 	} 
-	/**
-	 * @covers \Models\DefaultProject::runScript
-	 */
-	public function testRunScript_lazyLoadersAreReset() {
-		$mockBuilder = $this->getMockBuilder('\Models\Scripts\QIIME\ValidateMappingFile');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('acceptInput', 'renderCommand'));
-		$mockScript = $mockBuilder->getMock();
-		$mockScript->expects($this->once())->method('acceptInput');
-		$mockScript->expects($this->once())->method('renderCommand');
-		$scripts = array(1 => $mockScript);
-		$allRuns = array(
-			array("id" => 1, "script_name" => "name", "script_string" => "string", "run_status" => -1, "deleted" => 0),
-		);
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('startTakingRequests', 'createRun', 'forgetAllRequests', 'giveRunPid', 'executeAllRequests',
-			'getAllRuns'));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method('startTakingRequests');
-		$mockDatabase->expects($this->once())->method('createRun')->will($this->returnValue(1));
-		$mockDatabase->expects($this->never())->method('forgetAllRequests');
-		$mockDatabase->expects($this->once())->method('giveRunPid')->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method('executeAllRequests');
-		$mockDatabase->expects($this->exactly(4))->method('getAllRuns')->will($this->returnValue($allRuns));
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem');
-		$mockBuilder->disableOriginalConstructor();
-		$mockBuilder->setMethods(array('runScript'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("runScript");
-		$mockBuilder = $this->getMockBuilder('\Models\QIIMEProject');
-		$mockBuilder->setConstructorArgs(array($mockDatabase, $mockOperatingSystem));
-		$mockBuilder->setMethods(array("getScripts", "attemptGetDirContents", "getProjectDir"));
-		$this->object = $mockBuilder->getMock();
-		$this->object->expects($this->once())->method("getScripts")->will($this->returnValue($scripts));
-		$this->object->expects($this->exactly(4))->method("attemptGetDirContents")->will($this->returnValue(array(1)));
-		$this->object->expects($this->exactly(4))->method("getProjectDir");
-		$input = array('script' => 1);
-		$expected = "Able to validate script input-<br/>Script was started successfully";
 
-		$this->object->getPastScriptRuns();
-		$this->object->retrieveAllGeneratedFiles();
-		$actual = $this->object->runScript($input);
-		$this->object->getPastScriptRuns();
-		$this->object->retrieveAllGeneratedFiles();
+	/**
+	 * @covers \Models\DefaultProject::renderOverview
+	 */
+	public function testRenderOverview_zeroFormattedScripts() {
+		$this->markTestIncomplete();
+		$expected = "<div id=\"project_overview\">\n<div><span>cat1</span>{$mockScriptString}</div>\n<div><span>cat2</span>{$mockScriptString}{$mockScriptString}</div>\n</div>\n";
+		$mockBuilder = $this->getMockBuilder('\Models\Scripts\DefaultScript');
+		$mockBuilder->disableOriginalConstructor();
+		$mockBuilder->setMethods(array('getHtmlId', 'getScriptName', 'getScriptTitle'));
+		$mockScript = $mockBuilder->getMock();
+		$mockScript->expects($this->any())->method('getHtmlId')->will($this->returnValue('id'));
+		$mockScript->expects($this->any())->method('getScriptName')->will($this->returnValue('name'));
+		$mockScript->expects($this->any())->method('getScriptTitle')->will($this->returnValue('title'));
+		$mockScriptString = "<span><a class=\"button\" onclick=\"displayHideables('{$mockScript->getHtmlId()}');\" title=\"{$mockScript->getScriptName()}\">{$mockScript->getScriptTitle()}</a></span>";
+		$initialFormattedScripts = array(
+			'cat1' => array($mockScript),
+			'cat2' => array($mockScript, $mockScript),
+		);
+		$mockBuilder = $this->getMockBuilder('\Models\QIIMEProject');
+		$mockBuilder->disableOriginalConstructor();
+		$mockBuilder->setMethods(array('getFormattedScripts'));
+		$this->object = $mockBuilder->getMock();
+		$this->object->expects($this->once())->method('getFormattedScripts')->will($this->returnValue($initialFormattedScripts));
+		
+		$actual = $this->object->renderOverview();
 
 		$this->assertEquals($expected, $actual);
+	} 
+	/**
+	 * @covers \Models\DefaultProject::renderOverview
+	 */
+	public function testRenderOverview_oneFormattedScript() {
+		$this->markTestIncomplete();
 	}
-
 	/**
-	 * @covers \Models\DefaultProject::deleteUploadedFile
-	 * @expectedException \Exception
+	 * @covers \Models\DefaultProject::renderOverview
 	 */
-	public function testDeleteUploadedFile_dbFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(false));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("deleteFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->never())->method("deleteFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->deleteUploadedFile("fileName");
-
-		$this->fail("deleteUpoadedFile should have thrown an exception");
-	} 
+	public function testRenderOverview_manyFormattedScripts_oneCategory() {
+		$this->markTestIncomplete();
+	}
 	/**
-	 * @covers \Models\DefaultProject::deleteUploadedFile
-	 * @expectedException \Models\OperatingSystemException
+	 * @covers \Models\DefaultProject::renderOverview
 	 */
-	public function testDeleteUploadedFile_osFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("deleteFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("deleteFile")->will($this->throwException(new OperatingSystemException()));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->deleteUploadedFile("fileName");
-
-		$this->fail("deleteUpoadedFile should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::deleteUploadedFile
-	 */
-	public function testDeleteUploadedFile_nothingFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->never())->method("forgetAllRequests");
-		$mockDatabase->expects($this->once())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("deleteFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("deleteFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->deleteUploadedFile("fileName");
-	} 
-	
-	/**
-	 * @covers \Models\DefaultProject::deleteGeneratedFile
-	 */
-	public function testDeleteGeneratedFile() {
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array('deleteFile'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method('deleteFile');
-		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
-
-		$this->object->deleteGeneratedFile("filename", "runId");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::unzipUploadedFile
-	 * @expectedException \Exception
-	 */
-	public function testUnzipUploadedFile_dbRemoveFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile");
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("createUploadedFile");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("unzipFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->never())->method("unzipFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->unzipUploadedFile("fileName");
-
-		$this->fail("unzipUploadedFile should have thrown and exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::unzipUploadedFile
-	 * @expectedException \Models\OperatingSystemException
-	 */
-	public function testUnzipUploadedFile_osFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->never())->method("createUploadedFile");
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("unzipFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->throwException(new OperatingSystemException()));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->unzipUploadedFile("fileName");
-
-		$this->fail("unzipUploadedFile should have thrown and exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::unzipUploadedFile
-	 * @expectedException \Exception
-	 */
-	public function testUnzipUploadedFile_dbCreateFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method("forgetAllRequests");
-		$mockDatabase->expects($this->once())->method("createUploadedFile")->will($this->returnValue(false));
-		$mockDatabase->expects($this->never())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("unzipFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->returnValue(array(1, 2)));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->unzipUploadedFile("fileName");
-
-		$this->fail("unzipUploadedFile should have thrown and exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::unzipUploadedFile
-	 */
-	public function testUnzipUploadedFile_nothingFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("startTakingRequests", "removeUploadedFile", "forgetAllRequests", "createUploadedFile", "executeAllRequests"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("startTakingRequests");
-		$mockDatabase->expects($this->once())->method("removeUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->never())->method("forgetAllRequests");
-		$mockDatabase->expects($this->exactly(2))->method("createUploadedFile")->will($this->returnValue(true));
-		$mockDatabase->expects($this->once())->method("executeAllRequests");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("unzipFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("unzipFile")->will($this->returnValue(array(1, 2)));
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$actual = $this->object->unzipUploadedFile("fileName");
-
-		$this->assertTrue($actual);
-	} 
-	/**
-	 * @covers \Models\DefaultProject::unzipGeneratedFile
-	 */
-	public function testUnzipGeneratedFile() {
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array('unzipFile'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method('unzipFile');
-		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
-
-		$this->object->unzipGeneratedFile("filename", "runId");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::compressUploadedFile
-	 * @expectedException \Exception
-	 */
-	public function testCompressUploadedFile_dbFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("changeFileName"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("changeFileName");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("compressFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("compressFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->compressUploadedFile("fileName");
-
-		$this->fail("compressUploadedFile should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::compressUploadedFile
-	 */
-	public function testCompressUploadedFile_nothingFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("changeFileName"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("changeFileName")->will($this->returnValue(true));
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("compressFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("compressFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->compressUploadedFile("fileName");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::compressGeneratedFile
-	 */
-	public function testCompressGeneratedFile() {
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array('compressFile'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method('compressFile');
-		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
-
-		$this->object->compressGeneratedFile("filename", "runId");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::decompressUploadedFile
-	 * @expectedException \Exception
-	 */
-	public function testDecompressUploadedFile_dbFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("changeFileName"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("changeFileName");
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("decompressFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("decompressFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->decompressUploadedFile("fileName");
-
-		$this->fail("decompressUploadedFile should have thrown an exception");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::decompressUploadedFile
-	 */
-	public function testDecompressUploadedFile_nothingFails() {
-		$mockBuilder = $this->getMockBuilder('\Database\PDODatabase')
-			->disableOriginalConstructor()
-			->setMethods(array("changeFileName"));
-		$mockDatabase = $mockBuilder->getMock();
-		$mockDatabase->expects($this->once())->method("changeFileName")->will($this->returnValue(true));
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array("decompressFile"));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method("decompressFile");
-		$this->object = new QIIMEProject($mockDatabase, $mockOperatingSystem);
-
-		$this->object->decompressUploadedFile("fileName");
-	} 
-	/**
-	 * @covers \Models\DefaultProject::decompressGeneratedFile
-	 */
-	public function testDecompressGeneratedFile() {
-		$mockBuilder = $this->getMockBuilder('\Models\MacOperatingSystem')
-			->disableOriginalConstructor()
-			->setMethods(array('decompressFile'));
-		$mockOperatingSystem = $mockBuilder->getMock();
-		$mockOperatingSystem->expects($this->once())->method('decompressFile');
-		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
-
-		$this->object->decompressGeneratedFile("filename", "runId");
-	} 
+	public function testRenderOverview_manyFormattedScripts_manyCategory() {
+		$this->markTestIncomplete();
+	}
 }

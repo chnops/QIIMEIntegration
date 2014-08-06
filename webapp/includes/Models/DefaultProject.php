@@ -3,13 +3,13 @@
 namespace Models;
 
 abstract class DefaultProject implements ProjectI {
-	protected $owner;
-	protected $id;
-	protected $name;
+	protected $owner = "";
+	protected $id = 0;
+	protected $name = "";
 
-	protected $workflow;
-	protected $database;
-	protected $operatingSystem;
+	protected $workflow = NULL;
+	protected $database = NULL;
+	protected $operatingSystem = NULL;
 
 	protected $scripts = array();
 	protected $scriptsFormatted = array();
@@ -111,7 +111,6 @@ abstract class DefaultProject implements ProjectI {
 			$this->operatingSystem->uploadFile($this, $givenName, $tmpName);
 			$this->database->executeAllRequests();
 			$this->uploadedFiles = array();
-			return true;
 		}
 		catch(OperatingSystemException $ex) {
 			$this->database->forgetAllRequests();
@@ -152,7 +151,6 @@ abstract class DefaultProject implements ProjectI {
 				}
 			}
 			$this->database->executeAllRequests();
-			return true;
 		}
 		catch (OperatingSystemException $ex) {
 			$this->database->forgetAllRequests();
@@ -233,14 +231,14 @@ abstract class DefaultProject implements ProjectI {
 		return $this->generatedFiles;
 	}
 	public function attemptGetDirContents($dirName) {
-			try {
-				$dirContents = $this->operatingSystem->getDirContents($dirName);
-			}
-			catch (OperatingSystemException $ex) {
-				error_log("unable to list contents of directory: {$dirName}");
-				$dirContents = array();
-			}
-			return $dirContents;
+		try {
+			$dirContents = $this->operatingSystem->getDirContents($dirName);
+		}
+		catch (OperatingSystemException $ex) {
+			error_log("unable to list contents of directory: {$dirName}");
+			$dirContents = array();
+		}
+		return $dirContents;
 	}
 	public function runScript(array $allInput) {
 		$helper = \Utils\Helper::getHelper();
