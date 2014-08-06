@@ -14,8 +14,12 @@ files
 
 directories
 -------
-* public/ - Contains all files that could be downloaded as-is, with no PHP modifications
+* public/ - Contains all files that could be downloaded as-is, with no PHP modifications, such as man pages for all QIIME scripts, version number for all QIIME scripts, and custom help text for all parameters
 * includes/ - Contains most of the PHP code, mostly as PHP class files.  Also contains the README that describes the inner workings of the project
 * tests/ - Contains a suite of unit tests.  Also contains a README that explains test layout
 * data/ - Contains database and its accompanying schema file
-* projects/ - Contains all of the project data files, uploaded or generated
+* projects/ - Contains all of the project data files, uploaded or generated.  The layout of this folder is as follows:
+	Each user has a folder: u1/, u2/, u3/...
+	Each project has a folder: u1/p1/, u1/p2/, u2/p1/...
+	Each project folder has an uploads folder: u1/p1/uploads/, u1/p2/uploads/, u2/p1/uploads/...
+	Each time a script is run, a new folder is created: /u1/p1/r1/, u1/p2/r2, /u2/p1/r3/...
