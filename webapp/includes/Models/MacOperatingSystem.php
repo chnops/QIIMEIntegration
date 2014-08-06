@@ -131,14 +131,15 @@ class MacOperatingSystem implements OperatingSystemI {
 		$onFail = $database->renderCommandUploadFailure($project->getOwner(), $project->getId(), $outputName, $size = "\$size");
 
 		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . " 2>&1;
-			cd {$this->home}{$project->getProjectDir()}/uploads;
+			cd {$this->home}{$project->getProjectDir()}/uploads 2>/dev/null;
+			if [ $? -ne 0 ]; then printf 'Unable to find project directory'; exit 1; fi;
 			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
 			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
-				then echo 'The requested URL, {$urlEsc}, does not exist';
+				then printf 'The requested URL does not exist';
 				exit 1;
 			fi;
-			which wget &> /dev/null;
-			if [ $? != 0 ]; then echo 'wget not found'; exit 1; fi;
+			which -s wget;
+			if [ $? != 0 ]; then printf 'wget not found'; exit 1; fi;
 			(wget {$urlEsc} --limit-rate=1M --quiet --output-document={$outputNameEsc};
 				let wget_success=$?;
 				size=`wc -c {$outputNameEsc} | awk '{print $1}'`;
@@ -163,7 +164,7 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 
 		$fileNameEsc = escapeshellarg($fileName);
-		$code = "cd " . escapeshellarg($dir) . ";
+		$code = "cd " . escapeshellarg($dir) . "; if [ $? -ne 0 ]; then printf 'Unable to find project directory'; exit 1; fi;
 			touch {$fileNameEsc};
 			rm {$fileNameEsc};";
 
@@ -258,23 +259,23 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 
 	public function runScript(ProjectI $project, $runId, \Models\Scripts\ScriptI $script, \Database\DatabaseI $database) {
+		ob_start();
 		$projectDir = $project->getProjectDir();
 		$runDir = $projectDir . "/r" . $runId;
 
 		$bashCode = "
 			mkdir {$this->home}/{$runDir};
-			if [ $? -ne 0 ]; then echo 'Unable to create run dir'; exit 1; fi;
+			if [ $? -ne 0 ]; then printf 'Unable to create run dir'; exit 1; fi;
 			cd {$this->home}/{$runDir};
-			source {$project->getEnvironmentSource()};
-			if [ $? -ne 0 ]; then echo 'Unable to source environment variables'; exit 1; fi;
+			source {$project->getEnvironmentSource()} 2>&1;
 			printenv > env.txt;
 			{$script->renderVersionCommand()} >> env.txt;
-			if [ $? -ne 0 ]; then echo 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
+			if [ $? -ne 0 ]; then printf 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
 			jobs &> /dev/null;
 			({$script->renderCommand()};cd \$OLDPWD;{$database->renderCommandRunComplete($runId)})  >> output.txt 2>> error_log.txt &
 			job_id=`jobs -n`;
-			if [ ! -n \$job_id ]; then echo 'Unable to start the script'; exit 1; fi;
-			echo \$!;
+			if [ ! -n \$job_id ]; then printf 'Unable to start the script'; exit 1; fi;
+			printf \$!;
 			";
 
 		$codeReturn = 0;

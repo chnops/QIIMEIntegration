@@ -421,9 +421,15 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::downloadFile
 	 */
+	public function testDownloadFile_escapingOccursCorrectly() {
+		$this->markTestIncomplete();
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
 	public function testDownloadFile_sourceFails() {
 		$expected = new OperatingSystemException("Unable to download file");
-		$expected->setConsoleOutput("sh: line 1: /tmp/file_that_does_not_exist.fake: No such file or directory\n");
+		$expected->setConsoleOutput("sh: /tmp/file_that_does_not_exist.fake: No such file or directory\n");
 		$actual = NULL;
 		$mockProject = $this->projectBuilder
 			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
@@ -431,9 +437,12 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
 		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/tmp/file_that_does_not_exist.fake'));
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
 		$mockDatabase = $this->databaseBuilder
 			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
 			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
+		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
 		$url = "http://localhost/";
 		$outputName = "localhost.html";
 		try {
@@ -449,16 +458,300 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::downloadFile
 	 */
-	public function testDownloadFile_sourceFails() {
+	public function testDownloadFile_cdFails() {
+		$expected = new OperatingSystemException("Unable to download file");
+		$expected->setConsoleOutput("Unable to find project directory");
+		$actual = NULL;
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
+		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/dev/null'));
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("not_" . "u1"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
+		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
+		$url = "http://localhost/";
+		$outputName = "localhost.html";
+		try {
+
+			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile_urlDoesNotExist() {
+		$expected = new OperatingSystemException("Unable to download file");
+		$url = "http://localhost/bad_file_name.ext";
+		$outputName = "localhost.html";
+		$expected->setConsoleOutput("The requested URL does not exist");
+		$actual = NULL;
+		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
+		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/dev/null'));
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
+		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
+		try {
+
+			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile_wgetDoesNotExist() {
+		$expected = new OperatingSystemException("Unable to download file");
+		$url = "http://localhost/";
+		$outputName = "localhost.html";
+		$expected->setConsoleOutput("wget not found");
+		$actual = NULL;
+		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
+		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/dev/null'));
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1; alias which=false; cd ."));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
+			->getMock();	
+		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
+		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
+		try {
+
+			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile_wgetDoesNotSucceed() {
 		$this->markTestIncomplete();
+		// This is a hard one to test...
+	}
+	/**
+	 * @covers MacOperatingSystem::downloadFile
+	 */
+	public function testDownloadFile_wgetStartsSuccessfully() {
+		$expected = "";
+		$url = "http://localhost/";
+		$outputName = "localhost.html";
+		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->exactly(2))->method("getOwner")->will($this->returnValue("username"));
+		$mockProject->expects($this->exactly(2))->method("getId")->will($this->returnValue(1));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue('/dev/null'));
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandUploadSuccess", "renderCommandUploadFailure"))
+			->getMock();	
+		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
+		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
+
+		$actual = $this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
 	 * @covers MacOperatingSystem::deleteFile
 	 */
-	public function testDeleteFile() {
-		$this->markTestIncomplete();
+	public function testDeleteFile_badProjectDir() {
+		$expected = new OperatingSystemException("Unable to remove file");
+		$expected->setConsoleOutput("Unable to find project directory");
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		try {
+
+			$this->object->deleteFile($mockProject, "fileName", $isUploaded = true, $runId = -1);
+
+		}
+		catch (OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_uploaded_normalFile() {
+		$expecteds = array(
+			"function_return" => "",
+			"file_still_exists" => '0',
+			"dir_still_exists" => '1',
+		);
+		$actuals = array();
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/uploads/; touch ./projects/u1/uploads/fileName.txt");
+
+		$actuals['function_return'] = $this->object->deleteFile($mockProject, "fileName.txt", $isUploaded = true, $runId = -1);
+
+		exec("if [ -a './projects/u1/uploads/fileName.txt' ]; then echo 1; else echo 0; fi; if [ -a './projects/u1/uploads/' ]; then echo 1; else echo 0; fi;", $output);
+		$actuals['file_still_exists'] = $output[0];
+		$actuals['dir_still_exists'] = $output[1];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_generated_normalFile() {
+		$expecteds = array(
+			"function_return" => "",
+			"file_still_exists" => '0',
+			"dir_still_exists" => '1',
+			"upload_untouched" => '1',
+		);
+		$actuals = array();
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/uploads/; touch ./projects/u1/uploads/fileName.txt;
+				mkdir ./projects/u1/r1; touch ./projects/u1/r1/fileName.txt");
+
+		$actuals['function_return'] = $this->object->deleteFile($mockProject, "fileName.txt", $isUploaded = false, $runId = 1);
+
+		exec("if [ -a './projects/u1/r1/fileName.txt' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/r1/' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/uploads/' ]; then echo 1; else echo 0; fi;", $output);
+		$actuals['file_still_exists'] = $output[0];
+		$actuals['dir_still_exists'] = $output[1];
+		$actuals['upload_untouched'] = $output[2];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_generated_nonExistentFile() {
+		$expecteds = array(
+			"function_return" => "",
+			"file_still_exists" => '0',
+			"dir_still_exists" => '1',
+		);
+		$actuals = array();
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/r1");
+
+		$actuals['function_return'] = $this->object->deleteFile($mockProject, "fileName.txt", $isUploaded = false, $runId = 1);
+
+		exec("if [ -a './projects/u1/r1/fileName.txt' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/r1/' ]; then echo 1; else echo 0; fi", $output);
+		$actuals['file_still_exists'] = $output[0];
+		$actuals['dir_still_exists'] = $output[1];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_generated_fileOneOfManyInDir() {
+		$expecteds = array(
+			"function_return" => "",
+			"file_still_exists" => '0',
+			"dir_still_exists" => '1',
+			"other_file_still_exists" => '1',
+		);
+		$actuals = array();
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/r1; mkdir ./projects/u1/r1/dir; touch ./projects/u1/r1/dir/fileName.txt; touch ./projects/u1/r1/dir/fileName2.txt");
+
+		$actuals['function_return'] = $this->object->deleteFile($mockProject, "dir/fileName.txt", $isUploaded = false, $runId = 1);
+
+		exec("if [ -a './projects/u1/r1/dir/fileName.txt' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/r1/dir' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/r1/dir/fileName2.txt' ]; then echo 1; else echo 0; fi", $output);
+		$actuals['file_still_exists'] = $output[0];
+		$actuals['dir_still_exists'] = $output[1];
+		$actuals['other_file_still_exists'] = $output[2];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_generated_fileLastOneInDir() {
+		$this->markTestIncomplete();
+		$expecteds = array(
+			"function_return" => "",
+			"file_still_exists" => '0',
+			"dir_still_exists" => '0',
+		);
+		$actuals = array();
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/r1; mkdir ./projects/u1/r1/dir; touch ./projects/u1/r1/dir/fileName.txt");
+
+		$actuals['function_return'] = $this->object->deleteFile($mockProject, "dir/fileName.txt", $isUploaded = false, $runId = 1);
+
+		exec("if [ -a './projects/u1/r1/dir/fileName.txt' ]; then echo 1; else echo 0; fi;
+			if [ -a './projects/u1/r1/dir' ]; then echo 1; else echo 0; fi", $output);
+		$actuals['file_still_exists'] = $output[0];
+		$actuals['dir_still_exists'] = $output[1];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::deleteFile
+	 */
+	public function testDeleteFile_generated_fileInNonExistentDir() {
+		$expected = new OperatingSystemException("Unable to remove file");
+		$expected->setConsoleOutput("");
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		system("mkdir ./projects/u1; mkdir ./projects/u1/r1");
+		try {
+
+			$this->object->deleteFile($mockProject, "dir/fileName.txt", $isUploaded = false, $runId = 1);
+
+		}
+		catch (OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+
 	/**
 	 * @covers MacOperatingSystem::unzipFile
 	 */
@@ -480,7 +773,129 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::runScript
 	 */
-	public function testRunScript() {
+	public function testRunScript_badProjectDir() {
+		$expected = new OperatingSystemException("There was a problem initializing your script");
+		$expected->setConsoleOutput("Unable to create run dir");
+		$actual = NULL;
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir", "getEnvironmentSource"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
+		$mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("renderVersionCommand", "renderCommand"))
+			->getMockForAbstractClass();
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandRunComplete"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
+		$runId = 1;
+		try {
+
+			$this->object->runScript($mockProject, $runId, $mockScript, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::runScript
+	 */
+	public function testRunScript_badEnvironmentSource() {
+		$expected = new OperatingSystemException("There was a problem initializing your script");
+		$expected->setConsoleOutput("sh: line 4: /tmp/file_that_does_not_exist.ext: No such file or directory\n");
+		$actual = NULL;
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir", "getEnvironmentSource"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/tmp/file_that_does_not_exist.ext"));
+		$mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("renderVersionCommand", "renderCommand"))
+			->getMockForAbstractClass();
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandRunComplete"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
+		system("mkdir ./projects/u1/");
+		$runId = 1;
+		try {
+
+			$this->object->runScript($mockProject, $runId, $mockScript, $mockDatabase);
+
+		}
+		catch(OperatingSystemException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::runScript
+	 */
+	public function testRunScript_badVersionCommand() {
+		$expected = "";
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir", "getEnvironmentSource"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
+		$mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("renderVersionCommand", "renderCommand"))
+			->getMockForAbstractClass();
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("false"));
+		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandRunComplete"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
+		system("mkdir ./projects/u1/");
+		$runId = 1;
+
+		$actual = $this->object->runScript($mockProject, $runId, $mockScript, $mockDatabase);
+
+		$this->assertRegExp('/\d+/', $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::runScript
+	 */
+	public function testRunScript_notAbleToStartScript() {
 		$this->markTestIncomplete();
+		// this one is hard to test
+	}
+	/**
+	 * @covers MacOperatingSystem::runScript
+	 */
+	public function testRunScript_ableToStartScript() {
+		$expected = "";
+		$mockProject = $this->projectBuilder
+			->setMethods(array("getProjectDir", "getEnvironmentSource"))
+			->getMockForAbstractClass();
+		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
+		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
+		$mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("renderVersionCommand", "renderCommand"))
+			->getMockForAbstractClass();
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
+		$mockDatabase = $this->databaseBuilder
+			->setMethods(array("renderCommandRunComplete"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
+		system("mkdir ./projects/u1/");
+		$runId = 1;
+
+		$actual = $this->object->runScript($mockProject, $runId, $mockScript, $mockDatabase);
+
+		$this->assertRegExp('/\d+/', $actual);
 	}
 }
