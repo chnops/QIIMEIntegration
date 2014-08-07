@@ -732,24 +732,37 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadFailure_projectDoesNotExist() {
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$command = $this->object->renderCommandUploadFailure($this->newProj['owner'],
-			$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
+			$command = $this->object->renderCommandUploadFailure($this->newProj['owner'],
+				$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
 
-		$this->fail();
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadFailure_fileDoesNotExist() {
-		$command = $this->object->renderCommandUploadFailure($this->newFile['project_owner'],
-			$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$this->fail();
+			$command = $this->object->renderCommandUploadFailure($this->newFile['project_owner'],
+				$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure

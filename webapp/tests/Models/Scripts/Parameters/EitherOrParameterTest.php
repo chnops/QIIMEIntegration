@@ -20,6 +20,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	private $mockAlternative = NULL;
 	private $scriptJsVar = "js_script";
 	private $mockScript = NULL;
+	private $name = "";
 	private $object = NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
@@ -47,6 +48,8 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 			->setMethods(array("getJsVar"))
 			->getMockForAbstractClass();
 		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue($this->scriptJsVar));
+
+		$this->name = "__{$this->defaultName}__{$this->alternativeName}__";
 	}
 	public function setUp() {
 		$this->object = new \Models\Scripts\Parameters\EitherOrParameter($this->mockDefault, $this->mockAlternative);
@@ -59,7 +62,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"default" => $this->mockDefault,
 			"alternative" => $this->mockAlternative,
-			"name" => "__" . $this->mockDefault->getName() . "__" . $this->mockAlternative->getName() . "__",
+			"name" => $this->name,
 			"display_name" => $this->mockDefault->getName() . " or " . $this->mockAlternative->getName(),
 		);
 		$actuals = array();
@@ -80,7 +83,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"default" => $this->mockDefault,
 			"alternative" => $this->mockAlternative,
-			"name" => "__" . $this->mockDefault->getName() . "__" . $this->mockAlternative->getName() . "__",
+			"name" => $this->name,
 			"display_name" => $expectedName,
 		);
 		$actuals = array();
@@ -172,8 +175,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForOperatingSystem_noValue() {
 		$expected = "";
-		$value = false;
-		$this->object->setValue($value);
+		$this->object->setValue(false);
 
 		$actual = $this->object->renderForOperatingSystem();
 
@@ -184,8 +186,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForOperatingSystem_defaultValue() {
 		$expected = $this->defaultOperatingSystem;
-		$value = $this->defaultName;
-		$this->object->setValue($value);
+		$this->object->setValue($this->defaultName);
 
 		$actual = $this->object->renderForOperatingSystem();
 
@@ -196,8 +197,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForOperatingSystem_alternativeValue() {
 		$expected = $this->alternativeOperatingSystem;
-		$value = $this->alternativeName;
-		$this->object->setValue($value);
+		$this->object->setValue($this->alternativeName);
 
 		$actual = $this->object->renderForOperatingSystem();
 
@@ -209,14 +209,13 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm_disabled_noValueChecked() {
 		$expectedJsVar = "js_script_param";
-		$expectedName = "__{$this->defaultName}__{$this->alternativeName}__";
-		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$expectedName}\">{$this->defaultName} or {$this->alternativeName}
+		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->defaultName} or {$this->alternativeName}
 			<a class=\"param_help\" id=\"{$expectedJsVar}\">&amp;</a><br/>" . 
-			"<input type=\"radio\" name=\"{$expectedName}\" value=\"\" checked disabled>Neither</label></td></tr>" . 
+			"<input type=\"radio\" name=\"{$this->name}\" value=\"\" checked disabled>Neither</label></td></tr>" . 
 			"<tr>" . 
-			"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->defaultName}\" disabled>
+			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->defaultName}\" disabled>
 				{$this->defaultForm}</label></td>" . 
-				"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->alternativeName}\" disabled>
+				"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternativeName}\" disabled>
 				{$this->alternativeForm}</label></td>" . 
 			"</tr></table>";
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
@@ -234,14 +233,13 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm_disabled_defaultChecked() {
 		$expectedJsVar = "js_script_param";
-		$expectedName = "__{$this->defaultName}__{$this->alternativeName}__";
-		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$expectedName}\">{$this->defaultName} or {$this->alternativeName}
+		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->defaultName} or {$this->alternativeName}
 			<a class=\"param_help\" id=\"{$expectedJsVar}\">&amp;</a><br/>" . 
-			"<input type=\"radio\" name=\"{$expectedName}\" value=\"\" disabled>Neither</label></td></tr>" . 
+			"<input type=\"radio\" name=\"{$this->name}\" value=\"\" disabled>Neither</label></td></tr>" . 
 			"<tr>" . 
-			"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->defaultName}\" checked disabled>
+			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->defaultName}\" checked disabled>
 				{$this->defaultForm}</label></td>" . 
-				"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->alternativeName}\" disabled>
+				"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternativeName}\" disabled>
 				{$this->alternativeForm}</label></td>" . 
 			"</tr></table>";
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
@@ -260,14 +258,13 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderForForm_notDisabled_alternativeChecked() {
 		$expectedJsVar = "js_script_param";
-		$expectedName = "__{$this->defaultName}__{$this->alternativeName}__";
-		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$expectedName}\">{$this->defaultName} or {$this->alternativeName}
+		$expected = "<table class=\"either_or\"><tr><td colspan=\"2\"><label for=\"{$this->name}\">{$this->defaultName} or {$this->alternativeName}
 			<a class=\"param_help\" id=\"{$expectedJsVar}\">&amp;</a><br/>" . 
-			"<input type=\"radio\" name=\"{$expectedName}\" value=\"\">Neither</label></td></tr>" . 
+			"<input type=\"radio\" name=\"{$this->name}\" value=\"\">Neither</label></td></tr>" . 
 			"<tr>" . 
-			"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->defaultName}\">
+			"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->defaultName}\">
 				{$this->defaultForm}</label></td>" . 
-				"<td><label for=\"{$expectedName}\"><input type=\"radio\" name=\"{$expectedName}\" value=\"{$this->alternativeName}\" checked>
+				"<td><label for=\"{$this->name}\"><input type=\"radio\" name=\"{$this->name}\" value=\"{$this->alternativeName}\" checked>
 				{$this->alternativeForm}</label></td>" . 
 			"</tr></table>";
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
@@ -286,18 +283,19 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::renderFormScript
 	 */
 	public function testRenderFormScript_disabled() {
+		$expected = "";
 
 		$actual = $this->object->renderFormScript("js_script", $disabled = true);
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::renderFormScript
 	 */
 	public function testRenderFormScript_notDisabled() {
 		$expectedJsVar = "js_script___defaultName__alternativeName__";
-		$parentScript = "var {$expectedJsVar} = js_script.find(\"[name=__--defaultName__--alternativeName__]\");\n";
-		$expected = $parentScript . "\tmakeEitherOr({$expectedJsVar});{$expectedJsVar}.change();\n{$this->defaultScript}{$this->alternativeScript}";
+		$expectedParentScript = "var {$expectedJsVar} = js_script.find(\"[name={$this->name}]\");\n";
+		$expected = $expectedParentScript . "\tmakeEitherOr({$expectedJsVar});{$expectedJsVar}.change();\n{$this->defaultScript}{$this->alternativeScript}";
 
 		$actual = $this->object->renderFormScript("js_script", $disabled = false);
 
@@ -308,48 +306,58 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
 	 */
 	public function testIsValueValid_noValue() {
+		$expected = true;
 
 		$actual = $this->object->isValueValid(false);
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
 	 */
 	public function testIsValueValid_defaultValue() {
+		$expected = true;
 
 		$actual = $this->object->isValueValid($this->defaultName);
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
 	 */
 	public function testIsValueValid_alternativeValue() {
+		$expected = true;
 
 		$actual = $this->object->isValueValid($this->alternativeName);
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
 	 */
 	public function testIsValueValid_otherValue() {
+		$expected = false;
 
 		$actual = $this->object->isValueValid($this->alternativeName . "_bad");
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::setValue
-	 * @expectedException \Models\Scripts\ScriptException
 	 */
 	public function testSetValue_invalidValue() {
+		$expected = new ScriptException("An invalid value was provided for the parameter: {$this->name}");
+		$actual = NULL;
+		try {
 
-		$this->object->setValue($this->defaultName . "_bad");
+			$this->object->setValue($this->defaultName . "_bad");
 
-		$this->fail("setValue should have thrown an exception");
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::setValue
@@ -429,10 +437,11 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::getSelection
 	 */
 	public function testGetSelection() {
+		$expected = NULL;
 
 		$actual = $this->object->getSelection();
 
-		$this->assertNull($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::setSelection
@@ -451,10 +460,11 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::getNonSelection
 	 */
 	public function testGetNonSelection() {
+		$expected = NULL;
 
 		$actual = $this->object->getNonSelection();
 
-		$this->assertNull($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::setNonSelection
@@ -497,6 +507,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
 	 */
 	public function testAcceptInput_parentDoesNotThrowsException_parentDoesNotSetTruthyValue() {
+		$expected = NULL;
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\EitherOrParameter')
 			->setConstructorArgs(array($this->mockDefault, $this->mockAlternative))
 			->setMethods(array("getUnselectedValue"))
@@ -504,8 +515,9 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 		$this->object->expects($this->never())->method("getUnselectedValue");
 		$input = array($this->object->getName() => "");
 
-		$this->object->acceptInput($input);
+		$actual = $this->object->acceptInput($input);
 
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
@@ -597,7 +609,7 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::acceptInput
 	 */
 	public function testAcceptInput_parentPasses_childPasses() {
-		$expected = "";
+		$expected = NULL;
 		$mockDefault = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->setConstructorArgs(array($this->defaultName, "defaultValue"))
 			->setMethods(array("acceptInput"))
@@ -610,7 +622,8 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 		$input = array($this->object->getName() => $this->defaultName, $this->defaultName => true);
 		$this->object->expects($this->once())->method("getUnselectedValue")->will($this->returnValue($this->alternativeName));
 
-		$this->object->acceptInput($input);
+		$actual = $this->object->acceptInput($input);
 
+		$this->assertSame($expected, $actual);
 	}
 }

@@ -27,6 +27,7 @@ class LabelTest extends \PHPUnit_Framework_TestCase {
 	public function testConstructor() {
 		$expected = $this->value;
 
+		$this->object = new \Models\Scripts\Parameters\Label($this->value);
 
 		$actual = $this->object->getValue();
 		$this->assertEquals($expected, $actual);
@@ -36,57 +37,73 @@ class LabelTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\Label::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
+		$expected = "";
 
 		$actual = $this->object->renderForOperatingSystem();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\Label::renderForForm
 	 */
-	public function testRenderForForm() {
-		$expecteds = array(
-			"disabled" => "<p><strong>{$this->value}</strong></p>\n",
-			"not_disabled" => "<p><strong>{$this->value}</strong></p>\n",
-		);
-		$actuals = array();
+	public function testRenderForForm_disabled() {
+		$expected = "<p><strong>{$this->value}</strong></p>\n";
 
-		$actuals['disabled'] = $this->object->renderForForm(true, $this->mockScript);
-		$actuals['not_disabled'] = $this->object->renderForForm(false, $this->mockScript);
+		$actual = $this->object->renderForForm(true, $this->mockScript);
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\Label::renderForForm
+	 */
+	public function testRenderForForm_notDisabled() {
+		$expected = "<p><strong>{$this->value}</strong></p>\n";
+
+		$actual = $this->object->renderForForm(false, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\Label::acceptInput
 	 */
-	public function testAcceptInput() {
-		$expecteds = array(
-			"empty" => NULL,
-			"not_empty" => NULL,
-		);
-		$actuals = array();
+	public function testAcceptInput_inputEmpty() {
+		$expected = NULL;
 
-		$actuals['empty'] = $this->object->acceptInput(array());
-		$actuals['not_empty'] = $this->object->acceptInput(array(1, 2, 3));
+		$actual = $this->object->acceptInput(array());
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\Label::acceptInput
+	 */
+	public function testAcceptInput_inputNotEmpty() {
+		$expected = NULL;
+
+		$actual = $this->object->acceptInput(array(1, 2, 3));
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\Label::renderFormScript
 	 */
-	public function testRenderFormScript() {
-		$expecteds = array(
-			"disabled" => "",
-			"not_disabled" => "",
-		);
-		$actuals = array();
+	public function testRenderFormScript_disabled() {
+		$expected = "";
 
-		$actuals['disabled'] = $this->object->renderFormScript("formJsVar", true);
-		$actuals['not_disabled'] = $this->object->renderFormScript("formJsVar", false);
+		$actual = $this->object->renderFormScript("formJsVar", true);
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\Label::renderFormScript
+	 */
+	public function testRenderFormScript_notDisabled() {
+		$expected = "";
+
+		$actual = $this->object->renderFormScript("formJsVar", false);
+
+		$this->assertEquals($expected, $actual);
 	}
 }

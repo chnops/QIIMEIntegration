@@ -55,65 +55,67 @@ class NewFileParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::isDir
 	 */
 	public function testIsDir() {
+		$expected = false;
 
 		$actual = $this->object->isDir();
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::setIsDir
 	 */
 	public function testSetIsDir_false() {
-		$isDir = 0;
+		$expected = false;
 
-		$this->object->setIsDir($isDir);
+		$this->object->setIsDir(0);
 
 		$actual = $this->object->isDir();
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::setIsDir
 	 */
 	public function testSetIsDir_true() {
-		$isDir = "yes";
+		$expected = true;
 
-		$this->object->setIsDir($isDir);
+		$this->object->setIsDir("yes");
 
 		$actual = $this->object->isDir();
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::isValueValid
 	 */
 	public function testIsValueValid_valueIsValid() {
-		$value = "file_name_without_'double'_quotes";
+		$expected = true;
 
-		$actual = $this->object->isValueValid($value);
+		$actual = $this->object->isValueValid("file_name_without_'double'_quotes");
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::isValueValid
 	 */
 	public function testIsValueValid_valueIsNotValid() {
-		$value = "file_name_with_\"double\"_quotes";
+		$expected = false;
 
-		$actual = $this->object->isValueValid($value);
+		$actual = $this->object->isValueValid("file_name_with_\"double\"_quotes");
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem_isDir_valueFalse() {
+		$expected = "";
 		$this->object = new NewFileParameter($this->name, $value = false, $isDir = true);
 
 		$actual = $this->object->renderForOperatingSystem();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\NewFileParameter::renderForOperatingSystem

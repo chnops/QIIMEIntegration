@@ -6,6 +6,9 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		error_log("OldFileParameterTest");
 	}
+	public static function tearDownAfterClass() {
+		\Utils\Helper::setDefaultHelper(NULL);
+	}
 
 	private $mockProject = NULL;
 	private $mockScript = NULL; 
@@ -27,6 +30,7 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 
 	public function setUp() {
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->object = new OldFileParameter($this->name, $this->mockProject);
 	}
 
@@ -90,7 +94,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->getProject();
 		$this->assertEquals($expected, $actual);
-
 	}
 
 	/**
@@ -183,16 +186,16 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
-		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles", "retrieveAllGeneratedFiles", "retrieveAllBuiltInFiles"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
+		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue(array()));
 		$mockProject->expects($this->once())->method("retrieveAllGeneratedFiles")->will($this->returnValue($expectedGeneratedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllBuiltInFiles")->will($this->returnValue($expectedBuiltInFiles));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\OldFileParameter')
 			->setConstructorArgs(array($this->name, $mockProject, "../r2/{$this->value}"))
 			->setMethods(array("getJsVar"))
@@ -201,7 +204,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForForm($disabled = true, $this->mockScript);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -237,16 +239,16 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
-		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles", "retrieveAllGeneratedFiles", "retrieveAllBuiltInFiles"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->once())->method("categorizeArray")->will($this->returnArgument(0));
+		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($expectedUploadedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllGeneratedFiles")->will($this->returnValue($expectedGeneratedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllBuiltInFiles")->will($this->returnValue($expectedBuiltInFiles));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\OldFileParameter')
 			->setConstructorArgs(array($this->name, $mockProject, "../uploads/{$this->value}"))
 			->setMethods(array("getJsVar"))
@@ -255,7 +257,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForForm($disabled = true, $this->mockScript);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -295,16 +296,16 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->exactly(2))->method("categorizeArray")->will($this->returnArgument(0));
-		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles", "retrieveAllGeneratedFiles", "retrieveAllBuiltInFiles"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->exactly(2))->method("categorizeArray")->will($this->returnArgument(0));
+		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($expectedUploadedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllGeneratedFiles")->will($this->returnValue($expectedGeneratedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllBuiltInFiles")->will($this->returnValue($expectedBuiltInFiles));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\OldFileParameter')
 			->setConstructorArgs(array($this->name, $mockProject, $this->value))
 			->setMethods(array("getJsVar"))
@@ -313,7 +314,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForForm($disabled = true, $this->mockScript);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -353,16 +353,16 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("categorizeArray", "htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->exactly(2))->method("categorizeArray")->will($this->returnArgument(0));
-		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
-		\Utils\Helper::setDefaultHelper($mockHelper);
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->setMethods(array("retrieveAllUploadedFiles", "retrieveAllGeneratedFiles", "retrieveAllBuiltInFiles"))
 			->getMockForAbstractClass();
+		$mockHelper->expects($this->exactly(2))->method("categorizeArray")->will($this->returnArgument(0));
+		$mockHelper->expects($this->exactly(3))->method("htmlentities")->will($this->returnArgument(0));
 		$mockProject->expects($this->once())->method("retrieveAllUploadedFiles")->will($this->returnValue($expectedUploadedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllGeneratedFiles")->will($this->returnValue($expectedGeneratedFiles));
 		$mockProject->expects($this->once())->method("retrieveAllBuiltInFiles")->will($this->returnValue($expectedBuiltInFiles));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\OldFileParameter')
 			->setConstructorArgs(array($this->name, $mockProject))
 			->setMethods(array("getJsVar"))
@@ -371,8 +371,6 @@ class OldFileParameterTest extends \PHPUnit_Framework_TestCase {
 
 		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
 
-		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
-
 }

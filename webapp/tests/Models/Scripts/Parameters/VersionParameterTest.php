@@ -33,6 +33,7 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 		);
 		$actuals = array();
 
+		$this->object = new VersionParameter($this->mockScript);
 
 		$actuals['name'] = $this->object->getName();
 		$actuals['version_string'] = $this->object->getVersionString();
@@ -43,10 +44,11 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\VersionParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
+		$expected = "";
 
 		$actual = $this->object->renderForOperatingSystem();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**

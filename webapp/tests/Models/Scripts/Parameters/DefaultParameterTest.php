@@ -45,6 +45,7 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 		);
 		$actuals = array();
 
+		$this->object = new DefaultParameter($this->name, $this->value);
 
 		$actuals['name'] = $this->object->getName();
 		$actuals['value'] = $this->object->getValue();
@@ -75,18 +76,24 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setValue
-	 * @expectedException \Models\Scripts\ScriptException
 	 */
 	public function testSetValue_inValidValue() {
+		$expected = new ScriptException("An invalid value was provided for the parameter: ");
+		$actual = NULL;
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->disableOriginalConstructor()
 			->setMethods(array("isValueValid"))
 			->getMock();
 		$this->object->expects($this->once())->method("isValueValid")->will($this->returnValue(false));
+		try {
 
-		$this->object->setValue("anyValue");
+			$this->object->setValue("anyValue");
 
-		$this->fail("setValue should have thrown an exception");
+		}
+		catch(ScriptException $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
@@ -116,10 +123,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::isValueValid
 	 */
 	public function testIsValueValid() {
+		$expected = true;
 		
 		$actual = $this->object->isValueValid("anyValueAtAll");
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
@@ -137,9 +145,9 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem_twoLengthName() {
-		$twoLengthName = "-n";
-		$expected = $twoLengthName . " '" . $this->value . "'";
-		$this->object->setName($twoLengthName);
+		$expectedTwoLengthName = "-n";
+		$expected = $expectedTwoLengthName . " '" . $this->value . "'";
+		$this->object->setName($expectedTwoLengthName);
 
 		$actual = $this->object->renderForOperatingSystem();
 
@@ -159,9 +167,9 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem_valueIsEscaped() {
-		$escapableValue = "val'ue";
+		$expectedEscapableValue = "val'ue";
 		$expected = $this->name . "='val'\''ue'";
-		$this->object->setValue($escapableValue);
+		$this->object->setValue($expectedEscapableValue);
 
 		$actual = $this->object->renderForOperatingSystem();
 
@@ -195,10 +203,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::renderFormScript
 	 */
 	public function testRenderFormScript_disabled() {
+		$expected = "";
 
 		$actual = $this->object->renderFormScript($this->mockScript->getJsVar(), $disabled = true);
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::renderFormScript
@@ -308,18 +317,18 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 			->disableOriginalConstructor()
 			->setMethods(array("getJsVar", "getName"))
 			->getMock();
-		$mockRequiringTrigger->expects($this->once())->method("getJsVar")->will($this->returnValue($expectedRequiringTriggerVar));
-		$mockRequiringTrigger->expects($this->once())->method("getName")->will($this->returnValue("requirer"));
 		$mockAllowingTrigger = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->disableOriginalConstructor()
 			->setMethods(array("getJsVar", "getName"))
 			->getMock();
-		$mockAllowingTrigger->expects($this->once())->method("getJsVar")->will($this->returnValue($expectedAllowingTriggerVar));
-		$mockAllowingTrigger->expects($this->once())->method("getName")->will($this->returnValue("allower"));
 		$mockExcludingTrigger = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
 			->disableOriginalConstructor()
 			->setMethods(array("getJsVar", "getName"))
 			->getMock();
+		$mockRequiringTrigger->expects($this->once())->method("getJsVar")->will($this->returnValue($expectedRequiringTriggerVar));
+		$mockRequiringTrigger->expects($this->once())->method("getName")->will($this->returnValue("requirer"));
+		$mockAllowingTrigger->expects($this->once())->method("getJsVar")->will($this->returnValue($expectedAllowingTriggerVar));
+		$mockAllowingTrigger->expects($this->once())->method("getName")->will($this->returnValue("allower"));
 		$mockExcludingTrigger->expects($this->once())->method("getJsVar")->will($this->returnValue($expectedExcludingTriggerVar));
 		$mockExcludingTrigger->expects($this->once())->method("getName")->will($this->returnValue("excluder"));
 		$this->object = $this->getMockBuilder('\Models\Scripts\Parameters\DefaultParameter')
@@ -671,8 +680,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalse_paramIsEmptyString() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$expected = array(array("parameter" => $expectedParam, "value" => false));
 		$triggers = array(array("parameter" => $expectedParam, "value" => false));
-		$expected = $triggers;
 		$input = array($this->name => "");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -684,8 +693,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalse_paramIs0() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => false));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
 		$input = array($this->name => "0");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -697,8 +706,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalse_paramIsTruthy() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => false));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => false));
 		$input = array($this->name => $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -710,8 +719,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTrue_paramIsNotSet() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => true));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
 		$input = array();
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -723,8 +732,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTrue_paramIsEmptyString() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => true));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => true));
 		$input = array($this->name => "");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -736,8 +745,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTrue_paramIs0() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$expected = array(array("parameter" => $expectedParam, "value" => true)); 
 		$triggers = array(array("parameter" => $expectedParam, "value" => true));
-		$expected = $triggers;
 		$input = array($this->name => "0");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -749,8 +758,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTrue_paramIsTruthy() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$expected = array(array("parameter" => $expectedParam, "value" => true));
 		$triggers = array(array("parameter" => $expectedParam, "value" => true));
-		$expected = $triggers;
 		$input = array($this->name => $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -762,8 +771,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalsey_paramIsNotSet() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$input = array();
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -775,8 +784,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalsey_paramIsEmptyString() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$input = array($this->name => "");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -788,8 +797,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalsey_paramIs0() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$expected = array(array("parameter" => $expectedParam, "value" => "0")); 
 		$triggers = array(array("parameter" => $expectedParam, "value" => "0"));
-		$expected = $triggers;
 		$input = array($this->name => "0");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -801,8 +810,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueFalsey_paramIsTruthy() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => 0));
 		$input = array($this->name => $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -814,8 +823,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTruthy_paramIsNotSet() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$input = array();
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -827,8 +836,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTruthy_paramIsEmptyString() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$input = array($this->name => "");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -840,8 +849,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTruthy_paramIs0() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$input = array($this->name => "0");
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -853,8 +862,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTruthy_paramIsCorrectTruthy() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
+		$expected = array(array("parameter" => $expectedParam, "value" => $this->value)); 
 		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
-		$expected = $triggers;
 		$input = array($this->name => $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -866,8 +875,8 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGetActiveTriggers_valueTruthy_paramIsIncorrectTruthy() {
 		$expectedParam = new DefaultParameter($this->name, $this->value);
-		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$expected = array();
+		$triggers = array(array("parameter" => $expectedParam, "value" => $this->value));
 		$input = array($this->name => "not_" . $this->value);
 
 		$actual = $this->object->getActiveTriggers($triggers, $input);
@@ -1120,43 +1129,44 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::isAlwaysRequired
 	 */
 	public function testIsAlwaysRequired() {
+		$expected = false;
+
 		$actual = $this->object->isAlwaysRequired();
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsAlwaysRequired
 	 */
 	public function testSetIsAlwaysRequired_true() {
 		$expected = true;
-		$input = 1;
 
-		$this->object->setIsAlwaysRequired($input);
+		$this->object->setIsAlwaysRequired(1);
 
 		$actual = $this->object->isAlwaysRequired();
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsAlwaysRequired
 	 */
 	public function testSetIsAlwaysRequired_false() {
 		$expected = false;
-		$input = 0;
 
-		$this->object->setIsAlwaysRequired($input);
+		$this->object->setIsAlwaysRequired(0);
 
 		$actual = $this->object->isAlwaysRequired();
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getRequiringTriggers
 	 */
 	public function testGetRequiringTriggers() {
+		$expected = array();
 
 		$actual = $this->object->getRequiringTriggers();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setRequiringTriggers
@@ -1174,10 +1184,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getDismissingTriggers
 	 */
 	public function testGetDismissingTriggers() {
-		
+		$expected = array();
+
 		$actual = $this->object->getDismissingTriggers();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setDismissingTriggers
@@ -1195,43 +1206,44 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::isExcludedByDefault
 	 */
 	public function testIsExcludedByDefault() {
+		$expected = false;
+
 		$actual = $this->object->isExcludedByDefault();
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsExcludedByDefault
 	 */
 	public function testSetIsExcludedByDefault_true() {
 		$expected = true;
-		$input = 1;
 
-		$this->object->setIsExcludedByDefault($input);
+		$this->object->setIsExcludedByDefault(1);
 
 		$actual = $this->object->isExcludedByDefault();
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setIsExcludedByDefault
 	 */
 	public function testSetIsExcludedByDefault_false() {
 		$expected = false;
-		$input = 0;
 
-		$this->object->setIsExcludedByDefault($input);
+		$this->object->setIsExcludedByDefault(0);
 
 		$actual = $this->object->isExcludedByDefault();
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getAllowingTriggers
 	 */
 	public function testGetAllowingTriggers() {
+		$expected = array();
 
 		$actual = $this->object->getAllowingTriggers();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setAllowingTriggers
@@ -1249,10 +1261,11 @@ class DefaultParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::getExcludingTriggers
 	 */
 	public function testGetExcludingTriggers() {
+		$expected = array();
 
 		$actual = $this->object->getExcludingTriggers();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers \Models\Scripts\Parameters\DefaultParameter::setExcludingTriggers

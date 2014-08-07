@@ -69,32 +69,36 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 			"anything_goes" => true,
 		);
 		$actuals = array();
+		$keys = array_keys($expecteds);
+		$patterns = array(
+			TextArgumentParameter::PATTERN_DIGIT,
+			TextArgumentParameter::PATTERN_NUMBER,
+			TextArgumentParameter::PATTERN_PROPORTION,
+			TextArgumentParameter::PATTERN_NO_WHITE_SPACE,
+			TextArgumentParameter::PATTERN_ANYTHING_GOES,
+		);
+		$falseyValues = array(false, "", 0, array());
+		for($i = 0; $i < count($keys); $i++) {
+			$value = $falseyValues[$i % count($falseyValues)];
+			$this->object->setExpectedPattern($patterns[$i]);
+			
+			$actuals[$keys[$i]] = $this->object->isValueValid($value);
 
-		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_DIGIT);
-		$actuals['digit'] = $this->object->isValueValid(false);
-		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_NUMBER);
-		$actuals['number'] = $this->object->isValueValid("");
-		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_PROPORTION);
-		$actuals['proportion'] = $this->object->isValueValid(0);
-		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_NO_WHITE_SPACE);
-		$actuals['no_white_space'] = $this->object->isValueValid(false);
-		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_ANYTHING_GOES);
-		$actuals['anything_goes'] = $this->object->isValueValid("");
-
+		}
 		$this->assertEquals($expecteds, $actuals);
 	}
 	/**
 	 * @covers TextArgumentParameter::isValueValid
 	 */
 	public function testIsValueValid_digit_valid() {
+		$expecteds = array();
+		$actuals = array();
 		$inputs = array(
 			"one" => 1,
 			"two" => 23,
 			"nine" => 999999999,
 			"string" => "42",
 		);
-		$expecteds = array();
-		$actuals = array();
 		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_DIGIT);
 		foreach (array_keys($inputs) as $key) {
 			$expecteds[$key] = 1;
@@ -108,14 +112,14 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TextArgumentParameter::isValueValid
 	 */
 	public function testIsValueValid_digit_invalid() {
+		$expecteds = array();
+		$actuals = array();
 		$inputs = array(
 			"negative" => -1,
 			"letter_precedes" => "a23",
 			"letter_follows" => "23a",
 			"white_space" => "9999 99999",
 		);
-		$expecteds = array();
-		$actuals = array();
 		$this->object->setExpectedPattern(TextArgumentParameter::PATTERN_DIGIT);
 		foreach (array_keys($inputs) as $key) {
 			$expecteds[$key] = 0;

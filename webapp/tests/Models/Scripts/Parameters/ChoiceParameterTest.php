@@ -39,6 +39,7 @@ class ChoiceParameterTest extends \PHPUnit_Framework_TestCase {
 		);
 		$actuals = array();
 
+		$this->object = new ChoiceParameter($this->name, $this->default, $this->options);
 		
 		$actuals['name'] = $this->object->getName();
 		$actuals['value'] = $this->object->getValue();

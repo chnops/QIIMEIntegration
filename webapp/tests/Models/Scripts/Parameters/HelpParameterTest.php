@@ -29,6 +29,7 @@ class HelpParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testConstructor() {
 		$expected = "--help";
 
+		$this->object = new HelpParameter();
 
 		$actual = $this->object->getName();
 		$this->assertEquals($expected, $actual);
@@ -48,9 +49,10 @@ class HelpParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\HelpParameter::renderForOperatingSystem
 	 */
 	public function testRenderForOperatingSystem() {
+		$expected = "";
 
 		$actual = $this->object->renderForOperatingSystem();
 
-		$this->assertEmpty($actual);
+		$this->assertSame($expected, $actual);
 	}
 }
