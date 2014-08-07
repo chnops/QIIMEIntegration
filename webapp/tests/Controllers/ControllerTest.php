@@ -17,9 +17,9 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
 
-		$mockBuilder = $this->getMockBuilder('\Models\QIIMEWorkflow')
-			->disableOriginalConstructor();
-		$this->mockWorkflow = $mockBuilder->getMock();
+		$this->mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
+			->disableOriginalConstructor()
+			->getMock();
 
 		$this->objectBuilder = $this->getMockBuilder('\Controllers\Controller')
 			->setConstructorArgs(array($this->mockWorkflow));

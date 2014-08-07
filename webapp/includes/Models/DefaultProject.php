@@ -197,7 +197,6 @@ abstract class DefaultProject implements ProjectI {
 	
 	public function getPastScriptRuns() {
 		if (empty($this->pastScriptRuns)) {
-			$helper = \Utils\Helper::getHelper();
 			$pastRunsRaw = $this->database->getAllRuns($this->owner, $this->id);
 			foreach ($pastRunsRaw as $run) {
 				$runFileNames = $this->attemptGetDirContents($this->getProjectDir() . "/r" . $run['id']);
@@ -242,9 +241,6 @@ abstract class DefaultProject implements ProjectI {
 	}
 	public function runScript(array $allInput) {
 		$helper = \Utils\Helper::getHelper();
-		$this->generatedFiles = array();
-		$this->pastScriptRuns = array();
-
 		$scripts = $this->getScripts();
 		$scriptId = $allInput['script'];
 		if (!isset($scripts[$scriptId])) {
@@ -273,6 +269,8 @@ abstract class DefaultProject implements ProjectI {
 			}
 
 			$this->database->executeAllRequests();
+			$this->generatedFiles = array();
+			$this->pastScriptRuns = array();
 			return $result . "<br/>Script was started successfully";
 		}
 		catch (\Exception $ex) {

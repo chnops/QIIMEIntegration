@@ -185,7 +185,35 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Utils\Helper::htmlentities
 	 */
-	public function testHtmlentities_stringIsNotEmpty() {
+	public function testHtmlentities_bothQuotesAreEscaped() {
+		$expected = "&quot; &#039;";
+
+		$actual = $this->object->htmlentities("\" '");
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Utils\Helper::htmlentities
+	 */
+	public function testHtmlentities_entSubstitueIsSet() {
+		$this->markTestIncomplete();
+		if (!defined('ENT_SUBSTITUTE')) {
+			return;
+		}
+		$expected = "";
+
+		$actual = $this->object->htmlentities("\xff");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Utils\Helper::htmlentities
+	 */
+	public function testHtmlentities_entSubstitueIsNotSet_invalidValueIgnored() {
+		if (defined('ENT_SUBSTITUTE')) {
+			return;
+		}
 		$this->markTestIncomplete();
 	}
 }

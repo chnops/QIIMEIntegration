@@ -198,9 +198,7 @@ class QIIMEProjectTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\DefaultProject::retrieveAllBuiltInFiles
 	 */
-	public function testRetrieveAllBuiltInFiles_bothFoldersExist() {
-		$this->markTestIncomplete();
-		// TODO make sure lazy load is called right
+	public function testRetrieveAllBuiltInFiles_manyBuiltInFiles() {
 		$expected = array(
 			"/macqiime/greengenes/file1.txt",
 			"/macqiime/greengenes/file2.txt",
@@ -210,8 +208,8 @@ class QIIMEProjectTest extends \PHPUnit_Framework_TestCase {
 			"/macqiime/UNITe/file3.txt",
 		);
 		$expecteds = array(
-			"first_call" => $expected,
-			"second_call" => $expected,
+			$expected,
+			$expected,
 		);
 		$actuals = array();
 		$builtInFiles = array("file1.txt", "file2.txt", "file3.txt");
@@ -221,23 +219,59 @@ class QIIMEProjectTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockOperatingSystem->expects($this->exactly(2))->method('getDirContents')->will($this->returnValue($builtInFiles));
 		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+		for ($i = 0; $i < 2; $i++) {
 
-		$actuals['first_call'] = $this->object->retrieveAllBuiltInFiles();
-		$actuals['second_call'] = $this->object->retrieveAllBuiltInFiles();
+			$actuals[] = $this->object->retrieveAllBuiltInFiles();
 
+		}
 		$this->assertEquals($expecteds, $actuals); 
 	} 
 	/**
 	 * @covers \Models\DefaultProject::retrieveAllBuiltInFiles
 	 */
-	public function testRetrieveAllBuiltInFiles_neitherFolderExists() {
-		$this->markTestIncomplete();
+	public function testRetrieveAllBuiltInFiles_zeroBuiltInFiles() {
+		$expected = array();
+		$expecteds = array(
+			$expected,
+			$expected,
+		);
+		$actual = array();
+		$builtInFiles = array();
+		$mockOperatingSystem  = $this->getMockBuilder("\Models\MacOperatingSystem")
+			->disableOriginalConstructor()
+			->setMethods(array('getDirContents'))
+			->getMock();
+		$mockOperatingSystem->expects($this->exactly(4))->method('getDirContents')->will($this->returnValue($builtInFiles));
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+		for ($i = 0; $i < 2; $i++) {
+
+			$actuals[] = $this->object->retrieveAllBuiltInFiles();
+
+		}
+		$this->assertEquals($expecteds, $actuals); 
 	}
 	/**
 	 * @covers \Models\DefaultProject::retrieveAllBuiltInFiles
 	 */
-	public function testRetrieveAllBuiltInFiles_onlyOneFolderExists() {
-		$this->markTestIncomplete();
+	public function testRetrieveAllBuiltInFiles_exceptions() {
+		$expected = array();
+		$expecteds = array(
+			$expected,
+			$expected,
+		);
+		$actuals = array();
+		$mockOperatingSystem  = $this->getMockBuilder("\Models\MacOperatingSystem")
+			->disableOriginalConstructor()
+			->setMethods(array('getDirContents'))
+			->getMock();
+		$mockOperatingSystem->expects($this->exactly(2))->method('getDirContents')->will($this->throwException(new OperatingSystemException()));
+		$this->object = new QIIMEProject($this->mockDatabase, $mockOperatingSystem);
+		for ($i = 0; $i < 2; $i++) {
+
+				$actuals[] = $this->object->retrieveAllBuiltInFiles();
+
+		}
+		$this->assertEquals($expecteds, $actuals); 
 	}
 
 	/**
