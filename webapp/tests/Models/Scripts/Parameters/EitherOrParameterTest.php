@@ -315,6 +315,16 @@ class EitherOrParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
 	 */
+	public function testIsValueValid_trueValue() {
+		$expected = false;
+
+		$actual = $this->object->isValueValid(true);
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\EitherOrParameter::isValueValid
+	 */
 	public function testIsValueValid_defaultValue() {
 		$expected = true;
 

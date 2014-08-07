@@ -8,6 +8,8 @@ class ConvertFastaQualFastqTest extends \PHPUnit_Framework_TestCase {
 		error_log("ConvertFastqQualFastqTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(

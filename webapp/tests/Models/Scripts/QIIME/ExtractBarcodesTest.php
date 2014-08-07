@@ -8,6 +8,8 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		error_log("ExtractBarcodesTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -107,7 +109,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_single_end";
 		$input['--fastq2'] = true;
-		$input['--char_delineator'] = true;
+		$input['--char_delineator'] = $this->defaultValue;
 		$input['--switch_bc_order'] = true;
 		try {
 
@@ -143,7 +145,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_paired_end";
 		$input['--fastq2'] = true;
-		$input['--char_delineator'] = true;
+		$input['--char_delineator'] = $this->defaultValue;
 		$input['--switch_bc_order'] = true;
 		try {
 
@@ -180,7 +182,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_paired_stitched";
 		$input['--fastq2'] = true;
-		$input['--char_delineator'] = true;
+		$input['--char_delineator'] = $this->defaultValue;
 		$input['--switch_bc_order'] = true;
 		try {
 
@@ -217,7 +219,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_in_label";
 		$input['--fastq2'] = true;
-		$input['--char_delineator'] = true;
+		$input['--char_delineator'] = $this->defaultValue;
 		$input['--switch_bc_order'] = true;
 		try {
 
@@ -252,7 +254,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_single_end";
 		unset($input['--fastq2']);
-		$input['--bc2_len'] = true;
+		$input['--bc2_len'] = $this->defaultValue;
 		$input['--rev_comp_bc2'] = true;
 		try {
 
@@ -270,7 +272,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_paired_end";
 		$input['--fastq2'] = true;
-		$input['--bc2_len'] = true;
+		$input['--bc2_len'] = $this->defaultValue;
 		$input['--rev_comp_bc2'] = true;
 
 		$this->object->acceptInput($input);
@@ -282,7 +284,7 @@ class ExtractBarcodesTest extends \PHPUnit_Framework_TestCase {
 		$input['--fastq1'] = true;
 		$input['--input_type'] = "barcode_paired_stitched";
 		unset($input['--fastq2']);
-		$input['--bc2_len'] = true;
+		$input['--bc2_len'] = $this->defaultValue;
 		$input['--rev_comp_bc2'] = true;
 
 		$this->object->acceptInput($input);

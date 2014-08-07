@@ -9,6 +9,8 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		error_log("PickOtusTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $mockProject = NULL;
@@ -87,7 +89,7 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--trie_prefilter'] = true;
-		$input['--prefix_prefilter_length'] = true;
+		$input['--prefix_prefilter_length'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -106,7 +108,7 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		unset($input['--trie_prefilter']);
-		$input['--prefix_prefilter_length'] = true;
+		$input['--prefix_prefilter_length'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -125,19 +127,19 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "uclust";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--suppress_presort_by_abundance_uclust'] = true;
 		$input['--optimal_uclust'] = true;
 		$input['--exact_uclust'] = true;
 		$input['--user_sort'] = true;
-		$input['--stepwords'] = true;
-		$input['--uclust_otu_id_prefix'] = true;
+		$input['--stepwords'] = $this->defaultValue;
+		$input['--uclust_otu_id_prefix'] = $this->defaultValue;
 		$input['--suppress_uclust_stable_sort'] = true;
 		$input['--suppress_uclust_prefilter_exact_match'] = true;
 		$input['--save_uc_files'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = "--enable_rev_strand_match";
 		try {
@@ -195,19 +197,19 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "uclust";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--suppress_presort_by_abundance_uclust'] = true;
 		$input['--optimal_uclust'] = true;
 		$input['--exact_uclust'] = true;
 		$input['--user_sort'] = true;
-		$input['--stepwords'] = true;
-		$input['--uclust_otu_id_prefix'] = true;
+		$input['--stepwords'] = $this->defaultValue;
+		$input['--uclust_otu_id_prefix'] = $this->defaultValue;
 		$input['--suppress_uclust_stable_sort'] = true;
 		$input['--suppress_uclust_prefilter_exact_match'] = true;
 		$input['--save_uc_files'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = "--enable_rev_strand_match";
 		try {
@@ -230,19 +232,19 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "uclust_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--suppress_presort_by_abundance_uclust'] = true;
 		$input['--optimal_uclust'] = true;
 		$input['--exact_uclust'] = true;
 		$input['--user_sort'] = true;
-		$input['--stepwords'] = true;
-		$input['--uclust_otu_id_prefix'] = true;
+		$input['--stepwords'] = $this->defaultValue;
+		$input['--uclust_otu_id_prefix'] = $this->defaultValue;
 		$input['--suppress_uclust_stable_sort'] = true;
 		$input['--suppress_uclust_prefilter_exact_match'] = true;
 		$input['--save_uc_files'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = "--enable_rev_strand_match";
 		try {
@@ -308,19 +310,19 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "not_" . "uclust_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--suppress_presort_by_abundance_uclust'] = true;
 		$input['--optimal_uclust'] = true;
 		$input['--exact_uclust'] = true;
 		$input['--user_sort'] = true;
-		$input['--stepwords'] = true;
-		$input['--uclust_otu_id_prefix'] = true;
+		$input['--stepwords'] = $this->defaultValue;
+		$input['--uclust_otu_id_prefix'] = $this->defaultValue;
 		$input['--suppress_uclust_stable_sort'] = true;
 		$input['--suppress_uclust_prefilter_exact_match'] = true;
 		$input['--save_uc_files'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = "--enable_rev_strand_match";
 		try {
@@ -341,10 +343,10 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input = array();
 		$input['--otu_picking_method'] = "blast";
 		$input['--blast_db'] = true;
-		$input['--min_aligned_percent'] = true;
-		$input['--max_e_value'] = true;
+		$input['--min_aligned_percent'] = $this->defaultValue;
+		$input['--max_e_value'] = $this->defaultValue;
 		$input['--refseqs_fp'] = true;
-		$input['--similarity'] = true;
+		$input['--similarity'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -378,10 +380,10 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "blast";
 		$input['--blast_db'] = true;
-		$input['--min_aligned_percent'] = true;
-		$input['--max_e_value'] = true;
+		$input['--min_aligned_percent'] = $this->defaultValue;
+		$input['--max_e_value'] = $this->defaultValue;
 		$input['--refseqs_fp'] = true;
-		$input['--similarity'] = true;
+		$input['--similarity'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -399,7 +401,7 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "mothur";
-		$input['--clustering_algorithm'] = true;
+		$input['--clustering_algorithm'] = "furthest";
 		try {
 
 			$this->object->acceptInput($input);
@@ -420,7 +422,7 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "mothur";
-		$input['--clustering_algorithm'] = true;
+		$input['--clustering_algorithm'] = "furthest";
 		try {
 
 			$this->object->acceptInput($input);
@@ -438,8 +440,8 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "cdhit";
-		$input['--max_cdhit_memory'] = true;
-		$input['--similarity'] = true;
+		$input['--max_cdhit_memory'] = $this->defaultValue;
+		$input['--similarity'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -465,8 +467,8 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "cdhit";
-		$input['--max_cdhit_memory'] = true;
-		$input['--similarity'] = true;
+		$input['--max_cdhit_memory'] = $this->defaultValue;
+		$input['--similarity'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -485,23 +487,23 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "usearch";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -569,23 +571,23 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "usearch";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -606,23 +608,23 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "usearch_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -698,23 +700,23 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "not_" . "usearch_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -733,27 +735,27 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "usearch61";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
-		$input['--usearch61_sort_method'] = true;
-		$input['--threads'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
+		$input['--usearch61_sort_method'] = "abundance";
+		$input['--threads'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -831,27 +833,27 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "usearch61";
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
-		$input['--usearch61_sort_method'] = true;
-		$input['--threads'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
+		$input['--usearch61_sort_method'] = "abundance";
+		$input['--threads'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -872,26 +874,26 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "usearch61_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
-		$input['--usearch61_sort_method'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
+		$input['--usearch61_sort_method'] = "abundance";
 		try {
 
 			$this->object->acceptInput($input);
@@ -975,26 +977,26 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$input['--otu_picking_method'] = "not_" . "usearch61_ref";
 		$input['--refseqs_fp'] = true;
 		$input['--suppress_new_clusters'] = true;
-		$input['--similarity'] = true;
-		$input['--word_length'] = true;
-		$input['--max_accepts'] = true;
-		$input['--max_rejects'] = true;
+		$input['--similarity'] = $this->defaultValue;
+		$input['--word_length'] = $this->defaultValue;
+		$input['--max_accepts'] = $this->defaultValue;
+		$input['--max_rejects'] = $this->defaultValue;
 		$input['--usearch_fast_cluster'] = true;
 		$input['--enable_rev_strand_match'] = true;
 		$input['__--usearch_fast_cluster__--enable_rev_strand_match__'] = '--usearch_fast_cluster';
-		$input['--percent_id_err'] = true;
-		$input['--minsize'] = true;
-		$input['--abundance_skew'] = true;
+		$input['--percent_id_err'] = $this->defaultValue;
+		$input['--minsize'] = $this->defaultValue;
+		$input['--abundance_skew'] = $this->defaultValue;
 		$input['--db_filepath'] = true;
-		$input['--perc_id_blast'] = true;
+		$input['--perc_id_blast'] = $this->defaultValue;
 		$input['--suppress_de_novo_chimera_detection'] = true;
 		$input['--suppress_reference_chimera_detection'] = true;
 		$input['--suppress_cluster_size_filtering'] = true;
 		$input['--remove_usearch_logs'] = true;
 		$input['--derep_fullseq'] = true;
-		$input['--non_chimeras_retention'] = true;
-		$input['--minlen'] = true;
-		$input['--usearch61_sort_method'] = true;
+		$input['--non_chimeras_retention'] = "union";
+		$input['--minlen'] = $this->defaultValue;
+		$input['--usearch61_sort_method'] = "abundance";
 		try {
 
 			$this->object->acceptInput($input);
@@ -1012,8 +1014,8 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "prefix_suffix";
-		$input['--prefix_length'] = true;
-		$input['--suffix_length'] = true;
+		$input['--prefix_length'] = $this->defaultValue;
+		$input['--suffix_length'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -1036,8 +1038,8 @@ class PickOtusTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--otu_picking_method'] = "not_" . "prefix_suffix";
-		$input['--prefix_length'] = true;
-		$input['--suffix_length'] = true;
+		$input['--prefix_length'] = $this->defaultValue;
+		$input['--suffix_length'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);

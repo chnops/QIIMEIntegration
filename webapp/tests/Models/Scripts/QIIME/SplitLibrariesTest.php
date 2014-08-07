@@ -9,6 +9,8 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 		error_log("SplitLibrariesTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $mockProject = NULL;
@@ -104,7 +106,7 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--reverse_primers'] = "truncate_only";
-		$input['--reverse_primer_mismatches'] = true;
+		$input['--reverse_primer_mismatches'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -124,7 +126,7 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--reverse_primers'] = "truncate_remove";
-		$input['--reverse_primer_mismatches'] = true;
+		$input['--reverse_primer_mismatches'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -146,7 +148,7 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--reverse_primers'] = "invalide_value";
-		$input['--reverse_primer_mismatches'] = true;
+		$input['--reverse_primer_mismatches'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -167,9 +169,9 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = array();
 		$input['--qual'] = true;
-		$input['--min-qual-score'] = true;
+		$input['--min-qual-score'] = $this->defaultValue;
 		$input['--record_qual_scores'] = true;
-		$input['--qual_score_window'] = true;
+		$input['--qual_score_window'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -191,9 +193,9 @@ class SplitLibrariresTest extends \PHPUnit_Framework_TestCase {
 			$this->errorMessageOutro;
 		$actual = "";
 		$input = array();
-		$input['--min-qual-score'] = true;
+		$input['--min-qual-score'] = $this->defaultValue;
 		$input['--record_qual_scores'] = true;
-		$input['--qual_score_window'] = true;
+		$input['--qual_score_window'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);

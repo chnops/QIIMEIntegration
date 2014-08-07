@@ -28,6 +28,9 @@ class TextArgumentParameter extends DefaultParameter {
 		if (!$value) {
 			return true;
 		}
+		if ($value === true) {
+			return false;
+		}
 		$match = preg_match($this->expectedPattern, $value);
 		return $match;
 	}

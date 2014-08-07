@@ -95,10 +95,10 @@ class EitherOrParameter extends DefaultParameter {
 		if (!$value) {
 			return true;
 		}
-		if ($this->default->getName() == $value) {
+		if ($this->default->getName() === $value) {
 			return true;
 		}
-		if ($this->alternative->getName() == $value) {
+		if ($this->alternative->getName() === $value) {
 			return true;
 		}
 		return false;

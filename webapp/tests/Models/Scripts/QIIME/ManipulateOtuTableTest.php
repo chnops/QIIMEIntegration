@@ -9,6 +9,8 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		error_log("ManipulateOtuTableTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -178,7 +180,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input['--input-fp'] = true;
 		$input['--output-fp'] = true;
 		$input['action'] = "convert";
-		$input['--table-type'] = true;
+		$input['--table-type'] = "otu table";
 
 		$this->object->acceptInput($input);
 
@@ -229,7 +231,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input['action'] = "summarize-table";
 		unset($input['--qualitative']);
 		unset($input['--suppress-md5']);
-		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = true;
+		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = "--biom-to-classic-table";
 		try{
 
 			$this->object->acceptInput($input);
@@ -249,7 +251,7 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input-fp'] = true;
 		$input['--output-fp'] = true;
-		$input['--table-type'] = true;
+		$input['--table-type'] = "otu table";
 		$input['action'] = "convert";
 		$input['--qualitative'] = true;
 		$input['--suppress-md5'] = true;
@@ -275,9 +277,9 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--suppress-md5']);
 		unset($input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____']);
 		$input['--sample-metadata-fp'] = true;
-		$input['--matrix-type'] = true;
-		$input['--process-obs-metadata'] = true;
-		$input['--table-type'] = true;
+		$input['--matrix-type'] = "sparse";
+		$input['--process-obs-metadata'] = "naive";
+		$input['--table-type'] = "otu table";
 		
 		$this->object->acceptInput($input);
 
@@ -300,8 +302,8 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--matrix-type']);
 		unset($input['--process-obs-metadata']);
 		unset($input['--table-type']);
-		$input['--header-key'] = true;
-		$input['--output-metadata-id'] = true;
+		$input['--header-key'] = $this->defaultValue;
+		$input['--output-metadata-id'] = $this->defaultValue;
 		try {
 		
 			$this->object->acceptInput($input);
@@ -323,8 +325,8 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		unset($input['--suppress-md5']);
 		$input['__--biom-to-classic-table____--sparse-biom-to-dense-biom__--dense-biom-to-sparse-biom____'] = "--biom-to-classic-table";
 		$input['--biom-to-classic-table'] = true;
-		$input['--header-key'] = true;
-		$input['--output-metadata-id'] = true;
+		$input['--header-key'] = $this->defaultValue;
+		$input['--output-metadata-id'] = $this->defaultValue;
 		unset($input['--sample-metadata-fp']);
 		unset($input['--matrix-type']);
 		unset($input['--process-obs-metadata']);
@@ -350,10 +352,10 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input['--biom-to-classic-table'] = true;
 		unset($input['--header-key']);
 		unset($input['--output-metadata-id']);
-		$input['--sample-metadata-fp'] = true;
-		$input['--matrix-type'] = true;
-		$input['--process-obs-metadata'] = true;
-		$input['--table-type'] = true;
+		$input['--sample-metadata-fp'] = $this->defaultValue;
+		$input['--matrix-type'] = "sparse";
+		$input['--process-obs-metadata'] = "naive";
+		$input['--table-type'] = "otu table";
 		try {
 		
 			$this->object->acceptInput($input);
@@ -384,12 +386,12 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$input['--sparse-biom-to-dense-biom'] = true;
 		unset($input['--biom-to-classic-table']);
 		unset($input['--dense-biom-to-sparse-biom']);
-		$input['--header-key'] = true;
-		$input['--output-metadata-id'] = true;
+		$input['--header-key'] = $this->defaultValue;
+		$input['--output-metadata-id'] = $this->defaultValue;
 		$input['--sample-metadata-fp'] = true;
-		$input['--matrix-type'] = true;
-		$input['--process-obs-metadata'] = true;
-		$input['--table-type'] = true;
+		$input['--matrix-type'] = "sparse";
+		$input['--process-obs-metadata'] = "naive";
+		$input['--table-type'] = "otu table";
 		try {
 		
 			$this->object->acceptInput($input);

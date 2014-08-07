@@ -51,31 +51,41 @@ class ChoiceParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ChoiceParameter::isValidValue
 	 */
 	public function testIsValueValid_valueIsEmpty() {
-		$value = false;
+		$expected = true;
 
-		$actual = $this->object->isValueValid($value);
+		$actual = $this->object->isValueValid(false);
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers ChoiceParameter::isValidValue
+	 */
+	public function testIsValueValid_valueIsTrue() {
+		$expected = false;
+
+		$actual = $this->object->isValueValid(true);
+
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers ChoiceParameter::isValidValue
 	 */
 	public function testIsValueValid_valueIsValid() {
-		$value = $this->options[0];
+		$expected = true;
 
-		$actual = $this->object->isValueValid($value);
+		$actual = $this->object->isValueValid($this->options[0]);
 
-		$this->assertTrue($actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers ChoiceParameter::isValidValue
 	 */
 	public function testIsValueValid_valueIsNotValid() {
-		$value = $this->options[0] . "_bad";
+		$expected = false;
 
-		$actual = $this->object->isValueValid($value);
+		$actual = $this->object->isValueValid("not_" . $this->options[0]);
 
-		$this->assertFalse($actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**

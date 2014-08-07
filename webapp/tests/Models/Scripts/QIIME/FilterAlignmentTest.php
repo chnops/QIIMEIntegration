@@ -8,6 +8,8 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		error_log("FilterAlignmentTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -96,7 +98,7 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		$input['--remove_outliers'] = true;
-		$input['--threshold'] = true;
+		$input['--threshold'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -107,7 +109,7 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		unset($input['--remove_outliers']);
-		$input['--threshold'] = true;
+		$input['--threshold'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -127,7 +129,7 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
 		unset($input['--lane_mask_fp']);
-		$input['--entropy_threshold'] = true;
+		$input['--entropy_threshold'] = $this->defaultValue;
 		$input['--suppress_lane_mask_filter'] = true;
 		try {
 
@@ -158,7 +160,7 @@ class FilterAlignmentTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input = $this->emptyInput;
 		$input['--input_fasta_file'] = true;
-		$input['--entropy_threshold'] = true;
+		$input['--entropy_threshold'] = $this->defaultValue;
 		unset($input['--suppress_lane_mask_filter']);
 		$input['--lane_mask_fp'] = true;
 		try {

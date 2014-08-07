@@ -8,6 +8,8 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		error_log("JoinPairedEndsTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -116,10 +118,10 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		$input['--reverse_reads_fp'] = true;
 		$input['--output_dir'] = true;
 		$input['--pe_join_method'] = "fastq-join";
-		$input['--perc_max_diff'] = true;
-		$input['--max_ascii_score'] = true;
-		$input['--min_frac_match'] = true;
-		$input['--max_good_mismatch'] = true;
+		$input['--perc_max_diff'] = $this->defaultValue;
+		$input['--max_ascii_score'] = $this->defaultValue;
+		$input['--min_frac_match'] = $this->defaultValue;
+		$input['--max_good_mismatch'] = $this->defaultValue;
 		$input['--phred_64'] = true;
 		try {
 
@@ -161,10 +163,10 @@ class JoinPairedEndsTest extends \PHPUnit_Framework_TestCase {
 		$input['--reverse_reads_fp'] = true;
 		$input['--output_dir'] = true;
 		$input['--pe_join_method'] = "SeqPrep";
-		$input['--perc_max_diff'] = true;
-		$input['--max_ascii_score'] = true;
-		$input['--min_frac_match'] = true;
-		$input['--max_good_mismatch'] = true;
+		$input['--perc_max_diff'] = $this->defaultValue;
+		$input['--max_ascii_score'] = $this->defaultValue;
+		$input['--min_frac_match'] = $this->defaultValue;
+		$input['--max_good_mismatch'] = $this->defaultValue;
 		$input['--phred_64'] = true;
 		try {
 

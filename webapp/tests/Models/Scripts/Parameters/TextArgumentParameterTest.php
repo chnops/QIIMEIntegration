@@ -90,6 +90,34 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers TextArgumentParameter::isValueValid
 	 */
+	public function testIsValueValid_valueIsTrue() {
+		$expecteds = array(
+			"digit" => false,
+			"number" => false,
+			"proportion" => false,
+			"no_white_space" => false,
+			"anything_goes" => false,
+		);
+		$actuals = array();
+		$keys = array_keys($expecteds);
+		$patterns = array(
+			TextArgumentParameter::PATTERN_DIGIT,
+			TextArgumentParameter::PATTERN_NUMBER,
+			TextArgumentParameter::PATTERN_PROPORTION,
+			TextArgumentParameter::PATTERN_NO_WHITE_SPACE,
+			TextArgumentParameter::PATTERN_ANYTHING_GOES,
+		);
+		for($i = 0; $i < count($keys); $i++) {
+			$this->object->setExpectedPattern($patterns[$i]);
+			
+			$actuals[$keys[$i]] = $this->object->isValueValid(true);
+
+		}
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers TextArgumentParameter::isValueValid
+	 */
 	public function testIsValueValid_digit_valid() {
 		$expecteds = array();
 		$actuals = array();

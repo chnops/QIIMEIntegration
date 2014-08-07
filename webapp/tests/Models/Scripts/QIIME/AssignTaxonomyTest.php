@@ -8,6 +8,8 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		error_log("AssignTaxonomyTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -225,7 +227,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
-		$input['--read_id_regex'] = true;
+		$input['--read_id_regex'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -236,7 +238,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--read_id_regex'] = true;
+		$input['--read_id_regex'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -253,7 +255,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
-		$input['--amplicon_id_regex'] = true;
+		$input['--amplicon_id_regex'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -264,7 +266,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--amplicon_id_regex'] = true;
+		$input['--amplicon_id_regex'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -281,7 +283,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
-		$input['--header_id_regex'] = true;
+		$input['--header_id_regex'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -292,7 +294,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--header_id_regex'] = true;
+		$input['--header_id_regex'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -309,7 +311,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "mothur";
-		$input['--confidence'] = true;
+		$input['--confidence'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -319,7 +321,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--confidence'] = true;
+		$input['--confidence'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -330,7 +332,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
-		$input['--confidence'] = true;
+		$input['--confidence'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -347,7 +349,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--rdp_max_memory'] = true;
+		$input['--rdp_max_memory'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -358,7 +360,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rtax";
-		$input['--rdp_max_memory'] = true;
+		$input['--rdp_max_memory'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -375,7 +377,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
-		$input['--uclust_min_consensus_fraction'] = true;
+		$input['--uclust_min_consensus_fraction'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -386,7 +388,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--uclust_min_consensus_fraction'] = true;
+		$input['--uclust_min_consensus_fraction'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -403,7 +405,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
-		$input['--uclust_similarity'] = true;
+		$input['--uclust_similarity'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -414,7 +416,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--uclust_similarity'] = true;
+		$input['--uclust_similarity'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -431,7 +433,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "uclust";
-		$input['--uclust_max_accepts'] = true;
+		$input['--uclust_max_accepts'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -442,7 +444,7 @@ class AssignTaxonomyTest extends \PHPUnit_Framework_TestCase {
 		$input = $this->emptyInput;
 		$input['--input_fasta_fp'] = true;
 		$input['--assignment_method'] = "rdp";
-		$input['--uclust_max_accepts'] = true;
+		$input['--uclust_max_accepts'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);

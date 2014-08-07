@@ -8,6 +8,8 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		error_log("AlignSeqsTest");
 	}
 
+	private $defaultValue = 1;
+
 	private $errorMessageIntro = "There were some problems with the parameters you submitted:<ul>";
 	private $errorMessageOutro = "</ul>\n";
 	private $emptyInput = array(
@@ -152,7 +154,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "pynast";
-		$input['--pairwise_alignment_method'] = true;
+		$input['--pairwise_alignment_method'] = "uclust";
 
 		$this->object->acceptInput($input);
 
@@ -162,7 +164,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
-		$input['--pairwise_alignment_method'] = true;
+		$input['--pairwise_alignment_method'] = "uclust";
 		try {
 
 			$this->object->acceptInput($input);
@@ -178,7 +180,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "pynast";
-		$input['--min_percent_id'] = true;
+		$input['--min_percent_id'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -188,7 +190,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
-		$input['--min_percent_id'] = true;
+		$input['--min_percent_id'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
@@ -204,7 +206,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$expected = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "muscle";
-		$input['--muscle_max_memory'] = true;
+		$input['--muscle_max_memory'] = $this->defaultValue;
 
 		$this->object->acceptInput($input);
 
@@ -214,7 +216,7 @@ class AlignSeqsTest extends \PHPUnit_Framework_TestCase {
 		$actual = "";
 		$input['--input_fasta_fp'] = true;
 		$input['--alignment_method'] = "infernal";
-		$input['--muscle_max_memory'] = true;
+		$input['--muscle_max_memory'] = $this->defaultValue;
 		try {
 
 			$this->object->acceptInput($input);
