@@ -9,6 +9,7 @@ class MacOperatingSystem implements OperatingSystemI {
 		return $this->home;
 	}
 	public function createDir($name) {
+		$helper = \Utils\Helper::getHelper();
 		$nameParts = explode("/", $name);
 		foreach ($nameParts as $namePart) {
 			if (!$namePart) {
@@ -16,7 +17,7 @@ class MacOperatingSystem implements OperatingSystemI {
 			}
 			if (!$this->isValidFileName($namePart)) {
 				$exception = new OperatingSystemException("Unable to create directory");
-				$exception->setConsoleOutput("Invalid file name: " . htmlentities($name));
+				$exception->setConsoleOutput("Invalid file name: " . $helper->htmlentities($name));
 				throw $exception;
 			}
 		}
@@ -25,7 +26,9 @@ class MacOperatingSystem implements OperatingSystemI {
 		system("mkdir " . $this->home . "/" . $name, $returnCode);
 
 		if ($returnCode) {
-			throw new OperatingSystemException("mkdir failed: {$returnCode}");
+			$ex = new OperatingSystemException("Unable to create directory");
+			$ex->setConsoleOutput("mkdir returned error code: {$returnCode}");
+			throw $ex;
 		}
 	}
 	public function removeDirIfExists($name) {

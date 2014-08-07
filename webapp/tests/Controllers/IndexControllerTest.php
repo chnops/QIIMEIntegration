@@ -181,11 +181,11 @@ class IndexControllerTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Controllers\IndexController::renderOutput
 	 */
 	public function testRenderOutput_subNotSet() {
-		$this->markTestIncomplete();
+		$expected = NULL;
 
-		$this->object->renderOutput();
+		$actual = $this->object->renderOutput();
 
-		//assert error log written to
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers \Controllers\IndexController::renderOutput

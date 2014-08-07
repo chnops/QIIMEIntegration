@@ -132,6 +132,11 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expected = new OperatingSystemException("Unable to create directory");
 		$expected->setConsoleOutput("Invalid file name: {$expectedFileName}");
 		$actual = NULL;
+		$mockHelper = $this->getMockBuilder('\Utils\Helper')
+			->setMethods(array("htmlentities"))
+			->getMock();
+		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		try {
 
 			$this->object->createDir($expectedFileName);
@@ -140,6 +145,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch(OperatingSystemException $ex) {
 			$actual = $ex;
 		}
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
@@ -165,9 +171,8 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @covers MacOperatingSystem::createDir
 	 */
 	public function testCreateDir_unNested_validNameButAlreadyExists() {
-		$this->markTestIncomplete();
-		// TODO not very good exception
-		$expected = new OperatingSystemException("mkdir failed: 1");
+		$expected = new OperatingSystemException("Unable to create directory");
+		$expected->setConsoleOutput("mkdir returned error code: 1");
 		$actual = NULL;
 		$dirName = "u1";
 		system("mkdir {$this->projectHome}{$dirName}");
@@ -189,6 +194,11 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expected = new OperatingSystemException("Unable to create directory");
 		$expected->setConsoleOutput("Invalid file name: {$expectedFileName}");
 		$actual = NULL;
+		$mockHelper = $this->getMockBuilder('\Utils\Helper')
+			->setMethods(array("htmlentities"))
+			->getMock();
+		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
+		\Utils\Helper::setDefaultHelper($mockHelper);
 		try {
 
 			$this->object->createDir($expectedFileName);
@@ -197,16 +207,16 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch(OperatingSystemException $ex) {
 			$actual = $ex;
 		}
+		\Utils\Helper::setDefaultHelper(NULL);
 		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::createDir
 	 */
 	public function testCreateDir_nested_validNamePathDoesNotExist() {
-		$this->markTestIncomplete();
 		$expectedFileName = "u1/p1";
-		//TODO not a very good exception message
-		$expected = new OperatingSystemException("mkdir failed: 1");
+		$expected = new OperatingSystemException("Unable to create directory");
+		$expected->setConsoleOutput("mkdir returned error code: 1");
 		$actual = NULL;
 		try {
 

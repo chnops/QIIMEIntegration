@@ -503,9 +503,8 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::changeFileName
 	 */
 	public function testChangeFileName_fileDoesNotExists() { 
-		$this->markTestIncomplete();
 		$expecteds = array(
-			"function_return" => true, // TODO implementation should be false
+			"function_return" => false,
 		);
 		$actuals = array();
 		$newFileName = "NewFile.txt";
@@ -559,12 +558,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::giveRunPid
 	 */
 	public function testGiveRunPid_runDoesNotExists() {
-		$this->markTestIncomplete();
-		$expected = true;
+		$expected = false;
 
 		$actual = $this->object->giveRunPid($imaginaryRunId = 99, $pid = 78987);
 
-		$this->assertTrue($actual); // TODO implement should return false
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::giveRunPid

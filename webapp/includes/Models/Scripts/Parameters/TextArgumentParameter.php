@@ -6,7 +6,7 @@ use \Models\Scripts\ScriptException;
 class TextArgumentParameter extends DefaultParameter {
 	
 	const PATTERN_DIGIT = '/^\d+$/';
-	const PATTERN_NUMBER = '/^-?\d*(\.\d+)?([eE]-?\d+)?$/';
+	const PATTERN_NUMBER = '/^-?\d+(\.\d+)?([eE]-?\d+)?$/';
 	const PATTERN_PROPORTION = '/^((0?\.[0-9]+)|1(\.0+)?)$/';
 	const PATTERN_NO_WHITE_SPACE = '/^\S+$/';
 	const PATTERN_ANYTHING_GOES = '/.*/';

@@ -243,8 +243,10 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET run_status = :pid WHERE id = :id");
 			$execResult = $pdoStatement->execute(array("id" => $runId, "pid" => $pid));
+			$rowCount = $pdoStatement->rowCount();
+			$success = $execResult && ($rowCount > 0);
 			$pdoStatement->closeCursor();
-			return $execResult;
+			return $success;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to give run pid: " . $ex->getMessage());
@@ -321,8 +323,10 @@ class PDODatabase implements DatabaseI {
 				project_owner = :owner AND project_id = :id AND name = :oldName");
 			$execResult = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, 
 				"newName" => $newFileName, "oldName" => $fileName));
+			$rowCount = $pdoStatement->rowCount();
+			$success = $execResult && ($rowCount > 0);
 			$pdoStatement->closeCursor();
-			return $execResult;
+			return $success;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to : " . $ex->getMessage());

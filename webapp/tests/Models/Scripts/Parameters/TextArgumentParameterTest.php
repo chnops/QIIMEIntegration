@@ -172,11 +172,6 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 			"positive_decimal_capitalSci_negative" => "12.3E-456",
 			"positive_decimal_lowerSci_positive" => "12.3e456",
 			"positive_decimal_lowerSci_negative" => "12.3e-456",
-			"positive_onlyDecimal_noSci" => ".123",
-			"positive_onlyDecimal_capitalSci_positive" => ".123E456",
-			"positive_onlyDecimal_capitalSci_negative" => ".123E-456",
-			"positive_onlyDecimal_lowerSci_positive" => ".123e456",
-			"positive_onlyDecimal_lowerSci_negative" => ".123e-456",
 			"negative_noDecimal_noSci" => "-123",
 			"negative_noDecimal_capitalSci_positive" => "-123E456",
 			"negative_noDecimal_capitalSci_negative" => "-123E-456",
@@ -187,11 +182,6 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 			"negative_decimal_capitalSci_negative" => "-12.3E-456",
 			"negative_decimal_lowerSci_positive" => "-12.3e456",
 			"negative_decimal_lowerSci_negative" => "-12.3e-456",
-			"negative_onlyDecimal_noSci" => "-.123",
-			"negative_onlyDecimal_capitalSci_positive" => "-.123E456",
-			"negative_onlyDecimal_capitalSci_negative" => "-.123E-456",
-			"negative_onlyDecimal_lowerSci_positive" => "-.123e456",
-			"negative_onlyDecimal_lowerSci_negative" => "-.123e-456",
 		);
 		$expecteds = array();
 		$actuals = array();
@@ -208,12 +198,11 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers TextArgumentParameter::isValueValid
 	 */
 	public function testIsValueValid_number_invalid() {
-		$this->markTestIncomplete();
 		$inputs = array(
-//			"onlySci_capital_positive" => "E456",
-//			"onlySci_capital_negative" => "E-456",
-//			"onlySci_lower_positive" => "e456",
-//			"onlySci_lower_negative" => "e-456",
+			"onlySci_capital_positive" => "E456",
+			"onlySci_capital_negative" => "E-456",
+			"onlySci_lower_positive" => "e456",
+			"onlySci_lower_negative" => "e-456",
 			"sci_expressPositive" => "+12.3E456",
 			"sci_containsLetter_preDecimal" => "a2.3E456",
 			"sci_containsLetter_decimal" => "12.aE456",
@@ -225,6 +214,16 @@ class TextArgumentParameterTest extends \PHPUnit_Framework_TestCase {
 			"noSci_containsLetter_decimal" => "12.a",
 			"noSci_multiple_decimal" => "1.2.3",
 			"noSci_only_decimal" => ".",
+			"positive_onlyDecimal_noSci" => ".123",
+			"positive_onlyDecimal_capitalSci_positive" => ".123E456",
+			"positive_onlyDecimal_capitalSci_negative" => ".123E-456",
+			"positive_onlyDecimal_lowerSci_positive" => ".123e456",
+			"positive_onlyDecimal_lowerSci_negative" => ".123e-456",
+			"negative_onlyDecimal_noSci" => "-.123",
+			"negative_onlyDecimal_capitalSci_positive" => "-.123E456",
+			"negative_onlyDecimal_capitalSci_negative" => "-.123E-456",
+			"negative_onlyDecimal_lowerSci_positive" => "-.123e456",
+			"negative_onlyDecimal_lowerSci_negative" => "-.123e-456",
 		);
 		$expecteds = array();
 		$actuals = array();
