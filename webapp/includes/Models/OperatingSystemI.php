@@ -4,10 +4,13 @@ namespace Models;
 
 interface OperatingSystemI {
 	public function getHome();
+	public function isValidDirName($name);
+	public function isValidFileName($name);
+	public function getFileParts($name);
+	public function concatFileNames($name1, $name2);
 	public function createDir($name);
 	public function removeDirIfExists($name);
 	public function getDirContents($name, $prependHome = true);
-	public function isValidFileName($name);
 
 	public function uploadFile(ProjectI $project, $givenName, $tmpName);
 	public function downloadFile(ProjectI $project, $url, $outputName, \Database\DatabaseI $database);

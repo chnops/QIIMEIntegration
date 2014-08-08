@@ -44,368 +44,549 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSystem::isValidDirName
 	 */
-	public function testIsValidFileName_inWhitelist() {
+	public function testIsValidDirName_valid_allLetters() {
 		$expected = true;
 
-		$actual = $this->object->isValidFileName("uploads");
-		
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::isValidFileName
-	 */
-	public function testIsValidFileName_notInWhitelist() {
-		$expected = false;
+		$actual = $this->object->isValidDirName("asdfqwer");
 
-		$actual = $this->object->isValidFileName("upload");
-		
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSystem::isValidDirName
 	 */
-	public function testIsValidFileName_validLetterUOneDigit() {
+	public function testIsValidDirName_valid_allDigits() {
 		$expected = true;
 
-		$actual = $this->object->isValidFileName("u1");
-		
-		$this->assertEquals($expected, $actual);
+		$actual = $this->object->isValidDirName(123456);
+
+		$this->assertSame($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSystem::isValidDirName
 	 */
-	public function testIsValidFileName_validLetterXManyDigits() {
+	public function testIsValidDirName_valid_allUnderscores() {
 		$expected = true;
 
-		$actual = $this->object->isValidFileName("X123456789");
+		$actual = $this->object->isValidDirName("________");
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::isValidDirName
+	 */
+	public function testIsValidDirName_valid_combination() {
+		$expected = true;
+
+		$actual = $this->object->isValidDirName("uploads_1_");
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::isValidDirName
+	 */
+	public function testIsValidDirName_invalid_empty() {
+		$expected = false;
+
+		$actual = $this->object->isValidDirName("");
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::isValidDirName
+	 */
+	public function testIsValidDirName_invalid_containsHyphen() {
+		$expected = false;
+
+		$actual = $this->object->isValidDirName("uploads_1-");
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::isValidDirName
+	 */
+	public function testIsValidDirName_invalid_containsUppercase() {
+		$expected = false;
+
+		$actual = $this->object->isValidDirName("Uploads_1_");
+
+		$this->assertSame($expected, $actual);
+	}
+
+	/**
+	 * @covers MacOperatingSysmte::isValidFileName
+	 */
+	public function testIsValidFileName() {
+		$this->markTestIncomplete();
+	}
+
+	/**
+	 * @covers MacOperatingSysmte::getFileParts
+	 */
+	public function testGetFileParts_noDirs() {
+		$expected = array("file");
 		
+		$actual = $this->object->getFileParts("file");
+
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSysmte::getFileParts
 	 */
-	public function testIsValidFileName_LetterAfterDigits() {
-		$expected = false;
-
-		$actual = $this->object->isValidFileName("123456789X");
+	public function testGetFileParts_dirs() {
+		$expected = array("dir", "file");
 		
+		$actual = $this->object->getFileParts("dir/file");
+
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSysmte::getFileParts
 	 */
-	public function testIsValidFileName_noLetter() {
-		$expected = false;
-
-		$actual = $this->object->isValidFileName("123456789");
+	public function testGetFileParts_outsideSlashes() {
+		$expected = array("dir", "file");
 		
+		$actual = $this->object->getFileParts("/dir/file/");
+
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSysmte::getFileParts
 	 */
-	public function testIsValidFileName_noDigits() {
-		$expected = false;
-
-		$actual = $this->object->isValidFileName("u");
+	public function testGetFileParts_consecutiveSlashes() {
+		$expected = array("dir", "file");
 		
+		$actual = $this->object->getFileParts("/dir//file/");
+
+		$this->assertEquals($expected, $actual);
+	}
+		
+	/**
+	 * @covers MacOperatingSysmte::concatFileNames
+	 */
+	public function testConcatFileNames_noSlashes() {
+		$expected = "file1/file2";
+
+		$actual = $this->object->concatFileNames("file1", "file2");
+
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::isValidFileName
+	 * @covers MacOperatingSysmte::concatFileNames
 	 */
-	public function testIsValidFileName_containsWhiteSpace() {
-		$expected = false;
+	public function testConcatFileNames_outsideSlashes() {
+		$expected = "/file1/file2/";
 
-		$actual = $this->object->isValidFileName("u 123456789");
-		
+		$actual = $this->object->concatFileNames("/file1", "file2/");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSysmte::concatFileNames
+	 */
+	public function testConcatFileNames_insideSlashes() {
+		$expected = "/file1/file2/";
+
+		$actual = $this->object->concatFileNames("/file1/", "/file2/");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSysmte::concatFileNames
+	 */
+	public function testConcatFileNames_multipleSlashes() {
+		$expected = "/fi/le1/file2/";
+
+		$actual = $this->object->concatFileNames("//fi//le1//", "//file2//");
+
 		$this->assertEquals($expected, $actual);
 	}
 
 	/**
 	 * @covers MacOperatingSystem::createDir
 	 */
-	public function testCreateDir_unNested_invalidName() {
-		$expectedFileName = "notAValidFileName";
-		$expected = new OperatingSystemException("Unable to create directory");
-		$expected->setConsoleOutput("Invalid file name: {$expectedFileName}");
-		$actual = NULL;
+	public function testCreateDir_nameIsNotValid() {
+		$expecteds = array(
+			"exception" => new OperatingSystemException("Unable to create directory"),
+			"dir_exists" => 0,
+		);
+		$fileName = "fileName";
+		$expecteds['exception']->setConsoleOutput("Invalid file name: {$fileName}");
+		$actual = array();
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
 		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
 		\Utils\Helper::setDefaultHelper($mockHelper);
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(false));
 		try {
-
-			$this->object->createDir($expectedFileName);
+		
+			$this->object->createDir($fileName);
 
 		}
 		catch(OperatingSystemException $ex) {
-			$actual = $ex;
+			$actuals['exception'] = $ex;
 		}
 		\Utils\Helper::setDefaultHelper(NULL);
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::createDir
-	 */
-	public function testCreateDir_unNested_validNameDoesNotExist() {
-		$expecteds = array(
-			'dir_name' => "u1",
-			'return_code' => 0,
-		);
-		$actuals = array();
-
-		$this->object->createDir($expecteds['dir_name']);
-
-		$returnCode = 1;
-		ob_start();
-		system("ls {$this->projectHome}", $returnCode);
-		$actuals['dir_name'] = trim(ob_get_clean());
-		$actuals['return_code'] = $returnCode;
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
 		$this->assertEquals($expecteds, $actuals);
 	}
 	/**
 	 * @covers MacOperatingSystem::createDir
 	 */
-	public function testCreateDir_unNested_validNameButAlreadyExists() {
-		$expected = new OperatingSystemException("Unable to create directory");
-		$expected->setConsoleOutput("mkdir returned error code: 1");
-		$actual = NULL;
-		$dirName = "u1";
-		system("mkdir {$this->projectHome}{$dirName}");
-		try {
-		
-			$this->object->createDir($dirName);
-
-		}
-		catch(OperatingSystemException $ex) {
-			$actual = $ex;
-		}
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::createDir
-	 */
-	public function testCreateDir_nested_invalidName() {
-		$expectedFileName = "u1/p1/r 1";
-		$expected = new OperatingSystemException("Unable to create directory");
-		$expected->setConsoleOutput("Invalid file name: {$expectedFileName}");
-		$actual = NULL;
+	public function testCreateDir_dirAlreadyExists() {
+		$expecteds = array(
+			"exception" => new OperatingSystemException("Unable to create directory"),
+			"dir_exists" => 1,
+		);
+		$actuals = array();
+		$fileName = "fileName";
+		$expecteds['exception']->setConsoleOutput("mkdir returned error code: 1");
 		$mockHelper = $this->getMockBuilder('\Utils\Helper')
 			->setMethods(array("htmlentities"))
 			->getMock();
-		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnArgument(0));
+		$mockHelper->expects($this->never())->method("htmlentities");
 		\Utils\Helper::setDefaultHelper($mockHelper);
+		system("mkdir {$this->projectHome}/{$fileName}");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
 		try {
-
-			$this->object->createDir($expectedFileName);
+		
+			$this->object->createDir($fileName);
 
 		}
 		catch(OperatingSystemException $ex) {
-			$actual = $ex;
+			$actuals['exception'] = $ex;
 		}
 		\Utils\Helper::setDefaultHelper(NULL);
-		$this->assertEquals($expected, $actual);
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
 	}
 	/**
 	 * @covers MacOperatingSystem::createDir
 	 */
-	public function testCreateDir_nested_validNamePathDoesNotExist() {
-		$expectedFileName = "u1/p1";
-		$expected = new OperatingSystemException("Unable to create directory");
-		$expected->setConsoleOutput("mkdir returned error code: 1");
-		$actual = NULL;
+	public function testCreateDir_dirInNonExistentParent() {
+		$expecteds = array(
+			"exception" => new OperatingSystemException("Unable to create directory"),
+			"dir_exists" => 0,
+		);
+		$actuals = array();
+		$fileName = "dir/fileName";
+		$expecteds['exception']->setConsoleOutput("mkdir returned error code: 1");
+		$mockHelper = $this->getMockBuilder('\Utils\Helper')
+			->setMethods(array("htmlentities"))
+			->getMock();
+		$mockHelper->expects($this->never())->method("htmlentities");
+		\Utils\Helper::setDefaultHelper($mockHelper);
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
 		try {
-
-			$this->object->createDir($expectedFileName);
+		
+			$this->object->createDir($fileName);
 
 		}
 		catch(OperatingSystemException $ex) {
+			$actuals['exception'] = $ex;
+		}
+		\Utils\Helper::setDefaultHelper(NULL);
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::createDir
+	 */
+	public function testCreateDir_succeeds_depth1() {
+		$expecteds = array(
+			"function_return" => NULL,
+			"dir_exists" => 1,
+		);
+		$actuals = array();
+		$fileName = "fileName";
+		$mockHelper = $this->getMockBuilder('\Utils\Helper')
+			->setMethods(array("htmlentities"))
+			->getMock();
+		$mockHelper->expects($this->never())->method("htmlentities");
+		\Utils\Helper::setDefaultHelper($mockHelper);
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->createDir($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		\Utils\Helper::setDefaultHelper(NULL);
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::createDir
+	 */
+	public function testCreateDir_succeeds_depth2() {
+		$expecteds = array(
+			"function_return" => NULL,
+			"dir_exists" => '1',
+		);
+		$actuals = array();
+		$fileName = "dir/fileName";
+		$mockHelper = $this->getMockBuilder('\Utils\Helper')
+			->setMethods(array("htmlentities"))
+			->getMock();
+		$mockHelper->expects($this->never())->method("htmlentities");
+		\Utils\Helper::setDefaultHelper($mockHelper);
+		system("mkdir {$this->projectHome}/dir");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->createDir($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		\Utils\Helper::setDefaultHelper(NULL);
+		$this->assertEquals($expecteds, $actuals);
+	}
+
+	/**
+	 * @covers MacOperatingSystem::removeDirIfExists
+	 */
+	public function testRemoveDirIfExists_invalidFileName() {
+		$expecteds = array(
+			"function_return" => false,
+			"dir_exists" => 0,
+		);
+		$fileName = "fileName";
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(false));
+		
+		$actuals['function_return'] = $this->object->removeDirIfExists($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::removeDirIfExists
+	 */
+	public function testRemoveDirIfExists_fileDoesNotExist() {
+		$expecteds = array(
+			"function_return" => false,
+			"dir_exists" => 0,
+		);
+		$fileName = "fileName";
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->removeDirIfExists($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::removeDirIfExists
+	 */
+	public function testRemoveDirIfExists_succeedsDepth1() {
+		$expecteds = array(
+			"function_return" => true,
+			"dir_exists" => 0,
+		);
+		$actuals = array();
+		$fileName = "fileName";
+		system("mkdir {$this->projectHome}/{$fileName}");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->removeDirIfExists($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::removeDirIfExists
+	 */
+	public function testRemoveDirIfExists_succeedsDepth2() {
+		$expecteds = array(
+			"function_return" => true,
+			"dir_exists" => 0,
+		);
+		$actuals = array();
+		$fileName = "dir/fileName";
+		system("mkdir {$this->projectHome}/dir/; mkdir {$this->projectHome}/{$fileName}");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->removeDirIfExists($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers MacOperatingSystem::removeDirIfExists
+	 */
+	public function testRemoveDirIfExists_succeedsNotEmpty() {
+		$expecteds = array(
+			"function_return" => true,
+			"dir_exists" => 0,
+		);
+		$actuals = array();
+		$fileName = "dir/fileName";
+		system("mkdir {$this->projectHome}/dir/; mkdir {$this->projectHome}/{$fileName}; touch {$this->projectHome}/{$fileName}/file");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("isValidDirName"))
+			->getMock();
+		$this->object->expects($this->once())->method("isValidDirName")->will($this->returnValue(true));
+		
+		$actuals['function_return'] = $this->object->removeDirIfExists($fileName);
+
+		exec("if [ -a '{$this->projectHome}/{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
+		$actuals['dir_exists'] = $output[0];
+		$this->assertEquals($expecteds, $actuals);
+	}
+
+	/**
+	 * @covers MacOperatingSystem::getDirContents
+	 */
+	public function testGetDirContents_dirDoesNotExist() {
+		$expected = new OperatingSystemException("Unable to get dir contents");
+		$expected->setConsoleOutput("'find' failed with error code: 1");
+		$actual = NULL;
+		$dirName = "dir";
+		try {
+
+			$this->object->getDirContents($dirName);
+
+		}
+		catch (OperatingSystemException $ex) {
 			$actual = $ex;
 		}
 		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @covers MacOperatingSystem::createDir
-	 */
-	public function testRemoveDirIfExists_nested_validNamePathDoesExist() {
-		$expected = "p1";
-		$existentPath = "u1/p1";
-		system("mkdir {$this->projectHome}u1");
-
-		$this->object->createDir($existentPath);
-
-		ob_start();
-		system("ls {$this->projectHome}u1/");
-		$actual = trim(ob_get_clean());
-		$this->assertEquals($expected, $actual);
-	}
-
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_unNested_invalidName() {
-		$expected = false;
-
-		$actual = $this->object->removeDirIfExists("notAValidFileName");
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_unNested_validNameButDoesNotExist() {
-		$expected = false;
-		$dirName = "u1";
-
-		$actual = $this->object->removeDirIfExists($dirName);
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_unNested_validNameAlreadyExists() {
-		$expecteds = array(
-			'function_return' => true,
-			'dir_in_output' => false,
-		);
-		$actuals = array();
-		$dirName = "u1";
-		system("mkdir {$this->projectHome}{$dirName}");
-		
-		$actuals['function_return'] = $this->object->removeDirIfExists($dirName);
-
-		ob_start();
-		system("ls -R {$this->projectHome}");
-		$actuals['dir_in_output'] = (ob_get_clean() != "");
-		$this->assertEquals($expecteds, $actuals);
-	}
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_nested_invalidName() {
-		$expected = false;
-		$invalidName = "u1/p1/r 1";
-
-		$actual = $this->object->removeDirIfExists($invalidName);
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_nested_validNamePathDoesNotExist() {
-		$expected = false;
-		$nonExistentPath = "u1/p1";
-
-		$actual = $this->object->removeDirIfExists($nonExistentPath);
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers MacOperatingSystem::removeDirIfExists
-	 */
-	public function testRemoveDirIfExists_unNested_validNamePathDoesExist() {
-		$expecteds = array(
-			'function_return' => true,
-			'dir_in_output' => false,
-		);
-		$actuals = array();
-		$existentPath = "u1/p1";
-		system("mkdir {$this->projectHome}u1; mkdir {$this->projectHome}u1/p1");
-
-		$actuals['function_return'] = $this->object->removeDirIfExists($existentPath);
-
-		ob_start();
-		system("ls {$this->projectHome}/u1/");
-		$actuals['dir_in_output'] = (ob_get_clean() != "");
-		$this->assertEquals($expecteds, $actuals);
-	}
-
-	/**
 	 * @covers MacOperatingSystem::getDirContents
 	 */
-	public function testGetDirContents_emptyDir_inHome() {
-		$expecteds = array();
-		$emptyDir = "u1";
-		system("mkdir {$this->projectHome}{$emptyDir}");
+	public function testGetDirContents_dirIsEmpty() {
+		$expected = array();
+		$dirName = "dir";
+		system("mkdir {$this->projectHome}/{$dirName}");
 
-		$actuals = $this->object->getDirContents($emptyDir, $prependHome = true);
+		$actual = $this->object->getDirContents($dirName);
 
-		$this->assertSame($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::getDirContents
 	 */
-	public function testGetDirContents_oneLevelDir_inHome() {
-		$expecteds = array ("p1", "p2", "p3");
-		$oneLevelDir = "u1";
-		$files = $expecteds;
-		$commandString = "mkdir {$this->projectHome}{$oneLevelDir};";
-		foreach ($files as $file) {
-			$commandString .= "touch {$this->projectHome}{$oneLevelDir}/{$file};";
+	public function testGetDirContents_dirDepth1_onlyFiles() {
+		$expected = array("file1", "file2");
+		$dirName = "dir";
+		$setUpCode = "mkdir {$this->projectHome}/{$dirName};";
+		foreach ($expected as $fileName) {
+			$setUpCode .= "touch {$this->projectHome}/{$dirName}/{$fileName};";
 		}
-		system($commandString);
+		system($setUpCode);
 
-		$actuals = $this->object->getDirContents($oneLevelDir, $prependHome = true);
+		$actual = $this->object->getDirContents($dirName);
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::getDirContents
 	 */
-	public function testGetDirContents_twoLevelDir_inHome() {
-		$expecteds = array();
-		$twoLevelDir = "u1";
-		$files = array ("p1" => "r1", "p2" => "r2", "p3" => "r3");
-		$commandString = "mkdir {$this->projectHome}{$twoLevelDir};";
-		foreach ($files as $dir => $file) {
-			$commandString .= "mkdir {$this->projectHome}{$twoLevelDir}/{$dir}; touch {$this->projectHome}{$twoLevelDir}/{$dir}/{$file};";
-			$expecteds[] = $dir . "/" . $file;
+	public function testGetDirContents_dirDepth1_onlyEmptyDirs() {
+		$expected = array("file1", "file2");
+		$dirName = "dir";
+		$setUpCode = "mkdir {$this->projectHome}/{$dirName};";
+		foreach ($expected as $fileName) {
+			$setUpCode .= "mkdir {$this->projectHome}/{$dirName}/{$fileName};";
 		}
-		system($commandString);
+		system($setUpCode);
 
-		$actuals = $this->object->getDirContents($twoLevelDir, $prependHome = true);
+		$actual = $this->object->getDirContents($dirName);
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::getDirContents
 	 */
-	public function testGetDirContents_hiddenFiles_inHome() {
-		$expecteds = array("u1", "u2");
-		$files = array("u1", "u2", ".u3");
-		$commandString = "cd {$this->projectHome};";
-		foreach ($files as $file) {
-			$commandString .= "touch {$file};";
+	public function testGetDirContents_dirDepth2_onlyFullDirsOnLevel1() {
+		$expected = array("dir1/file1", "dir2/file2");
+		$levelOneDirs = array("dir1", "dir2");
+		$dirName = "dir";
+		$setUpCode = "mkdir {$this->projectHome}/{$dirName};";
+		foreach ($levelOneDirs as $levelOneDirName) {
+			$setUpCode .= "mkdir {$this->projectHome}/{$dirName}/{$levelOneDirName};";
 		}
-		system($commandString);
+		foreach ($expected as $fileName) {
+			$setUpCode .= "touch {$this->projectHome}/{$dirName}/{$fileName};";
+		}
+		system($setUpCode);
 
-		$actuals = $this->object->getDirContents("", $prependHome = true);
+		$actual = $this->object->getDirContents($dirName);
 
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers MacOperatingSystem::getDirContents
 	 */
-	public function testGetDirContents_nonEmpty_outOfHome() {
-		$expecteds = array("u1", "u2", "u3");
-		$outOfHomeDir = "/tmp/phpunit_dir";
-		$files = $expecteds;
-		$commandString = "mkdir {$outOfHomeDir};";
-		foreach ($files as $file) {
-			$commandString .= "touch {$outOfHomeDir}/{$file};";
+	public function testGetDirContents_dirDepth2_mixedDirsOnLevel1() {
+		$expected = array("dir1/file1", "dir2");
+		$levelOneDirs = array("dir1", "dir2");
+		$dirName = "dir";
+		$setUpCode = "mkdir {$this->projectHome}/{$dirName};";
+		foreach ($levelOneDirs as $levelOneDirName) {
+			$setUpCode .= "mkdir {$this->projectHome}/{$dirName}/{$levelOneDirName};";
 		}
-		system($commandString);
+		foreach ($expected as $fileName) {
+			$setUpCode .= "touch {$this->projectHome}/{$dirName}/{$fileName};";
+		}
+		system($setUpCode);
 
-		$actuals = $this->object->getDirContents($outOfHomeDir, $prependHome = false);
+		$actual = $this->object->getDirContents($dirName);
 
-		system("rm -r {$outOfHomeDir}");
-		$this->assertEquals($expecteds, $actuals);
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers MacOperatingSystem::getDirContents
+	 */
+	public function testGetDirContents_dirDepth3() {
+		$expected = array("dir1/dir1a/file1a", "dir1/file1", "dir2/file2");
+		$levelOneDirs = array("dir1", "dir1/dir1a", "dir2");
+		$dirName = "dir";
+		$setUpCode = "mkdir {$this->projectHome}/{$dirName};";
+		foreach ($levelOneDirs as $levelOneDirName) {
+			$setUpCode .= "mkdir {$this->projectHome}/{$dirName}/{$levelOneDirName};";
+		}
+		foreach ($expected as $fileName) {
+			$setUpCode .= "touch {$this->projectHome}/{$dirName}/{$fileName};";
+		}
+		system($setUpCode);
+
+		$actual = $this->object->getDirContents($dirName);
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**

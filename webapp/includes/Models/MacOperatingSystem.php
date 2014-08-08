@@ -8,22 +8,47 @@ class MacOperatingSystem implements OperatingSystemI {
 	public function getHome() {
 		return $this->home;
 	}
-	public function createDir($name) {
-		$helper = \Utils\Helper::getHelper();
-		$nameParts = explode("/", $name);
+
+	public function isValidDirName($name) {
+		$matchesRegex = preg_match('/^[a-z0-9_]+$/', $name);
+		return $matchesRegex == 1;
+	}
+
+	public function isValidFileName($name) {
+		$nameParts = $this->getFileParts($name);
 		foreach ($nameParts as $namePart) {
-			if (!$namePart) {
-				continue;
+			if ($matchesRegex != preg_match('/^[a-z0-9_]+(\.[a-z]+)?$/', $name)) {
+				return false;
 			}
-			if (!$this->isValidFileName($namePart)) {
-				$exception = new OperatingSystemException("Unable to create directory");
-				$exception->setConsoleOutput("Invalid file name: " . $helper->htmlentities($name));
-				throw $exception;
-			}
+		}
+		return true;
+	}
+
+	public function getFileParts($name) {
+		$name = preg_replace('/\/+/', '/', $name);
+		$name = trim($name, '/');
+		return explode('/', $name);
+	}
+
+	public function concatFileNames($name1, $name2) {
+		$name1 = preg_replace('/\/+/', '/', $name1);
+		$name1 = rtrim($name1, '/');
+		$name2 = preg_replace('/\/+/', '/', $name2);
+		$name2 = ltrim($name2, '/');
+		return $name1 . '/' . $name2;
+	}
+
+	public function createDir($name) {
+		if (!$this->isValidDirName($name)) {
+			$exception = new OperatingSystemException("Unable to create directory");
+			$helper = \Utils\Helper::getHelper();
+			$exception->setConsoleOutput("Invalid file name: " . $helper->htmlentities($name));
+			throw $exception;
 		}
 
 		$returnCode = 0;
-		system("mkdir " . $this->home . "/" . $name, $returnCode);
+		$dirName = $this->concatFileNames($this->home, $name);
+		system("mkdir {$dirName}", $returnCode);
 
 		if ($returnCode) {
 			$ex = new OperatingSystemException("Unable to create directory");
@@ -32,19 +57,14 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 	}
 	public function removeDirIfExists($name) {
-		$nameParts = explode("/", $name);
-		foreach ($nameParts as $namePart) {
-			if (!$namePart) {
-				continue;
-			}
-			if (!$this->isValidFileName($namePart)) {
-				return false;
-			}
+		if (!$this->isValidDirName($name)) {
+			return false;
 		}
 
 		$returnCode = 0;
 		ob_start();
-		system("rmdir " . $this->home . "/" . $name, $returnCode);
+		$dirName = $this->concatFileNames($this->home, $name);
+		system("rm -r {$dirName}", $returnCode);
 		ob_end_clean();
 		if ($returnCode != 0) {
 			return false;
@@ -53,66 +73,36 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 
 	public function getDirContents($name, $prependHome = true) {
+		if ($prependHome) {
+			$name = $this->concatFileNames($this->home, $name);
+		}
+		$name = rtrim($name, "/");
+		$code = "find " . escapeshellarg($name) . " -type f;
+			find " . escapeshellarg($name) . " -type d -empty";
+
 		$result = 0;
 		ob_start();
-		if ($prependHome) {
-			$code = "ls " . escapeshellarg($this->home . "/" . $name);
-		}
-		else {
-			$code = "ls " . escapeshellarg($name);
-		}
 		system($code, $result);
-
 		if ($result) {
 			ob_end_clean();
-			throw new OperatingSystemException("ls failed.  See error log");
+			$ex = new OperatingSystemException("Unable to get dir contents");
+			$ex->setConsoleOutput("'find' failed with error code: {$result}");
+			throw $ex;
 		}
 
-		$immediateOutput = ob_get_clean();
-		if (!$immediateOutput) {
-			return array();
-		}
-		$immediateOutput = explode("\n", trim($immediateOutput));
+		$rawOutput = explode("\n", trim(ob_get_clean()));
+		sort($rawOutput);
 		$output = array();
-
-		foreach ($immediateOutput as $currentFileName) {
-			ob_start();
-			if ($prependHome) {
-				$potentialDirectory = escapeshellarg($this->home . $name . "/" . $currentFileName);
-			}
-			else {
-				$potentialDirectory = escapeshellarg($name . "/" . $currentFileName);
-			}
-			system("if [ -d {$potentialDirectory} ]; then printf '1'; else printf '0'; fi;");
-			$isDir = ob_get_clean();
-			if ($isDir) {
-				$childOutput = $this->getDirContents($name . "/" . $currentFileName, $prependHome);
-				if (!empty($childOutput)) {
-					foreach ($childOutput as $file) {
-						$output[] = $currentFileName . "/" . $file;					
-					}
-				}
-			}
-			else {
-				$output[] = $currentFileName;
+		// plus one is for preceding '/' that was removed from $name
+		$subStrStart = strlen($name) + 1;
+		foreach($rawOutput as $file) {
+			// Ignore directory name itself
+			if (strlen($file) > $subStrStart) {
+				$output[] = substr($file, $subStrStart);
 			}
 		}
-
 		return $output;
 	}
-
-	public function isValidFileName($name) {
-		$whitelist = array("uploads");
-		if (in_array($name, $whitelist)) {
-			return true;
-		}
-		$matchesRegex = preg_match("/^[A-z]\\d+$/", $name);
-		if ($matchesRegex === false) {
-			throw new \Exception("unable to check file name");
-		}
-		return $matchesRegex;
-	}
-
 
 	public function uploadFile(ProjectI $project, $givenName, $tmpName) {
 			$targetName = $this->home . $project->getProjectDir() . "/uploads/" . $givenName;
