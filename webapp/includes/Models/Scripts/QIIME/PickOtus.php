@@ -41,7 +41,7 @@ class PickOtus extends DefaultScript {
 			array("furthest", "nearest", "average"));
 		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mothur");
 
-		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", TextArgumentParameter::PATTERN_DIGIT); // TODO units = Mbyte
+		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", TextArgumentParameter::PATTERN_DIGIT);
 		$maxCdhitMemory->excludeButAllowIf($otuPickingMethod, "cdhit");
 
 		$trieReverseSeqs = new TrueFalseParameter("--trie_reverse_seqs");
@@ -79,7 +79,7 @@ class PickOtus extends DefaultScript {
 		$similarity->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 		$similarity->excludeButAllowIf($otuPickingMethod, "uclust");
 		$similarity->excludeButAllowIf($otuPickingMethod, "uclust_ref");
-		$wordLength = new TextArgumentParameter("--word_length", "12", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
+		$wordLength = new TextArgumentParameter("--word_length", "12", TextArgumentParameter::PATTERN_DIGIT);
 		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust");
 		$wordLength->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch");
@@ -93,17 +93,17 @@ class PickOtus extends DefaultScript {
 		$suppressPresortByAbundanceUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$optimalUclust = new TrueFalseParameter("--optimal_uclust");
 		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust");
-		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$exactUclust = new TrueFalseParameter("--exact_uclust");
 		$exactUclust->excludeButAllowIf($otuPickingMethod, "uclust");
-		$exactUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$exactUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$userSort = new TrueFalseParameter("--user_sort");
 		$userSort->excludeButAllowIf($otuPickingMethod, "uclust");
-		$userSort->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
+		$userSort->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$stepwords = new TextArgumentParameter("--stepwords", "20", TextArgumentParameter::PATTERN_DIGIT);
 		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust");
 		$stepwords->excludeButAllowIf($otuPickingMethod, "uclust_ref");
-		$uclustOtuIdPrefix = new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", TextArgumentParameter::PATTERN_NO_WHITE_SPACE); // TODO no whitespace
+		$uclustOtuIdPrefix = new TextArgumentParameter("--uclust_otu_id_prefix", "denovo", TextArgumentParameter::PATTERN_NO_WHITE_SPACE);
 		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust");
 		$uclustOtuIdPrefix->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$suppressUclustStableSort = new TrueFalseParameter("--suppress_uclust_stable_sort");
@@ -116,18 +116,18 @@ class PickOtus extends DefaultScript {
 		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust");
 		$saveUcFiles->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 
-		$maxAccepts = new TextArgumentParameter("--max_accepts", "20", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
+		$maxAccepts = new TextArgumentParameter("--max_accepts", "20", TextArgumentParameter::PATTERN_DIGIT);
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$maxAccepts->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		$maxRejects = new TextArgumentParameter("--max_rejects", "500", TextArgumentParameter::PATTERN_DIGIT); // TODO dynamic default
+		$maxRejects = new TextArgumentParameter("--max_rejects", "500", TextArgumentParameter::PATTERN_DIGIT);
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust");
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
-		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); // TODO forces usearch61_sort_method = long
+		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); 
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -172,19 +172,16 @@ class PickOtus extends DefaultScript {
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$percIdBlast->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		//new TrueFalseInvertedParameter("--de_novo_chimera_detection"), // TODO deprecated
 		$suppressDeNovoChimeraDetection = new TrueFalseParameter("--suppress_de_novo_chimera_detection");
 		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch");
 		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$suppressDeNovoChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		//new TrueFalseInvertedParameter("--reference_chimera_detection"), // TODO deprecated
 		$suppressReferenceChimeraDetection = new TrueFalseParameter("--suppress_reference_chimera_detection");
 		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch");
 		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61");
 		$suppressReferenceChimeraDetection->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
-		//new TrueFalseInvertedParameter("--cluster_size_filtering"), // TODO deprecated
 		$suppressClusterSizeFiltering = new TrueFalseParameter("--suppress_cluster_size_filtering");
 		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch");
 		$suppressClusterSizeFiltering->excludeButAllowIf($otuPickingMethod, "usearch_ref");
@@ -271,7 +268,7 @@ class PickOtus extends DefaultScript {
 
 			new Label("Ouput options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) // TODO dynamic default
+			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) 
 		);
 		return $parameters;
 	}

@@ -30,7 +30,6 @@ class AlignSeqs extends DefaultScript {
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
 			array("pynast", "infernal", "clustalw", "muscle", "mafft"));
 		$blastDb = new OldFileParameter("--blast_db", $this->project);
-			// TODO [default: created on-the-fly from template_alignment
 		$pairwiseAlignmentMethod = new ChoiceParameter("--pairwise_alignment_method", "uclust",
 			array("muscle", "pair_hmm", "clustal", "blast", "uclust", "mafft"));
 		$minPercentId = new TextArgumentParameter("--min_percent_id", "0.75", TextArgumentParameter::PATTERN_PROPORTION);
@@ -48,8 +47,7 @@ class AlignSeqs extends DefaultScript {
 
 			new Label("Optional Parameters"),
 			new OldFileParameter("--template_fp", $this->project, '/macqiime/greengenes/core_set_aligned.fasta.imputed'),
-			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_PROPORTION),
-			// TODO [default: 75% of the median input sequence length] (is the pattern correct?)
+			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_DIGIT),
 			$alignmentMethod,
 			$pairwiseAlignmentMethod,
 			$blastDb,
@@ -58,7 +56,7 @@ class AlignSeqs extends DefaultScript {
 
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "_aligned", $isDir = true) // TODO dynamic default
+			new NewFileParameter("--output_dir", "_aligned", $isDir = true)
 		);
 
 		return $parameters;

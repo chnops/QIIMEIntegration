@@ -41,7 +41,7 @@ class MakePhylogeny extends DefaultScript {
 
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--result_fp", "_.tre"), // TODO dynamic default
+			new NewFileParameter("--result_fp", "_.tre"),
 			new NewFileParameter("--log_fp", "")
 		);
 		return $parameters;

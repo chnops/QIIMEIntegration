@@ -63,8 +63,8 @@ class SplitLibraries extends DefaultScript {
 			$eitherBarcode,
 
 			new Label("Optional Parameters - Demultiplexing"),
-			new TextArgumentParameter("--added_demultiplex_field", "", "/^[^=]+$/"), // TODO or run_header
-			new TrueFalseParameter("--disable_bc_correction"), // TODO Can improve performance
+			new TextArgumentParameter("--added_demultiplex_field", "", "/^[^=]+$/"),
+			new TrueFalseParameter("--disable_bc_correction"),
 			new TextArgumentParameter("--max-barcode-errors", "1.5", TextArgumentParameter::PATTERN_NUMBER),
 			new TrueFalseParameter("--disable_primers"),
 			new TextArgumentParameter("--max-primer-mismatch", "0", TextArgumentParameter::PATTERN_DIGIT),

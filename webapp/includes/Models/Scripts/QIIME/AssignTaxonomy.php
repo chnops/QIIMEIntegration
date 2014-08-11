@@ -35,11 +35,11 @@ class AssignTaxonomy extends DefaultScript {
 		$read2SeqsFp = new OldFileParameter("--read_2_seqs_fp", $this->project);
 		$singleOk = new TrueFalseParameter("--single_ok");
 		$noSingleOkGeneric = new TrueFalseParameter("--no_single_ok_generic");
-		$readIdRegex = new TextArgumentParameter("--read_id_regex", "\\S+\\s+(\\S+)", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
-		$ampliconIdRegex = new TextArgumentParameter("--amplicon_id_regex", "(\\S+)\\s+(\\S+?)\\/", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
-		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", TextArgumentParameter::PATTERN_ANYTHING_GOES); // TODO really complex regex
+		$readIdRegex = new TextArgumentParameter("--read_id_regex", "\\S+\\s+(\\S+)", TextArgumentParameter::PATTERN_ANYTHING_GOES);
+		$ampliconIdRegex = new TextArgumentParameter("--amplicon_id_regex", "(\\S+)\\s+(\\S+?)\\/", TextArgumentParameter::PATTERN_ANYTHING_GOES);
+		$headerIdRegex = new TextArgumentParameter("--header_id_regex", "\S+\s+(\S+?)\/", TextArgumentParameter::PATTERN_ANYTHING_GOES); 
 		$confidence = new TextArgumentParameter("--confidence", "0.8", TextArgumentParameter::PATTERN_PROPORTION);
-		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", TextArgumentParameter::PATTERN_DIGIT); // TODO units = MB
+		$rdpMaxMemory = new TextArgumentParameter("--rdp_max_memory", "4000", TextArgumentParameter::PATTERN_DIGIT);
 		$uclustMinConsensusFraction = new TextArgumentParameter("--uclust_min_consensus_fraction", "0.51", TextArgumentParameter::PATTERN_PROPORTION);
 		$uclustSimilarity = new TextArgumentParameter("--uclust_similarity", "0.9", TextArgumentParameter::PATTERN_PROPORTION);
 		$uclustMaxAccepts = new TextArgumentParameter("--uclust_max_accepts", "3", TextArgumentParameter::PATTERN_DIGIT); 
@@ -94,11 +94,10 @@ class AssignTaxonomy extends DefaultScript {
 			$treeFp,
 			new TextArgumentParameter("--e_value", "0.001", TextArgumentParameter::PATTERN_NUMBER),
 			new OldFileParameter("--training_data_properties_fp", $this->project),
-				// TODO This option is overridden by the -t and -r options.
 
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", "_assigned_taxonomy", $isDir = true) // TODO dynamic default
+			new NewFileParameter("--output_dir", "_assigned_taxonomy", $isDir = true)
 			);
 		return $parameters;
 	}

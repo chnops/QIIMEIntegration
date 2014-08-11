@@ -27,7 +27,7 @@ class MakeOtuTable extends DefaultScript {
 		$parameters = parent::getInitialParameters();
 
 		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
-		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom"); // TODO dynamic default
+		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom");
 
 		$otuMapFile->requireIf();
 		$outputBiomFp->requireIf();

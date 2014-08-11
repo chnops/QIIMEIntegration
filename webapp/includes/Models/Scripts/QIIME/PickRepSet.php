@@ -47,7 +47,7 @@ class PickRepSet extends DefaultScript {
 			new Label("Output options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--log_fp", ""), 
-			new NewFileParameter("--result_fp", "_rep_set.fasta"), // TODO dynamic default 
+			new NewFileParameter("--result_fp", "_rep_set.fasta"),
 			new ChoiceParameter("--sort_by", "otu", array("otu", "seq_id"))
 		);
 		return $parameters;

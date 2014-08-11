@@ -36,8 +36,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Error checking user ({$username}) existance: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return FALSE;
 		}
 	}
@@ -62,8 +60,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to create user ({$username}): " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -77,8 +73,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get user root ({$username}): " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return "";
 		}
 	}
@@ -93,8 +87,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get all projects: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return array();
 		}
 	}
@@ -132,8 +124,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to create project: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -153,7 +143,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to find project name: " . $ex->getMessage());
-			// TODO error handling
 			return false;
 		}
 	}
@@ -178,8 +167,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to create uploaded file: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -196,8 +183,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get uploaded files: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 		}
 		return $files;
 	
@@ -212,8 +197,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to delete file: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -233,8 +216,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to create run: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -250,8 +231,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to give run pid: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
@@ -276,8 +255,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to get all runs: " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return array();
 		}
 	}
@@ -330,8 +307,6 @@ class PDODatabase implements DatabaseI {
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to : " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
 			return false;
 		}
 	}
