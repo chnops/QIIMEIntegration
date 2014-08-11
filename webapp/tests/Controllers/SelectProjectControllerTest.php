@@ -393,6 +393,46 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Controllers\SelectProjectController::createProject
 	 */
+	public function testCreateProject_invalidName() {
+		$expecteds = array(
+			"is_result_error" => true,
+			"result" => "A project name can only contain lower case letters, digits, and underscores.",
+			"projects" => array(),
+			"project" => NULL,
+			"session" => array(),
+		);
+		$actuals = array();
+		$projectName = "projectName";
+		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
+			->disableOriginalConstructor()
+			->setMethods(array("beginProject"))
+			->getMockForAbstractClass();
+		$mockWorkflow = $this->getMockBuilder('\Models\QIIMEWorkflow')
+			->disableOriginalConstructor()
+			->setMethods(array("getNewProject"))
+			->getMock();
+		$mockProject->setName($projectName);
+		$mockProject->expects($this->never())->method("beginProject");
+		$mockWorkflow->expects($this->never())->method("getNewProject");
+		$this->object = $this->getMockBuilder('\Controllers\SelectProjectController')
+			->setConstructorArgs(array($mockWorkflow))
+			->setMethods(array("isProjectNameValid"))
+			->getMock();
+		$this->object->expects($this->once())->method("isProjectNameValid")->will($this->returnValue(false));
+
+		$this->object->createProject($projectName);
+
+		$actuals['is_result_error'] = $this->object->isResultError();
+		$actuals['result'] = $this->object->getResult();
+		$actuals['projects'] = $this->object->getProjects();
+		$actuals['project'] = $this->object->getProject();
+		$actuals['result'] = $this->object->getResult();
+		$actuals['session'] = $_SESSION;
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers \Controllers\SelectProjectController::createProject
+	 */
 	public function testCreateProject_beginProjectFails() {
 		$expecteds = array(
 			"is_result_error" => true,
@@ -414,7 +454,11 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->setName($projectName);
 		$mockProject->expects($this->once())->method("beginProject")->will($this->throwException(new \Exception()));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
-		$this->object = new SelectProjectController($mockWorkflow);
+		$this->object = $this->getMockBuilder('\Controllers\SelectProjectController')
+			->setConstructorArgs(array($mockWorkflow))
+			->setMethods(array("isProjectNameValid"))
+			->getMock();
+		$this->object->expects($this->once())->method("isProjectNameValid")->will($this->returnValue(true));
 
 		$this->object->createProject($projectName);
 
@@ -451,7 +495,11 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->setName($expectedProjectName);
 		$mockProject->expects($this->once())->method("beginProject");
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
-		$this->object = new SelectProjectController($mockWorkflow);
+		$this->object = $this->getMockBuilder('\Controllers\SelectProjectController')
+			->setConstructorArgs(array($mockWorkflow))
+			->setMethods(array("isProjectNameValid"))
+			->getMock();
+		$this->object->expects($this->once())->method("isProjectNameValid")->will($this->returnValue(true));
 
 		$this->object->createProject($expectedProjectName);
 
@@ -491,7 +539,11 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 		$mockHelper->expects($this->once())->method("htmlentities")->will($this->returnValue(""));
 		$mockWorkflow->expects($this->once())->method("getNewProject")->will($this->returnValue($mockProject));
 		\Utils\Helper::setDefaultHelper($mockHelper);
-		$this->object = new SelectProjectController($mockWorkflow);
+		$this->object = $this->getMockBuilder('\Controllers\SelectProjectController')
+			->setConstructorArgs(array($mockWorkflow))
+			->setMethods(array("isProjectNameValid"))
+			->getMock();
+		$this->object->expects($this->once())->method("isProjectNameValid")->will($this->returnValue(true));
 
 		$this->object->createProject($projectName);
 
@@ -503,6 +555,78 @@ class SelectProjectControllerTest extends \PHPUnit_Framework_TestCase {
 		$actuals['session'] = $_SESSION;
 		$this->assertEquals($expecteds, $actuals);
 	}
+
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_invalid_empty() {
+		$expected = false;
+
+		$actual = $this->object->isProjectNameValid("");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_invalid_uppercase() {
+		$expected = false;
+
+		$actual = $this->object->isProjectNameValid("invAlid");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_invalid_hyphen() {
+		$expected = false;
+
+		$actual = $this->object->isProjectNameValid("invalid-project-name");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_valid_allLetters() {
+		$expected = true;
+
+		$actual = $this->object->isProjectNameValid("projectname");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_valid_allDigits() {
+		$expected = true;
+
+		$actual = $this->object->isProjectNameValid("123");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_valid_allUnderscore() {
+		$expected = true;
+
+		$actual = $this->object->isProjectNameValid("_");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverss \Controllers\SelectProjectController::isProjectNameValid
+	 */
+	public function testIsProjectNameValid_valid_combination() {
+		$expected = true;
+
+		$actual = $this->object->isProjectNameValid("_valid_project_name_1_");
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	/**
 	 * @covers \Controllers\SelectProjectController::selectProject
 	 */

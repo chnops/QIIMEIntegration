@@ -32,5 +32,4 @@ Outstanding issues:
 ------------------
 * De-noise step of QIIME not implemented
 * env.txt in run results displays server information
-* Dangerous inputs are allowed
 * We should convert this into a training utility: <ul><li>remove the database and operating system</li><li>leave the scripts and parameters</li><li>change Project's "runScript" function to print the code to screen so users can cut and paste it</li></ul>

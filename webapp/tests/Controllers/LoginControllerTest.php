@@ -251,7 +251,35 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Controllers\LoginController::createUser
 	 */
-	public function testCreateUser_createUserFails() {
+	public function testCreateUser_invalidInput() {
+		$expecteds = array(
+			"is_result_error" => true,
+			"result" => "A username can only contain lower case letters, digits, and underscores.",
+		);
+		$actuals = array();
+		$mockRoster = $this->getMockBuilder('\Utils\Roster')
+			->disableOriginalConstructor()
+			->setMethods(array("createUser"))
+			->getMock();
+		$mockRoster->expects($this->never())->method("createUser");
+		\Utils\Roster::setDefaultRoster($mockRoster);
+		$this->object = $this->getMockBuilder('\Controllers\LoginController')
+			->setConstructorArgs(array($this->mockWorkflow))
+			->setMethods(array("login", "isUsernameValid"))
+			->getMock();
+		$this->object->expects($this->never())->method("login");
+		$this->object->expects($this->once())->method("isUsernameValid")->will($this->returnValue(false));
+
+		$this->object->createUser("username");
+
+		$actuals['is_result_error'] = $this->object->isResultError();
+		$actuals['result'] = $this->object->getResult();
+		$this->assertEquals($expecteds, $actuals);
+	}
+	/**
+	 * @covers \Controllers\LoginController::createUser
+	 */
+	public function testCreateUser_validInput_createUserFails() {
 		$expecteds = array(
 			"is_result_error" => true,
 			"result" => "We were unable to create a new user.  Please see the error log or contact your system administrator",
@@ -265,9 +293,10 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		\Utils\Roster::setDefaultRoster($mockRoster);
 		$this->object = $this->getMockBuilder('\Controllers\LoginController')
 			->setConstructorArgs(array($this->mockWorkflow))
-			->setMethods(array("login"))
+			->setMethods(array("login", "isUsernameValid"))
 			->getMock();
 		$this->object->expects($this->never())->method("login");
+		$this->object->expects($this->once())->method("isUsernameValid")->will($this->returnValue(true));
 
 		$this->object->createUser("username");
 
@@ -292,15 +321,77 @@ class LoginControllerTest extends \PHPUnit_Framework_TestCase {
 		\Utils\Roster::setDefaultRoster($mockRoster);
 		$this->object = $this->getMockBuilder('\Controllers\LoginController')
 			->setConstructorArgs(array($this->mockWorkflow))
-			->setMethods(array("login"))
+			->setMethods(array("login", "isUsernameValid"))
 			->getMock();
 		$this->object->expects($this->once())->method("login");
+		$this->object->expects($this->once())->method("isUsernameValid")->will($this->returnValue(true));
 
 		$this->object->createUser("username");
 
 		$actuals['is_result_error'] = $this->object->isResultError();
 		$actuals['result'] = $this->object->getResult();
 		$this->assertEquals($expecteds, $actuals);
+	}
+
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_invalid_empty() {
+		$expected = false;
+
+		$actual = $this->object->isUsernameValid("");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_invalid_uppercase() {
+		$expected = false;
+
+		$actual = $this->object->isUsernameValid("inValid_username");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_invalid_hyphen() {
+		$expected = false;
+
+		$actual = $this->object->isUsernameValid("invalid-username");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_valid_justLetters() {
+		$expected = true;
+
+		$actual = $this->object->isUsernameValid("username");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_valid_justNumbers() {
+		$expected = true;
+
+		$actual = $this->object->isUsernameValid("123");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Controllers\LoginController::isUsernameValid
+	 */
+	public function testIsUsernameValid_valid_justUnderscores() {
+		$expected = true;
+
+		$actual = $this->object->isUsernameValid("_");
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**

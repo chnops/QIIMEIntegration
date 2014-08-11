@@ -77,6 +77,11 @@ class SelectProjectController extends Controller {
 		return false;
 	}
 	public function createProject($projectName) {
+		if (!$this->isProjectNameValid($projectName)) {
+			$this->isResultError = true;
+			$this->result = "A project name can only contain lower case letters, digits, and underscores.";
+			return;
+		}
 		$project = $this->workflow->getNewProject();
 		$project->setName($projectName);
 		$project->setOwner($this->username);
@@ -94,6 +99,11 @@ class SelectProjectController extends Controller {
 		$this->result = "Successfully created project: " . $this->helper->htmlentities($projectName);
 		$_SESSION['project_id'] = $project->getId();
 	}
+
+	public function isProjectNameValid($projectName) {
+		return preg_match('/^[a-z0-9_]+$/', $projectName);
+	}
+
 	public function selectProject($projectId) {
 		$project = $this->workflow->findProject($this->username, $projectId);
 		$this->result = "Project selected: " . $this->helper->htmlentities($project->getName());

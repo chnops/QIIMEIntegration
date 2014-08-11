@@ -59,6 +59,11 @@ class LoginController extends Controller {
 		$this->result = "You have successfully logged in.";
 	}
 	public function createUser($username) {
+		if (!$this->isUsernameValid($username)) {
+			$this->isResultError = true;
+			$this->result = "A username can only contain lower case letters, digits, and underscores.";
+			return;
+		}
 		try {
 			$this->roster->createUser($username);
 		}
@@ -70,6 +75,9 @@ class LoginController extends Controller {
 		}
 		$this->result = "You have successfully created a new user.";
 		$this->login($username);
+	}
+	public function isUsernameValid($username) {
+		return preg_match('/^[a-z0-9_]+$/', $username);
 	}
 
 	public function getSubTitle() {
