@@ -1,24 +1,35 @@
-QIIMEIntegration
-================
+QIIMEIntegration webapp
+=======================
 
-I am working on incorporating QIIME into a workspace-specific pipeline. I keep notes and useful scripts here. The purpose of this project, overall, is to make it so that non-computer people run their raw data through the basic steps of the pipeline in a reasonable (short) amount of time without requiring much direction or assisstance.
+Program overview:
+----------------
+QIIME is an open source software package that is useful for microbial ecologists working with next generation sequencing data. This program, QIIMEIntegration, is an interface for QIIME; it makes QIIME easier to learn and use.
+The user can log on and create "projects", upload their raw data files, and then run steps of the QIIME pathway on a remote machine.  All the while this application provides helpful notes and tips about QIIME usage.
+While easy to use, setup of this program is involved, and requires administrative privelages.  Therefore, this program is best used by research group leaders--or their computer savvy friends--who want to provide easy access to group members.
 
-1. Installation
- * I used MacQIIME (http://www.wernerlab.org/software/macqiime) for easy installation. Out of box, everything worked fine. 
- * Because we work with paired-end sequencing data, I included fastq-join as well (http://www.wernerlab.org/software/macqiime/add-fastq-join-to-macqiime-1-8-0/Add_ea-tools_to_MacQIIME-1.8.0.tgz?attredirects=0&d=1)
+Contents of this directory:
+---------------------------
+###files
+* README.md - this file
+* index.php - The main file that runs the whole application when requested on the server
+* download.php - A PHP script that downloads one of the generated or uploaded data files
+* style.css - Most of the CSS styling directives
+* javascript.js - A set of JavaScript functions used on multiple pages of the application
+* parameter_relationships.js - A set of JavaScript functions used on only one page of the application
 
-2. Automatic default run
-As an initial step, I created a script--run_qiime_analysis.sh--that will perform some of QIIMEs fundamental tasks with default parameters
- a. Source QIIME bash environment variables
- b. Check mapping file format
- c. De-multiplex sequences
- d. Trim sequences based on quality
- e. Select OTUs based on sequence similarity
- f. Select representative sequences for each OTU
- g. Optionally perform steps for phylogeny analysis (align sequences, filter alignment, create tree)
- h. Optionally perform taxonomy assignment
- i. Creat OTU table, the starting point for many of the QIIME analyses
-These steps make up the core QIIME functionality we care about for each analysis. Potential custom parameter decisions are marked as TODO items in the script.
+###directories
+* public/ - Contains all files that could be downloaded as-is, with no PHP modifications, such as man pages for all QIIME scripts, version number for all QIIME scripts, and custom help text for all parameters
+* includes/ - Contains most of the PHP code, mostly as PHP class files.  Also contains the README that describes the inner workings of the project
+* tests/ - Contains a suite of unit tests.  Also contains a README that explains test layout
+* data/ - Contains database and its accompanying schema file
+* projects/ - Contains all of the project data files, uploaded or generated.  The layout of this folder is as follows:
+	Each user has a folder: u1/, u2/, u3/...
+	Each project has a folder: u1/p1/, u1/p2/, u2/p1/...
+	Each project folder has an uploads folder: u1/p1/uploads/, u1/p2/uploads/, u2/p1/uploads/...
+	Each time a script is run, a new folder is created: /u1/p1/r1/, u1/p2/r2, /u2/p1/r3/...
 
-3. Web App
-A really convenient way to run this automation would be through the GUI that a web application provides.  Users can look at all the options available to them without having to understand whole manual pages. The web application is written in PHP.  All the code for the webapp is in the webapp/ directory.
+Outstanding issues:
+------------------
+* env.txt in run results displays potentially dangerous server information
+* Convert hard-coding of QIIME scripts/parameters/relationships into text/json config files
+* We should convert this into a training--not a doing it for you--utility
