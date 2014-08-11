@@ -126,7 +126,7 @@ abstract class DefaultProject implements ProjectI {
 		}
 		
 		try {
-			$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = true, $runId = -1);
+			$this->operatingSystem->deleteFile($this, $fileName, $runId = -1);
 			$this->database->executeAllRequests();
 		}
 		catch(OperatingSystemException $ex) {
@@ -143,7 +143,7 @@ abstract class DefaultProject implements ProjectI {
 		}
 
 		try {	
-			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $isUploaded = true, $runId = -1);
+			$newFileNames = $this->operatingSystem->unzipFile($this, $fileName, $runId = -1);
 			foreach ($newFileNames as $newFileName) {
 				if(!$this->database->createUploadedFile($this->owner, $this->id, $newFileName, 'arbitrary_text')) {
 					$this->database->forgetAllRequests();
@@ -158,30 +158,30 @@ abstract class DefaultProject implements ProjectI {
 		}
 	}
 	public function compressUploadedFile($fileName) {
-		$newFileName = $this->operatingSystem->compressFile($this, $fileName, $isUploaded = true, $runId = -1);
+		$newFileName = $this->operatingSystem->compressFile($this, $fileName, $runId = -1);
 		$nameChangeResult = $this->database->changeFileName($this->owner, $this->id, $fileName, $newFileName);
 		if (!$nameChangeResult) {
 			throw new \Exception("Unable to change file name, compression failed.");
 		}
 	}
 	public function decompressUploadedFile($fileName) {
-		$newFileName = $this->operatingSystem->decompressFile($this, $fileName, $isUploaded = true, $runId = -1);
+		$newFileName = $this->operatingSystem->decompressFile($this, $fileName, $runId = -1);
 		$nameChangeResult = $this->database->changeFileName($this->owner, $this->id, $fileName, $newFileName);
 		if (!$nameChangeResult) {
 			throw new \Exception("Unable to change file name, decompression failed.");
 		}
 	}
 	public function deleteGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->deleteFile($this, $fileName, $isUploaded = false, $runId);
+		$this->operatingSystem->deleteFile($this, $fileName, $runId);
 	}
 	public function unzipGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->unzipFile($this, $fileName, $isUploaded = false, $runId);
+		$this->operatingSystem->unzipFile($this, $fileName, $runId);
 	}
 	public function compressGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->compressFile($this, $fileName, $isUploaded = false, $runId);
+		$this->operatingSystem->compressFile($this, $fileName, $runId);
 	}
 	public function decompressGeneratedFile($fileName, $runId) {
-		$this->operatingSystem->decompressFile($this, $fileName, $isUploaded = false, $runId);
+		$this->operatingSystem->decompressFile($this, $fileName, $runId);
 	}
 	public function retrieveAllUploadedFiles() {
 		if (empty($this->uploadedFiles)) {

@@ -10,14 +10,9 @@ class MacOperatingSystem implements OperatingSystemI {
 	}
 
 	public function isValidDirName($name) {
-		$matchesRegex = preg_match('/^[a-z0-9_]+$/', $name);
-		return $matchesRegex == 1;
-	}
-
-	public function isValidFileName($name) {
 		$nameParts = $this->getFileParts($name);
 		foreach ($nameParts as $namePart) {
-			if ($matchesRegex != preg_match('/^[a-z0-9_]+(\.[a-z]+)?$/', $name)) {
+			if (!preg_match('/^[a-z0-9_]+$/', $namePart)) {
 				return false;
 			}
 		}
@@ -131,7 +126,7 @@ class MacOperatingSystem implements OperatingSystemI {
 				then printf 'The requested URL does not exist';
 				exit 1;
 			fi;
-			which -s wget;
+			which wget &>/dev/null;
 			if [ $? != 0 ]; then printf 'wget not found'; exit 1; fi;
 			(wget {$urlEsc} --limit-rate=1M --quiet --output-document={$outputNameEsc};
 				let wget_success=$?;
@@ -147,19 +142,30 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return ob_get_clean();
 	}
-	public function deleteFile(ProjectI $project, $fileName, $isUploaded, $runId) {
-		$dir = $this->home . $project->getProjectDir();
-		if ($isUploaded) {
-			$dir .= "/uploads/";
+
+	public function findFileName(ProjectI $project, $fileName, $runId) {
+		$projectDir = $this->concatFileNames($this->home, $project->getProjectDir());
+		if ($runId == -1) {
+			$dir = "uploads/";
 		}
 		else {
-			$dir .= "/r{$runId}/";
+			$dir = "r{$runId}/";
 		}
+		$dir = $this->concatFileNames($projectDir, $dir);
+
+		return $this->concatFileNames($dir, $fileName);
+	}
+
+	public function getFileExistsCode($fileName) {
+		return "if [ ! -e " . escapeshellarg($fileName) . " ]; then printf 'The requested file does not exist.'; exit 1; fi;";
+	}
+
+	public function deleteFile(ProjectI $project, $fileName, $runId) {
+		$fileName = $this->findFileName($project, $fileName, $runId);
 
 		$fileNameEsc = escapeshellarg($fileName);
-		$code = "cd " . escapeshellarg($dir) . "; if [ $? -ne 0 ]; then printf 'Unable to find project directory'; exit 1; fi;
-			touch {$fileNameEsc};
-			rm {$fileNameEsc};";
+		$code = $this->getFileExistsCode($fileName) .
+			"if [ -d {$fileNameEsc} ]; then rmdir {$fileNameEsc} 2>&1; else rm {$fileNameEsc} 2>&1; fi;";
 
 		$exitStatus = 0;
 		ob_start();
@@ -173,52 +179,37 @@ class MacOperatingSystem implements OperatingSystemI {
 			return ob_get_clean();
 		}
 	}
-	public function unzipFile(ProjectI $project, $fileName, $isUploaded, $runId) {
-		$dir = $this->home . $project->getProjectDir();
-		if ($isUploaded) {
-			$dir .= "/uploads/";
-		}
-		else {
-			$dir .= "/r{$runId}/";
-		}
+	public function unzipFile(ProjectI $project, $fileName, $runId) {
+		$fileNamePathway = $this->findFileName($project, $fileName, $runId);
 
 		ob_start();
 		$returnCode = 0;
 
-		$fileNameEsc = escapeshellarg($fileName);
-		system("cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
-			zipinfo -1 {$fileNameEsc} 2> /dev/null;
+		$fileNameEsc = escapeshellarg($fileNamePathway);
+		$code = $this->getFileExistsCode($fileNamePathway) .
+			//zipinfo prints out file names contained in zip
+			"zipinfo -1 {$fileNameEsc} 2> /dev/null;
 			unzip -qq {$fileNameEsc} &> /dev/null;
 			if [ $? -eq 0 ]; then rm {$fileNameEsc};
-			else echo 'Unable to unzip file'; exit 1; fi;", $returnCode);
+			else echo 'Unable to unzip file'; exit 1; fi;";
+		system($code, $returnCode);
 
 		if ($returnCode) {
 			$ex = new OperatingSystemException("Unable to unzip file");
 			$ex->setConsoleOutput(ob_get_clean());
 			throw $ex;
 		}
-		$allFiles = explode("\n", trim(ob_get_clean()));
-		$nonDirFiles = array();
-		foreach ($allFiles as $file) {
-			if ($file[strlen($file) - 1] != "/") {
-				$nonDirFiles[] = $file;
-			}
-		}
-		return $nonDirFiles;
+		$files = explode("\n", trim(ob_get_clean()));
+		return $files;
 	}
-	public function compressFile(ProjectI $project, $fileName, $isUploaded, $runId) {
-		$dir = $this->home . $project->getProjectDir();
-		if ($isUploaded) {
-			$dir .= "/uploads/";
-		}
-		else {
-			$dir .= "/r{$runId}/";
-		}
+	public function compressFile(ProjectI $project, $fileName, $runId) {
+		$fileNamePath = $this->findFileName($project, $fileName, $runId);
 
 		ob_start();
 		$exitCode = 0;
-		$code = "cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
-			gzip " . escapeshellarg($fileName) . " 2>&1;";
+		$code = $this->getFileExistsCode($fileNamePath) .
+			"output=`echo 'n' | gzip " . escapeshellarg($fileNamePath) . " 2>&1`;" . 
+			"if [ -n \"\$output\" ]; then printf \"\$output\"; exit 1; fi;";
 		system($code, $exitCode);
 
 		if ($exitCode) {
@@ -228,19 +219,14 @@ class MacOperatingSystem implements OperatingSystemI {
 		}
 		return "{$fileName}.gz";
 	}
-	public function decompressFile(ProjectI $project, $fileName, $isUploaded, $runId) {
-		$dir = $this->home . $project->getProjectDir();
-		if ($isUploaded) {
-			$dir .= "/uploads/";
-		}
-		else {
-			$dir .= "/r{$runId}/";
-		}
+	public function decompressFile(ProjectI $project, $fileName, $runId) {
+		$fileNamePath = $this->findFileName($project, $fileName, $runId);
 
 		ob_start();
 		$exitCode = 0;
-		$code = "cd {$dir}; if [ $? -ne 0 ]; then echo 'Unable to find project directory'; exit 1; fi;
-			gunzip " . escapeshellarg($fileName) . " 2>&1;";
+		$code = $this->getFileExistsCode($fileNamePath) .
+			"output=`echo 'n' | gunzip " . escapeshellarg($fileNamePath) . " 2>&1`;" . 
+			"if [ -n \"\$output\" ]; then printf \"\$output\"; exit 1; fi;";
 		system($code, $exitCode);
 
 		if ($exitCode) {
@@ -248,30 +234,28 @@ class MacOperatingSystem implements OperatingSystemI {
 			$ex->setConsoleOutput(ob_get_clean());
 			throw $ex;
 		}
-		return preg_replace("/\.gz/", "", $fileName);
+		return preg_replace("/\.gz$/", "", $fileName);
 	}
 
 	public function runScript(ProjectI $project, $runId, \Models\Scripts\ScriptI $script, \Database\DatabaseI $database) {
 		ob_start();
-		$projectDir = $project->getProjectDir();
-		$runDir = $projectDir . "/r" . $runId;
+		$projectDir = $this->concatFileNames($this->home, $project->getProjectDir());
+		$runDir = $this->concatFileNames($projectDir, "r" . $runId);
 
-		$bashCode = "
-			mkdir {$this->home}/{$runDir};
+		$bashCode = $this->getFileExistsCode($projectDir) .
+			"mkdir {$runDir};
 			if [ $? -ne 0 ]; then printf 'Unable to create run dir'; exit 1; fi;
-			cd {$this->home}/{$runDir};
-			source {$project->getEnvironmentSource()} 2>&1;
+			cd {$runDir};
+			source " . escapeshellarg($project->getEnvironmentSource()) . " 2>&1;
 			printenv > env.txt;
 			{$script->renderVersionCommand()} >> env.txt;
-			if [ $? -ne 0 ]; then printf 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
+			if [ $? -ne 0 ]; then echo 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
 			jobs &> /dev/null;
-			({$script->renderCommand()};cd \$OLDPWD;{$database->renderCommandRunComplete($runId)})  >> output.txt 2>> error_log.txt &
+			({$script->renderCommand()};cd \$OLDPWD;{$database->renderCommandRunComplete($runId)})  > output.txt 2>> error_log.txt &
 			job_id=`jobs -n`;
 			if [ ! -n \$job_id ]; then printf 'Unable to start the script'; exit 1; fi;
-			printf \$!;
-			";
+			printf \$!;";
 
-		$codeReturn = 0;
 		system($bashCode, $codeReturn);
 		if ($codeReturn) {
 			$ex = new OperatingSystemException("There was a problem initializing your script");
