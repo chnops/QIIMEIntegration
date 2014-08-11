@@ -4,10 +4,10 @@ namespace Utils;
 
 class Roster {
 	private static $roster = NULL;
-	public static function setDefaultRoster(Roster $roster) {
+	public static function setDefaultRoster(Roster $roster = NULL) {
 		Roster::$roster = $roster;
 	}
-	public static function getDefaultRoster() {
+	public static function getRoster() {
 		return Roster::$roster;
 	}
 
@@ -27,7 +27,7 @@ class Roster {
 		}
 
 		try {
-			$this->operatingSystem->executeArbitraryCommand("", "","mkdir u" . $userId);
+			$this->operatingSystem->createDir("u" . $userId);
 			$this->database->executeAllRequests();
 			return true;
 		}

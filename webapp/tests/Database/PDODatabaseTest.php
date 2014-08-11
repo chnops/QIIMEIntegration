@@ -3,6 +3,9 @@
 namespace Database;
 
 class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
+	public static function setUpBeforeClass() {
+		error_log("PDODatabaseTest");
+	}
 
 	private $testDSN = "sqlite:./data/database.sqlite";
 	private $pdo;
@@ -90,25 +93,33 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::userExists
 	 */
 	public function testUserExists_userDoesExist() {
-		$this->assertTrue($this->object->userExists($this->goodUser['username']));
+		$expected = true;
+
+		$actual = $this->object->userExists($this->goodUser['username']);
+
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers PDODatabase::userExists
 	 */
 	public function testUserExists_userDoesNotExist() {
-		$this->assertFalse($this->object->userExists($this->newUser['username']));
+		$expected = false;
+
+		$actual = $this->object->userExists($this->newUser['username']);
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
 	 * @covers PDODatabase::createUser
 	 */
 	public function testCreateUser_userDoesNotExist() {
-		$actuals = array();
 		$expecteds = array(
 			"function_return" => $this->newUser['root'],
 			"new_database_row" => $this->newUser,
 			"next_database_row" => false,
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createUser($this->newUser['username']);
 
@@ -122,14 +133,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::createUser
 	 */
 	public function testCreateUser_userDoesExist() {
-		$actuals = array();
-		$expecteds = array(
-			"function_return" => false
-		);
+		$expected = false;
 
-		$actuals['function_return'] = $this->object->createUser($this->goodUser['username']);
+		$actual = $this->object->createUser($this->goodUser['username']);
 
-		$this->assertSame($expecteds, $actuals);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
@@ -157,10 +165,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getAllProjects
 	 */
 	public function testGetAllProjects_userDoesNotExist() {
+		$expected = array();
 
 		$actual = $this->object->getAllProjects($this->newUser['username']);
 
-		$this->assertEmpty($actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers PDODatabase::getAllProjects
@@ -177,11 +186,12 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getAllProjects
 	 */
 	public function testGetAllProjects_userExistsButHasNoProjects() {
+		$expected = array();
 		$this->object->createUser($this->newUser['username']);
 
 		$actuals = $this->object->getAllProjects($this->newUser['username']);
 
-		$this->assertEmpty($actuals);
+		$this->assertEquals($expected, $actuals);
 	}
 
 
@@ -189,20 +199,22 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::createProject
 	 */
 	public function testCreateProject_userDoesNotExist() {
+		$expected = false;
+
 		$actual = $this->object->createProject($this->newUser['username'], $this->newProj['name']);
 
-		$this->assertFalse($actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @covers PDODatabase::createProject
 	 */
 	public function testCreateProject_userDoesExistAndProjectDoesNot() {
-		$actuals = array();
 		$expecteds = array(
 			"function_return" => $this->newProj['id'],
 			"new_database_row" => $this->newProj,
 			"next_database_row" => false,
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createProject($this->newProj['owner'], $this->newProj['name']);
 
@@ -227,11 +239,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getProjectName
 	 */
 	public function testGetProjectName_userDoesNotExist() {
-		$expected = "ERROR";
+		$expected = false;
 	   
 		$actual = $this->object->getProjectName($this->newUser['username'], $this->goodProj['id']);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 	/**
 	 * @covers PDODatabase::getProjectName
@@ -247,26 +259,25 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @covers PDODatabase::getProjectName
 	 */
 	public function testGetProjectName_userDoesExistButProjectDoesNot() {
-		$expected = "ERROR";
+		$expected = false;
 		
 		$actual = $this->object->getProjectName($this->newProj['owner'], $this->newProj['id']);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 	/**
 	 * @coverse PDODatabase::createUploadedFile
 	 */
 	public function testCreateUploadedFile_userDoesNotExist() {
-		$isDownload = false;
-		$actuals = array();
 		$expecteds = array(
 			'function_return' => false,
 			'row_count' => 0,
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createUploadedFile($this->newUser['username'], $this->newFile['project_id'],
-			$this->newFile['name'], $this->newFile['file_type'], $isDownload, $this->newFile['approx_size']);
+			$this->newFile['name'], $this->newFile['file_type'], $isDownload = false, $this->newFile['approx_size']);
 		
 		$pdoStatement = $this->pdo->query("SELECT COUNT(*) FROM uploaded_files WHERE name = \"{$this->newFile['name']}\"");
 		$actuals['row_count'] = $pdoStatement->fetchColumn(0);
@@ -277,15 +288,14 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::createUploadedFile
 	 */
 	public function testCreateUploadedFile_userDoesExistButProjectDoesNot() {
-		$isDownload = false;
-		$actuals = array();
 		$expecteds = array(
 			'function_return' => false,
 			'row_count' => 0,
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createUploadedFile($this->newFile['project_owner'], $this->newProj['id'],
-			$this->newFile['name'], $this->newFile['file_type'], $isDownload, $this->newFile['approx_size']);
+			$this->newFile['name'], $this->newFile['file_type'], $isDownload = false, $this->newFile['approx_size']);
 		
 		$pdoStatement = $this->pdo->query("SELECT COUNT(*) FROM uploaded_files WHERE name = \"{$this->newFile['name']}\"");
 		$actuals['row_count'] = $pdoStatement->fetchColumn(0);
@@ -296,15 +306,14 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::createUploadedFile
 	 */
 	public function testCreateUploadedFile_fileDoesNotExist() {
-		$isDownload = false;
-		$actuals = array();
 		$expecteds = array(
 			'function_return' => true,
 			'database_row' => $this->newFile,
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createUploadedFile($this->newFile['project_owner'], $this->newFile['project_id'],
-			$this->newFile['name'], $this->newFile['file_type'], $isDownload, $this->newFile['approx_size']);
+			$this->newFile['name'], $this->newFile['file_type'], $isDownload = false, $this->newFile['approx_size']);
 		
 		$pdoStatement = $this->pdo->query("SELECT * FROM uploaded_files WHERE name = \"{$this->newFile['name']}\"");
 		$actuals['database_row'] = $pdoStatement->fetch(\PDO::FETCH_ASSOC);
@@ -315,15 +324,14 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::createUploadedFile
 	 */
 	public function testCreateUploadedFile_fileDoesExist() {
-		$isDownload = false;
-		$actuals = array();
 		$expecteds = array(
 			'function_return' => true, // TODO bad implementation
 			'row_count' => 2, // TODO bad implementation
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createUploadedFile($this->goodFile['project_owner'], $this->goodFile['project_id'],
-			$this->goodFile['name'], $this->goodFile['file_type'], $isDownload, $this->goodFile['approx_size']);
+			$this->goodFile['name'], $this->goodFile['file_type'], $isDownload = false, $this->goodFile['approx_size']);
 		
 		$pdoStatement = $this->pdo->query("SELECT COUNT(*) FROM uploaded_files WHERE name = \"{$this->goodFile['name']}\"");
 		$actuals['row_count'] = $pdoStatement->fetchColumn(0);
@@ -334,8 +342,6 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::createUploadedFile
 	 */
 	public function testCreateUploadedFile_downloadDoesNotExist() {
-		$isDownload = true;
-		$actuals = array();
 		$expectedFile = $this->newFile;
 		$expectedFile['status'] = 1;
 		$expecteds = array(
@@ -343,9 +349,10 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 			'new_database_row' => $expectedFile,
 			'next_database_row' => false,
 		);
+		$actuals = array();
 
 		$actuals['function_output'] = $this->object->createUploadedFile($this->newFile['project_owner'], $this->newFile['project_id'],
-			$this->newFile['name'], $this->newFile['file_type'], $isDownload, $this->newFile['approx_size']);
+			$this->newFile['name'], $this->newFile['file_type'], $isDownload = true, $this->newFile['approx_size']);
 
 		$pdoStatement = $this->pdo->query("SELECT * FROM uploaded_files WHERE name = \"{$this->newFile['name']}\"");
 		$actuals['new_database_row'] = $pdoStatement->fetch(\PDO::FETCH_ASSOC);
@@ -358,17 +365,16 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * TODO bad implementation, should be separate function
 	 */
 	public function testCreateUploadedFile_downloadDoesExist() {
-		$isDownload = true;
-		$actuals = array();
 		$expectedFile = $this->goodFile;
 		$expectedFile['status'] = 1;
 		$expecteds = array(
 			'function_output' => true, // TODO bad implementation, should be false
 			'row_count' => 2, // TODO bad implementation, should be 1
 		);
+		$actuals = array();
 
 		$actuals['function_output'] = $this->object->createUploadedFile($this->goodFile['project_owner'], $this->goodFile['project_id'],
-			$this->goodFile['name'], $this->goodFile['file_type'], $isDownload, $this->goodFile['approx_size']);
+			$this->goodFile['name'], $this->goodFile['file_type'], $isDownload = true, $this->goodFile['approx_size']);
 
 		$pdoStatement = $this->pdo->query("SELECT COUNT(*) FROM uploaded_files WHERE name = \"{$this->goodFile['name']}\"");
 		$actuals['row_count'] = $pdoStatement->fetchColumn(0);
@@ -432,11 +438,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::removeUploadedFile
 	 */
 	public function testRemoveUploadedFile_fileDoesExist() {
-		$actuals = array();
 		$expecteds = array(
 			'function_result' => true,
 			'row_count' => 0,
 		);
+		$actuals = array();
 
 		$actuals['function_result'] = $this->object->removeUploadedFile($this->goodFile['project_owner'],
 			$this->goodFile['project_id'], $this->goodFile['name']);
@@ -451,11 +457,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::removeUploadedFile
 	 */
 	public function testRemoveUploadedFile_fileDoesNotExist() {
-		$actuals = array();
 		$expecteds = array(
 			'function_result' => true,
 			'row_count' => 0,
 		);
+		$actuals = array();
 
 		$actuals['function_result'] = $this->object->removeUploadedFile($this->newFile['project_owner'],
 			$this->newFile['project_id'], $this->newFile['name']);
@@ -471,13 +477,13 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::changeFileName
 	 */
 	public function testChangeFileName_fileExists() { 
-		$newFileName = "NewFile.txt";
-		$actuals = array();
 		$expecteds = array(
 			"function_return" => true,
 			"new_name_row_count" => 1,
 			"old_name_row_count" => 0,
 		);
+		$actuals = array();
+		$newFileName = "NewFile.txt";
 
 		$actuals['function_return'] = $this->object->changeFileName($this->goodFile['project_owner'],
 			$this->goodFile['project_id'], $this->goodFile['name'], $newFileName);
@@ -497,11 +503,11 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::changeFileName
 	 */
 	public function testChangeFileName_fileDoesNotExists() { 
-		$newFileName = "NewFile.txt";
-		$actuals = array();
 		$expecteds = array(
-			"function_return" => true, // TODO implementation should be false
+			"function_return" => false,
 		);
+		$actuals = array();
+		$newFileName = "NewFile.txt";
 
 		$actuals['function_return'] = $this->object->changeFileName($this->newFile['project_owner'],
 			$this->newFile['project_id'], $this->newFile['name'], $newFileName);
@@ -513,16 +519,16 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::createRun
 	 */
 	public function testCreateRun_badProject() {
+		$expected = false;
 
 		$actual = $this->object->createRun($this->newProj['owner'], $this->newProj['id'], $this->runCommand, $this->runString);
 
-		$this->assertFalse($actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::createRun
 	 */
 	public function testCreateRun_firstRun() {
-		$actuals = array();
 		$expectedRunId = 3;
 		$expecteds = array(
 			'function_return' => $expectedRunId,
@@ -538,6 +544,7 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 				"deleted" => $this->runDefaultDeleted,
 			),
 		);
+		$actuals = array();
 
 		$actuals['function_return'] = $this->object->createRun($this->goodProj['owner'], $this->goodProj['id'], $this->runCommand, $this->runString);
 
@@ -551,28 +558,27 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::giveRunPid
 	 */
 	public function testGiveRunPid_runDoesNotExists() {
-		$imaginaryRunId = 99;
-		$pid = 78987;
+		$expected = false;
 
-		$actual = $this->object->giveRunPid($imaginaryRunId, $pid);
+		$actual = $this->object->giveRunPid($imaginaryRunId = 99, $pid = 78987);
 
-		$this->assertTrue($actual); // TODO implement should return false
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::giveRunPid
 	 */
 	public function testGiveRunPid_runExists() {
-		$pid = $this->runningRun['run_status'];
-		$runId = $this->completeRun['id'];
-		$actuals = array();
+		$expectedRunId = $this->completeRun['id'];
+		$expectedPid = $this->runningRun['run_status'];
 		$expecteds = array(
 			'function_return' => true,
-			'new_pid' => $pid,
+			'new_pid' => $expectedPid,
 		);
+		$actuals = array();
 
-		$actuals['function_return'] = $this->object->giveRunPid($runId, $pid);
+		$actuals['function_return'] = $this->object->giveRunPid($expectedRunId, $expectedPid);
 
-		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = {$runId}");
+		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = {$expectedRunId}");
 		$actuals['new_pid'] = $pdoStatement->fetchColumn(0);
 		$pdoStatement->closeCursor();
 		$this->assertEquals($expecteds, $actuals);
@@ -582,19 +588,19 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::renderCommandRunComplete
 	 */
 	public function testRenderCommandRunComplete_runComplete() {
-		$actuals = array();
+		$expectedRunId = $this->completeRun['id'];
 		$expecteds = array(
 			'system_return_code' => 0,
 			'database_status' => -1,
 		);
-		$runId = $this->completeRun['id'];
+		$actuals = array();
 
-		$command = $this->object->renderCommandRunComplete($runId);
+		$command = $this->object->renderCommandRunComplete($expectedRunId);
 
 		$systemResult = 0;
 		system($command, $systemResult);
 		$actuals['system_return_code'] = $systemResult;
-		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = \"{$runId}\"");
+		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = \"{$expectedRunId}\"");
 		$actuals['database_status'] = $pdoStatement->fetchColumn(0);
 		$pdoStatement->closeCursor();
 		$this->assertEquals($expecteds, $actuals);
@@ -603,19 +609,19 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::renderCommandRunComplete
 	 */
 	public function testRenderCommandRunComplete_runRunning() {
-		$actuals = array();
+		$expectedRunId = $this->runningRun['id'];
 		$expecteds = array(
 			'system_return_code' => 0,
 			'database_status' => -1,
 		);
-		$runId = $this->runningRun['id'];
+		$actuals = array();
 
-		$command = $this->object->renderCommandRunComplete($runId);
+		$command = $this->object->renderCommandRunComplete($expectedRunId);
 
 		$systemResult = 0;
 		system($command, $systemResult);
 		$actuals['system_return_code'] = $systemResult;
-		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = \"{$runId}\"");
+		$pdoStatement = $this->pdo->query("SELECT run_status FROM script_runs WHERE id = \"{$expectedRunId}\"");
 		$actuals['database_status'] = $pdoStatement->fetchColumn(0);
 		$pdoStatement->closeCursor();
 		$this->assertEquals($expecteds, $actuals);
@@ -659,40 +665,53 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @coverse PDODatabase::renderCommandUploadSuccess
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadSuccess_projectDoesNotExist() {
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$command = $this->object->renderCommandUploadSuccess($this->newProj['owner'],
-			$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
+			$command = $this->object->renderCommandUploadSuccess($this->newProj['owner'],
+				$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
 
-		$this->fail();
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadSuccess
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadSuccess_fileDoesNotExist() {
-		$command = $this->object->renderCommandUploadSuccess($this->newFile['project_owner'],
-			$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$this->fail();
+			$command = $this->object->renderCommandUploadSuccess($this->newFile['project_owner'],
+				$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadSuccess
 	 */
 	public function testRenderCommandUploadSuccess_fileExists() {
-		$actuals = array();
-		$newSize = 800;
+		$expectedNewSize = 800;
 		$expecteds = array(
 			"escapeshellcmd_does_nothing" => false, // TODO implementation should be true?
 			"system_return_code" => "0",
 			"new_status" => 0,
-			"new_size" => $newSize,
+			"new_size" => $expectedNewSize,
 		);
+		$actuals = array();
 
 		$command = $this->object->renderCommandUploadSuccess($this->downloadingFile['project_owner'],
-			$this->downloadingFile['project_id'], $this->downloadingFile['name'], $newSize);
+			$this->downloadingFile['project_id'], $this->downloadingFile['name'], $expectedNewSize);
 
 		$actuals['escapeshellcmd_does_nothing'] = ($command == escapeshellcmd($command));
 		$systemReturn = 0;
@@ -711,43 +730,55 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadFailure_projectDoesNotExist() {
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$command = $this->object->renderCommandUploadFailure($this->newProj['owner'],
-			$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
+			$command = $this->object->renderCommandUploadFailure($this->newProj['owner'],
+				$this->newProj['id'], $this->goodFile['name'], $this->goodFile['approx_size']);
 
-		$this->fail();
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure
-	 * @expectedException \Exception
 	 */
 	public function testRenderCommandUploadFailure_fileDoesNotExist() {
-		$command = $this->object->renderCommandUploadFailure($this->newFile['project_owner'],
-			$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+		$expected = new \Exception("File not found");
+		$actual = NULL;
+		try {
 
-		$this->fail();
+			$command = $this->object->renderCommandUploadFailure($this->newFile['project_owner'],
+				$this->newFile['project_id'], $this->newFile['name'], $this->newFile['approx_size']);
+
+		}
+		catch(\Exception $ex) {
+			$actual = $ex;
+		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::renderCommandUploadFailure
 	 */
 	public function testRenderCommandUploadFailure_fileExists() {
-		$actuals = array();
-		$newSize = 800;
+		$expectedNewSize = 800;
 		$expecteds = array(
 			"escapeshellcmd_does_nothing" => false, // TODO implementation should be true?
 			"system_return_code" => "0",
 			"new_status" => 2,
-			"new_size" => $newSize,
+			"new_size" => $expectedNewSize,
 		);
+		$actuals = array();
 
 		$command = $this->object->renderCommandUploadFailure($this->downloadingFile['project_owner'],
-			$this->downloadingFile['project_id'], $this->downloadingFile['name'], $newSize);
+			$this->downloadingFile['project_id'], $this->downloadingFile['name'], $expectedNewSize);
 
 		$actuals['escapeshellcmd_does_nothing'] = ($command == escapeshellcmd($command));
-		error_log($command);
 		$systemReturn = 0;
 		system($command, $systemRetrun);
 		$actuals['system_return_code'] = $systemReturn;
@@ -766,20 +797,22 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 	 * @coverse PDODatabase::uploadExists
 	 */
 	public function testUploadExists_uploadDoesExist() {
+		$expected = true;
 		
 		$actual = $this->object->uploadExists($this->goodFile['project_owner'],
 			$this->goodFile['project_id'], $this->goodFile['name']);
 
-		$this->assertTrue($actual);
+		$this->assertEquals($expected, $actual);
 	}
 	/**
 	 * @coverse PDODatabase::uploadExists
 	 */
 	public function testUploadExists_uploadDoesNotExist() {
+		$expected = false;
 		
 		$actual = $this->object->uploadExists($this->newFile['project_owner'],
 			$this->newFile['project_id'], $this->newFile['name']);
 
-		$this->assertFalse($actual);
+		$this->assertEquals($expected, $actual);
 	}
 }

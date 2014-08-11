@@ -14,7 +14,7 @@ interface ScriptI {
 	public function getScriptTitle();
 	public function getHtmlId();
 	public function renderHelp();
-	public function initializeParameters();
+	public function getInitialParameters();
 
 	// output
 	public function renderAsForm($disabled);

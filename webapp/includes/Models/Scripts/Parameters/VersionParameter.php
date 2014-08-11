@@ -21,9 +21,10 @@ class VersionParameter extends DefaultParameter {
 		return "<a class=\"button\" onclick=\"alert('{$this->versionString}');\">Version</a>";
 	}
 
-	public function acceptInput(array $input) {
-		if (isset($input[$this->name])) {
-			throw new ScriptException("Using the version parameter is not allowed");
-		}
+	public function getVersionString() {
+		return $this->versionString;
+	}
+	public function setVersionString($versionString) {
+		$this->versionString = $versionString;
 	}
 }

@@ -13,26 +13,6 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class MakeOtuTable extends DefaultScript {
-
-	public function initializeParameters() {
-		parent::initializeParameters();
-		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
-		$otuMapFile->requireIf();
-		// TODO dynamic default / no default
-		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom");
-		$outputBiomFp->requireIf();
-
-		array_push($this->parameters,
-			new Label("Required Parameters"),
-			$otuMapFile,
-			$outputBiomFp, 
-			new Label("Optional Parameters"),
-			new OldFileParameter("--taxonomy", $this->project),
-			new OldFileParameter("--exclude_otus_fp", $this->project),
-			new Label("Output Options"),
-			new TrueFalseParameter("--verbose")
-		);
-	}
 	public function getScriptName() {
 		return "make_otu_table.py";
 	}
@@ -41,5 +21,29 @@ class MakeOtuTable extends DefaultScript {
 	}
 	public function getHtmlId() {
 		return "make_otu_table";
+	}
+
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
+
+		$otuMapFile = new OldFileParameter("--otu_map_fp", $this->project);
+		$outputBiomFp = new NewFileParameter("--output_biom_fp", "_.biom"); // TODO dynamic default
+
+		$otuMapFile->requireIf();
+		$outputBiomFp->requireIf();
+
+		array_push($parameters,
+			new Label("Required Parameters"),
+			$otuMapFile,
+			$outputBiomFp, 
+
+			new Label("Optional Parameters"),
+			new OldFileParameter("--taxonomy", $this->project),
+			new OldFileParameter("--exclude_otus_fp", $this->project),
+
+			new Label("Output Options"),
+			new TrueFalseParameter("--verbose")
+		);
+		return $parameters;
 	}
 }

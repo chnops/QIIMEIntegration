@@ -16,7 +16,6 @@ echo "===================================================================="
 echo "Beginning QIIME Operational Taxonomic Unit (OTU) diversity analysis."
 echo "--------------------------------------------------------------------"
 
-## TODO universal, consistent treatment of errors
 printf "Sourcing necessary environment variables ... "
 source $PROFILE_FP 2> /dev/null
 if [ $? -ne 0 ]
@@ -24,7 +23,6 @@ if [ $? -ne 0 ]
 		printf "FAIL\n\tSourcing failed; unable to read or execute file: $PROFILE_FP\n"
 		RETURN_CODE=3
 		exit $RETURN_CODE
-		## TODO still "finish" script by printing execution complete
 	else
 		printf "OK\n"
 fi
@@ -56,7 +54,6 @@ echo "--------------------------------------------------------------------"
 RESULT_DIR=results
 mkdir $RESULT_DIR
 
-## TODO incorporate getopts()
 ## TODO include sequence quality information
 SEQUENCE_FP=$2
 if [ ! $SEQUENCE_FP ]
@@ -68,10 +65,10 @@ fi
 
 ## TODO possibly include identification of chimeric sequences
 ## TODO possibly exclude sequences by BLAST as well
+## TODO possibly include fastq formatted input file
+## TODO possibly implement reverse primer deletion here
 
 ## TODO splitting_output might already exist in the working directory
-## TODO a separate quality file is uneccesary if sequences are in fastq format, but a different python script must be used
-## TODO possibly implement reverse primer deletion here
 printf "Splitting multiplexed libraries by barcode ... "
 LIBRARY_SPLITTING_RESULT=`split_libraries.py -f $SEQUENCE_FP -m $MAP_FP -o splitting_output`
 if [ $LIBRARY_SPLITTING_RESULT ]
@@ -107,7 +104,6 @@ echo "--------------------------------------------------------------------"
 #													#
 #####################################################
 
-## TODO redirect errors to a file, then check its line count*
 ## TODO otus may already exist in the working directory
 printf "Picking OTUs based on cross-sample sequence similarity ... "
 OTU_SELECTION_RESULT=`pick_otus.py -i split_sequences.fna -o otus/uclust_picked_otus`
@@ -127,9 +123,7 @@ rmdir otus/uclust_picked_otus
 
 printf "Selecting representative sequence from each OTU ... "
 mkdir otus/rep_set
-## TODO files that are used multiple times (otus.txt, split_sequences.fna) should be referred to with variable names
 REPRESENTATIVE_SELECTION_RESULT=`pick_rep_set.py -i otus.txt -f split_sequences.fna -l otus/rep_set/seqs_rep_set.log -o otus/rep_set/seqs_rep_set.fasta`
-## TODO not effective error checking*
 if [ $REPRESENTATIVE_SELECTION_RESULT ]
 then
 	printf "FAIL\n\tUnable to select representative OTUs ($OTU_SELECTION_RESULT)\n"
@@ -139,7 +133,7 @@ else
 	printf "OK\n"
 fi
 mv otus/rep_set/seqs_rep_set.log $RESULT_DIR/uclust_representative_sequences.log
-## TODO representative_sequences.fasta may already exist, and it should be a variable, not a literal
+## TODO representative_sequences.fasta may already exist
 mv otus/rep_set/seqs_rep_set.fasta representative_sequences.fasta
 rmdir otus/rep_set/
 
@@ -151,10 +145,8 @@ if [ $PERFORM_PHYLOGENY ]
 then
 	echo '--------------Performing steps for phylogeny analysis---------------'
 
-	## TODO make default options (intentionally being used) explicit in script
 	printf "Aligning representative OTU sequences ... "
 	ALIGN_SEQUENCE_RESULT=`align_seqs.py -i representative_sequences.fasta -o otus/alignment`
-	## TODO check otus/alignment/representative_sequences_failures.fasta, print warning**
 	if [ $ALIGN_SEQUENCE_RESULT ]
 	then
 		printf "FAIL\n\tUnable to align representative OTU sequences ($ALIGN_SEQUENCE_RESULT)\n"
@@ -166,7 +158,6 @@ then
 		## TODO only run this command if the file is empty**
 		rm otus/alignment/representative_sequences_failures.fasta
 
-		## TODO lanemask is a default; should be explicit
 		printf "Filtering alignment ... "
 		FILTER_SEQUENCE_RESULT=`filter_alignment.py -i otus/alignment/representative_sequences_aligned.fasta -o otus/alignment`
 
@@ -181,8 +172,6 @@ then
 			## TODO filtered_alignment.fasta may already exist in the working directory
 			mv otus/alignment/representative_sequences_aligned_pfiltered.fasta filtered_alignment.fasta
 
-			## TODO -t and -r are both defaults
-			## TODO filtered_alignment.fasta should be a variable
 			printf "Creating phylogeny from filtered alignment ... "
 			MAKE_PHYLOGENY_RESULT=`make_phylogeny.py -i filtered_alignment.fasta -l $RESULT_DIR/phylogeny.log -o $RESULT_DIR/phylogeny.tre`
 			if [ $MAKE_PHYLOGENY_RESULT ]
@@ -191,7 +180,6 @@ then
 			else
 				printf "OK\n"
 
-				## TODO should be a variable, maybe
 				rmdir otus/alignment
 				mv filtered_alignment.fasta $RESULT_DIR
 			fi
@@ -219,7 +207,7 @@ then
 		printf "OK\n"
 	
 		mv taxonomies/seqs_rep_set_tax_assignments.log $RESULT_DIR/taxonomy_assignment.log
-		## TODO move taxonomies/seqs_rep_set_tax_assignments.txt to the results or working directory***
+		mv taxonomies/seqs_rep_set_tax_assignments.txt taxonomies.txt
 		rmdir taxonomies
 	fi
 fi
@@ -227,8 +215,7 @@ fi
 printf "Creating OTU table ... "
 if [ $PERFORM_TAXONOMY_ASSIGNMENT ]
 then
-	## TODO rename taxonomies/seqs_rep_set_tax_assignments.txt***
-	MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom -t taxonomies/seqs_rep_set_tax_assignments.txt`
+	MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom -t taxonomies.txt`
 else
 	MAKE_OTU_TABLE_RESULT=`make_otu_table.py -i otus.txt -o otu_table.biom`
 fi
@@ -249,10 +236,4 @@ rmdir otus
 echo "--------------------------------------------------------------------"
 echo "Execution complete."
 echo "===================================================================="
-## TODO create a separate folder for the results of this run.  Copy the input files into that folder.  Make a link called most recent, pointing to that run.
-## TODO utilize functions
-## TODO create GUI
-## TODO include CSS
-## TODO minimize javascript, and only include it once
-## TODO implement check-points be creating un-writeable files
 exit $RETURN_CODE

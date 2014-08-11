@@ -27,6 +27,13 @@ class ChoiceParameter extends DefaultParameter {
 		if (!$value) {
 			return true;
 		}
-		return in_array($value, $this->options);
+		return in_array($value, $this->options, $strict = true);
+	}
+
+	public function setOptions(array $options) {
+		$this->options = $options;
+	}
+	public function getOptions() {
+		return $this->options;
 	}
 }

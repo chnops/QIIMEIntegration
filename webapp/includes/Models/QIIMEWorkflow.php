@@ -14,79 +14,37 @@ class QIIMEWorkflow implements WorkflowI {
 		"run" => "Run scripts",
 		"view" => "View results");
 
-	public function getSteps() {
-		return $this->steps;
-	}
-
 	public function __construct(\Database\DatabaseI $database, OperatingSystemI $operatingSystem) {
 		$this->database = $database;
 		$this->operatingSystem = $operatingSystem;
 	}
 
-	public function getNextStep($step) {
-		$keys = array_keys($this->steps);
-		$currentPosition = 0;
-		$found = false;
-		for (; $currentPosition < count($keys); $currentPosition++) {
-			if ($step == $keys[$currentPosition]) {
-				$found = true;
-				break;
-			}
-		}
-		if ($found) {
-			if ($currentPosition == count($keys)-1) {
-				return $keys[$currentPosition];
-			}
-			return $keys[$currentPosition + 1];
-		}
-		return $keys[0];
-	}
-
-	public function getPreviousStep($step) {
-		$keys = array_keys($this->steps);
-		$currentPosition = count($keys) - 1;
-		$found = false;
-		for (; $currentPosition >= 0; $currentPosition--) {
-			if ($step == $keys[$currentPosition]) {
-				$found = true;
-				break;
-			}
-		}
-		if ($found) {
-			if ($currentPosition == 0) {
-				return $keys[$currentPosition];
-			}
-			return $keys[$currentPosition - 1];
-		}
-		return $keys[count($keys)-1];
+	public function getSteps() {
+		return $this->steps;
 	}
 
 	public function getCurrentStep($controller) {
 		$objectName = get_class($controller);
 		switch ($objectName) {
-			case "Controllers\\TestController":
-				return "test";
-			case "Controllers\\Controller":
-				return "login";
-			case "Controllers\\IndexController":
-				return "login";
-			case "Controllers\\LoginController":
-				return "login";
-			case "Controllers\\SelectProjectController":
-				return "select";
-			case "Controllers\\UploadController":
-				return "upload";
-			case "Controllers\\RunScriptsController":
-				return "run";
-			case "Controllers\\ViewResultsController":
-				return "view";
+			case 'Controllers\Controller':
+				return 'login';
+			case 'Controllers\IndexController':
+				return 'login';
+			case 'Controllers\LoginController':
+				return 'login';
+			case 'Controllers\SelectProjectController':
+				return 'select';
+			case 'Controllers\UploadController':
+				return 'upload';
+			case 'Controllers\RunScriptsController':
+				return 'run';
+			case 'Controllers\ViewResultsController':
+				return 'view';
 		}
 	}
 
 	public function getController($step) {
 			switch($step) {
-			case "test":
-				return new \Controllers\TestController($this);
 			case "login":
 				return new \Controllers\LoginController($this);
 			case "select":
@@ -103,11 +61,11 @@ class QIIMEWorkflow implements WorkflowI {
 	}
 
 	public function getNewProject() {
-		return new QIIMEProject($this->database, $this, $this->operatingSystem);
+		return new QIIMEProject($this->database, $this->operatingSystem);
 	}
 	public function findProject($username, $projectId) {
 		$projectName = $this->database->getProjectName($username, $projectId);
-		if ($projectName == "ERROR") {
+		if (!$projectName) {
 			return NULL;
 		}
 		$project = $this->getNewProject();

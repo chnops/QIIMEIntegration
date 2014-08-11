@@ -9,6 +9,17 @@ class NewFileParameter extends DefaultParameter {
 		$this->value = $value;
 		$this->isDir = $isDir;
 	}
+	public function setIsDir($isDir) {
+		if($isDir) {
+			$this->isDir = true;
+		}
+		else {
+			$this->isDir = false;
+		}
+	}
+	public function isDir() {
+		return $this->isDir;
+	}
 	public function isValueValid($value) {
 		return !preg_match("/\"/", $value);
 	}
@@ -20,11 +31,7 @@ class NewFileParameter extends DefaultParameter {
 			else if (!$this->value) {
 				return ".";
 			}
-			$separator = (strlen($this->name) == 2) ? " " : "=";
-			return $this->name . $separator . escapeshellarg($this->value);
 		}
-		else {
-			return parent::renderForOperatingSystem();
-		}
+		return parent::renderForOperatingSystem();
 	}
 }

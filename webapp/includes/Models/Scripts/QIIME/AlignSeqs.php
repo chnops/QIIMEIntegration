@@ -13,9 +13,19 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class AlignSeqs extends DefaultScript {
+	public function getScriptName() {
+		return "align_seqs.py";
+	}
+	public function getScriptTitle() {
+		return "Align sequences";
+	}
+	public function getHtmlId() {
+		return "align_seqs";
+	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
+
 		$inputFp = new OldFileParameter("--input_fasta_fp", $this->project);
 		$alignmentMethod = new ChoiceParameter("--alignment_method", "pynast", 
 			array("pynast", "infernal", "clustalw", "muscle", "mafft"));
@@ -32,30 +42,25 @@ class AlignSeqs extends DefaultScript {
 		$minPercentId->excludeButAllowIf($alignmentMethod, "pynast");
 		$muscleMaxMemory->excludeButAllowIf($alignmentMethod, "muscle");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputFp,
+
 			new Label("Optional Parameters"),
 			new OldFileParameter("--template_fp", $this->project, '/macqiime/greengenes/core_set_aligned.fasta.imputed'),
 			new TextArgumentParameter("--min_length", "", TextArgumentParameter::PATTERN_PROPORTION),
-			// TODO [default: 75% of the median input sequence length]
+			// TODO [default: 75% of the median input sequence length] (is the pattern correct?)
 			$alignmentMethod,
 			$pairwiseAlignmentMethod,
 			$blastDb,
 			$minPercentId,
 			$muscleMaxMemory,
+
 			new Label("Output Options"),
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "_aligned", $isDir = true) // TODO dynamic default
 		);
-	}
-	public function getScriptName() {
-		return "align_seqs.py";
-	}
-	public function getScriptTitle() {
-		return "Align sequences";
-	}
-	public function getHtmlId() {
-		return "align_seqs";
+
+		return $parameters;
 	}
 }

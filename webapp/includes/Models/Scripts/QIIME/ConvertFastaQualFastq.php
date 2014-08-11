@@ -13,36 +13,6 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class ConvertFastaQualFastq extends DefaultScript {
-
-	public function initializeParameters() {
-		parent::initializeParameters();
-
-		$fastaFilePath = new OldFileParameter("--fasta_file_path", $this->project);
-		$fastaFilePath->requireIf();
-
-		$conversionType = new ChoiceParameter("--conversion_type", "fastaqual_to_fastq", 
-			array("fastaqual_to_fastq", "fastq_to_fastaqual"));
-		$qualFilePath = new OldFileParameter("--qual_file_path", $this->project);
-		$qualFilePath->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
-		$fullFastq = new TrueFalseParameter("--full_fastq");
-		$fullFastq->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
-
-		array_push($this->parameters,
-			new Label("Required Parameters"),
-			$fastaFilePath,
-			new Label("Optional parameters"),
-			$conversionType,
-			$qualFilePath,
-			new TextArgumentParameter("--ascii_increment", "33", TextArgumentParameter::PATTERN_DIGIT),
-
-			new Label("Output options"),
-			new TrueFalseParameter("--full_fasta_headers"),
-			$fullFastq,
-			new TrueFalseParameter("--multiple_output_files"),
-			new NewFileParameter("--output_dir", ".", $isDir = true),
-			new TrueFalseParameter("--verbose")
-		);
-	}
 	public function getScriptName() {
 		return "convert_fastaqual_fastq.py";
 	}
@@ -51,5 +21,36 @@ class ConvertFastaQualFastq extends DefaultScript {
 	}
 	public function getHtmlId() {
 		return "convert_fasta_qual_fastq";
+	}
+
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
+
+		$fastaFilePath = new OldFileParameter("--fasta_file_path", $this->project);
+		$fastaFilePath->requireIf();
+
+		$conversionType = new ChoiceParameter("--conversion_type", "fastaqual_to_fastq", 
+			array("fastaqual_to_fastq", "fastq_to_fastaqual"));
+		$qualFilePath = new OldFileParameter("--qual_file_path", $this->project);
+		$fullFastq = new TrueFalseParameter("--full_fastq");
+
+		$qualFilePath->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
+		$fullFastq->excludeButAllowIf($conversionType, "fastaqual_to_fastq");
+
+		array_push($parameters,
+			new Label("Required Parameters"),
+			$fastaFilePath,
+			new Label("Optional parameters"),
+			$conversionType,
+			$qualFilePath,
+			new TextArgumentParameter("--ascii_increment", "33", TextArgumentParameter::PATTERN_DIGIT),
+			new Label("Output options"),
+			new TrueFalseParameter("--full_fasta_headers"),
+			$fullFastq,
+			new TrueFalseParameter("--multiple_output_files"),
+			new NewFileParameter("--output_dir", ".", $isDir = true),
+			new TrueFalseParameter("--verbose")
+		);
+		return $parameters;
 	}
 }

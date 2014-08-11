@@ -3,162 +3,193 @@
 namespace Models;
 
 class QIIMEWorkflowTest extends \PHPUnit_Framework_TestCase {
-
-	private $operatingSystem;
-	private $database;
-	private $workflow;
-
 	public static function setUpBeforeClass() {
 		error_log("QIIMEWorkflowTest");
 	}
 
+	private $username = "username";
+	private $projectId = "projectId";
+	private $projectName = "projectName";
+
+	private $mockDatabase = NULL;
+	private $mockOperatingSystem = NULL;
+	private $object = NULL;
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$this->mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->getMock();
+		$this->mockOperatingSystem = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->disableOriginalConstructor()
+			->getMock();
+	}
+
 	public function setUp() {
-		$this->operatingSystem = new MacOperatingSystem();
-		$this->database = new \Database\PDODatabase($this->operatingSystem);
-		$this->workflow = new QIIMEWorkflow($this->database, $this->operatingSystem);
+		$this->object = new QIIMEWorkflow($this->mockDatabase, $this->mockOperatingSystem);
 	}
 
 	/**
-	 * @test
 	 * @covers QIIMEWorkflow::getSteps
 	 */
 	public function testGetSteps() {
-		$expectedSteps = array (
+		$expected = array (
 			"login" => "Login",	
 			"select" => "Select/create project",
 			"upload" => "Upload files",
 			"run" => "Run scripts",
 			"view" => "View results");
-		$this->assertEquals($expectedSteps, $this->workflow->getSteps());
+
+		$actual = $this->object->getSteps();
+
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
-	 * @test
-	 * @covers QIIMEWorkflow::getNextStep
-	 */
-	public function testGetNextStep() {
-		$stepsInOrder = array ("login", "select", "upload", "run", "view");
-		$stepsCount = count($stepsInOrder);
-		for ($i = 0; $i < $stepsCount - 1; $i++) {
-			$expected = $stepsInOrder[$i + 1];
-			$this->assertEquals($expected, $this->workflow->getNextStep($stepsInOrder[$i]));
-		}
-		$this->assertEquals($stepsInOrder[$stepsCount - 1], $this->workflow->getNextStep($stepsInOrder[$stepsCount - 1]));
-		$this->assertEquals($stepsInOrder[0], $this->workflow->getNextStep("notAStep"));
-	}
-
-	/**
-	 * @test
-	 * @covers QIIMEWorkflow::getPreviousStep
-	 */
-	public function testGetPreviousStep() {
-		$stepsInReverseOrder = array ("view", "run", "upload", "select", "login");
-		$stepsCount = count($stepsInReverseOrder);
-		for ($i = 0; $i < $stepsCount - 1; $i++) {
-			$expected = $stepsInReverseOrder[$i + 1];
-			$this->assertEquals($expected, $this->workflow->getPreviousStep($stepsInReverseOrder[$i]));
-		}
-		$this->assertEquals($stepsInReverseOrder[$stepsCount - 1], $this->workflow->getPreviousStep($stepsInReverseOrder[$stepsCount - 1]));
-		$this->assertEquals($stepsInReverseOrder[0], $this->workflow->getPreviousStep("notAStep"));
-	}
-
-	/**
-	 * @test
 	 * @covers QIIMEWorkflow::getCurrentStep
 	 */
 	public function testGetCurrentStep() {
-		$controllersInOrder = array (
-				new \Controllers\TestController($this->database, $this->workflow), 
-				new \Controllers\IndexController($this->database, $this->workflow), 
-				new \Controllers\LoginController($this->database, $this->workflow), 
-				new \Controllers\SelectProjectController($this->database, $this->workflow), 
-				new \Controllers\UploadController($this->database, $this->workflow), 
-				new \Controllers\RunScriptsController($this->database, $this->workflow),
-				new \Controllers\ViewResultsController($this->database, $this->workflow), 
-			);
-		$stepsInOrder = array ("test","login","login","select",
+		$expected = array ("login","login","select",
 			"upload","run","view",);
-		$stepsCount = count($stepsInOrder);
-		for ($i = 0; $i < $stepsCount; $i++) {
-			$this->assertEquals($stepsInOrder[$i],
-			   	$this->workflow->getCurrentStep($controllersInOrder[$i]));
+		$actual = array();
+		$controllersInOrder = array (
+			new \Controllers\IndexController($this->object), 
+			new \Controllers\LoginController($this->object), 
+			new \Controllers\SelectProjectController($this->object), 
+			new \Controllers\UploadController($this->object), 
+			new \Controllers\RunScriptsController($this->object),
+			new \Controllers\ViewResultsController($this->object), 
+		);
+		foreach ($controllersInOrder as $controller) {
+
+			$actual[] = $this->object->getCurrentStep($controller);
+
 		}
+		$this->assertEquals($expected, $actual);
 	}
 	/**
-	 * @test
 	 * @covers QIIMEWorkflow::getController
 	 */
 	public function testGetController() {
-		$stepsInOrder = array ("test","index","login","select",
+		$expected = array (
+			new \Controllers\LoginController($this->object), 
+			new \Controllers\LoginController($this->object), 
+			new \Controllers\SelectProjectController($this->object), 
+			new \Controllers\UploadController($this->object), 
+			new \Controllers\RunScriptsController($this->object),
+			new \Controllers\ViewResultsController($this->object), 
+		);
+		$actual = array();
+		$stepsInOrder = array ("index","login","select",
 			"upload","run","view",);
-		$controllerNamesInOrder = array (
-				"Controllers\\TestController", 
-				"Controllers\\LoginController", 
-				"Controllers\\LoginController", 
-				"Controllers\\SelectProjectController", 
-				"Controllers\\UploadController", 
-				"Controllers\\RunScriptsController",
-				"Controllers\\ViewResultsController", 
-			);
-		$stepsCount = count($stepsInOrder);
-		for ($i = 0; $i < $stepsCount; $i++) {
-			$controller = $this->workflow->getController($stepsInOrder[$i]);
-			$this->assertEquals($controllerNamesInOrder[$i],
-				get_class($controller));
+
+		foreach ($stepsInOrder as $step) {
+
+			$actual[] = $this->object->getController($step);
+
 		}
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
-	 * @test
 	 * @covers QIIMEWorkflow::getNewProject
 	 */
 	public function testGetNewProject() {
-		$expectedProject = new QIIMEProject($this->database, $this->workflow, $this->operatingSystem);
-		$newProject = $this->workflow->getNewProject();
-		$this->assertEquals($expectedProject, $newProject);
+		$expected= new QIIMEProject($this->mockDatabase, $this->mockOperatingSystem);
+
+		$actual = $this->object->getNewProject();
+
+		$this->assertEquals($expected, $actual);
 	}
+
 	/**
-	 * @test
 	 * @covers QIIMEWorkflow::findProject
 	 */
-	public function testFindProject() {
-		$badUsername = "asdfasdf";
-		$goodUsername = "sharpa";
-		$goodProjectId1 = 1;
-		$goodProjectId2 = 2;
+	public function testFindProject_projectDoesNotExist() {
+		$expected = NULL;
+		$mockDatabase = $this->getMocKBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("getProjectName"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("getProjectName")->will($this->returnValue(false));
+		$this->object = new QIIMEWorkflow($mockDatabase, $this->mockOperatingSystem);
 
-		$this->assertNull($this->workflow->findProject($badUsername, $goodProjectId1));
-		$expectedProject1 = $this->workflow->getNewProject();
-		$expectedProject1->setName("Proj1");
-		$expectedProject1->setOwner($goodUsername);
-		$expectedProject1->setId($goodProjectId1);
-		$this->assertEquals($expectedProject1, $this->workflow->findProject($goodUsername, $goodProjectId1));
-		$expectedProject2 = $this->workflow->getNewProject();
-		$expectedProject2->setName("Proj2");
-		$expectedProject2->setOwner($goodUsername);
-		$expectedProject2->setId($goodProjectId2);
-		$this->assertEquals($expectedProject2, $this->workflow->findProject($goodUsername, $goodProjectId2));
+		$actual = $this->object->findProject("username", "projectId");
+
+		$this->assertSame($expected, $actual);
 	}
 	/**
-	 * @test
+	 * @covers QIIMEWorkflow::findProject
+	 */
+	public function testFindProject_projectDoesExist() {
+		$mockDatabase = $this->getMocKBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("getProjectName"))
+			->getMock();
+		$expected = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+		$expected->setOwner($this->username);
+		$expected->setId($this->projectId);
+		$expected->setName($this->projectName);
+		$mockDatabase->expects($this->once())->method("getProjectName")->will($this->returnValue($this->projectName));
+		$this->object = new QIIMEWorkflow($mockDatabase, $this->mockOperatingSystem);
+
+		$actual = $this->object->findProject("username", "projectId");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
 	 * @covers QIIMEWorkflow::getAllProjects
 	 */
-	public function testGetAllProjects() {
-		$badUsername = "asdfasdf";
-		$goodUsername = "sharpa";
+	public function testGetAllProjects_userDoesNotExist() {
+		$expected = array();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("getAllProjects"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("getAllProjects")->will($this->returnValue(array()));
+		$this->object = new QIIMEWorkflow($mockDatabase, $this->mockOperatingSystem);
 
-		$this->assertEmpty($this->workflow->getAllProjects($badUsername));
-		
-		$expectedProject1 = $this->workflow->getNewProject();
-		$expectedProject1->setOwner($goodUsername);
-		$expectedProject1->setId(1);
-		$expectedProject1->setName("Proj1");
-		$expectedProject2 = $this->workflow->getNewProject();
-		$expectedProject2->setOwner($goodUsername);
-		$expectedProject2->setId(2);
-		$expectedProject2->setName("Proj2");
-		$expectedProjects = array($expectedProject1, $expectedProject2);
+		$actual = $this->object->getAllProjects("username");
 
-		$this->assertEquals($expectedProjects, $this->workflow->getAllProjects($goodUsername));
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers QIIMEWorkflow::getAllProjects
+	 */
+	public function testGetAllProjects_userExistsButNoProjects() {
+		$expected = array();
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("getAllProjects"))
+			->getMock();
+		$mockDatabase->expects($this->once())->method("getAllProjects")->will($this->returnValue(array()));
+		$this->object = new QIIMEWorkflow($mockDatabase, $this->mockOperatingSystem);
+
+		$actual = $this->object->getAllProjects("username");
+
+		$this->assertSame($expected, $actual);
+	}
+	/**
+	 * @covers QIIMEWorkflow::getAllProjects
+	 */
+	public function testGetAllProjects_userExistsAndHasProjects() {
+		$mockDatabase = $this->getMockBuilder('\Database\PDODatabase')
+			->disableOriginalConstructor()
+			->setMethods(array("getAllProjects"))
+			->getMock();
+		$expectedProject = new QIIMEProject($mockDatabase, $this->mockOperatingSystem);
+		$expectedProject->setName($this->projectName);
+		$expectedProject->setOwner($this->username);
+		$expectedProject->setId($this->projectId);
+		$expected = array($expectedProject);
+		$projects = array(
+			array("name" => $this->projectName, "owner" => $this->username, "id" => $this->projectId)
+		);
+		$mockDatabase->expects($this->once())->method("getAllProjects")->will($this->returnValue($projects));
+		$this->object = new QIIMEWorkflow($mockDatabase, $this->mockOperatingSystem);
+
+		$actual = $this->object->getAllProjects("username");
+
+		$this->assertEquals($expected, $actual);
 	}
 }

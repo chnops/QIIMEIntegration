@@ -3,24 +3,84 @@
 namespace Models\Scripts\Parameters;
 
 class VersionParameterTest extends \PHPUnit_Framework_TestCase {
-
-	private $parameter;
-
 	public static function setUpBeforeClass() {
 		error_log("VersionParameterTest");
 	}
 
+	private $mockScript = NULL;
+	private $object;
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$this->mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("getHtmlId"))
+			->getMockForAbstractClass();
+		$this->mockScript->expects($this->any())->method("getHtmlId")->will($this->returnValue("script"));
+	}
+
 	public function setUp() {
-		$mockProject = $this->getMock("\Models\DefaultProject", array(), array(), "", $callConstructor = false);
-		$mockProject->expects($this->any())->method("getVersion")->will($this->returnValue("mock version 1.7"));
-		$this->parameter = new VersionParameter($mockProject, "");
+		$this->object = new VersionParameter($this->mockScript);
 	}
 
+	/**
+	 * @covers \Models\Scripts\Parameters\VersionParameter::__constructor
+	 */
+	public function testConstructor() {
+		$expecteds = array(
+			'name' => "--version",
+			'version_string' => "File: public/versions/script.txt"
+		);
+		$actuals = array();
+
+		$this->object = new VersionParameter($this->mockScript);
+
+		$actuals['name'] = $this->object->getName();
+		$actuals['version_string'] = $this->object->getVersionString();
+		$this->assertEquals($expecteds, $actuals);
+	}
+
+	/**
+	 * @covers \Models\Scripts\Parameters\VersionParameter::renderForOperatingSystem
+	 */
 	public function testRenderForOperatingSystem() {
-		$this->assertEmpty($this->parameter->renderForOperatingSystem());
+		$expected = "";
+
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertSame($expected, $actual);
 	}
 
+	/**
+	 * @covers \Models\Scripts\Parameters\VersionParameter::renderForForm
+	 */
 	public function testRenderForForm() {
-		$this->assertEquals("<a class=\"button\" onclick=\"alert('mock version 1.7');\">Version</a>", $this->parameter->renderForForm());
+		$expected = "<a class=\"button\" onclick=\"alert('File: public/versions/script.txt');\">Version</a>";
+
+		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @covers \Models\Scripts\Parameters\VersionParameter::getVersionString
+	 */
+	public function testGetVersionString() {
+		$expected = "File: public/versions/script.txt";
+
+		$actual = $this->object->getVersionString();
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @covers \Models\Scripts\Parameters\VersionParameter::setVersionString
+	 */
+	public function testSetVersionString() {
+		$expected = "new version";
+
+		$this->object->setVersionString($expected);
+
+		$actual = $this->object->getVersionString();
+		$this->assertEquals($expected, $actual);
 	}
 }

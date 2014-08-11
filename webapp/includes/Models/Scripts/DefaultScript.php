@@ -12,17 +12,17 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 	public function __construct(\Models\ProjectI $project) {
 		$this->project = $project;
 	}
-	public function initializeParameters() {
-		$helpParameter = new HelpParameter($this);
+	public function getInitialParameters() {
+		$helpParameter = new HelpParameter();
 		$versionParameter = new VersionParameter($this);
 		$helpParameter->excludeButAllowIf();
 		$versionParameter->excludeButAllowIf();
-		$this->parameters = array($helpParameter->getName() => $helpParameter,
+		return array($helpParameter->getName() => $helpParameter,
 			$versionParameter->getName() => $versionParameter,);
 	}
 	public function getParameters() {
 		if (empty($this->parameters)) {
-			$this->initializeParameters();
+			$this->parameters = $this->getInitialParameters();
 		}
 		return $this->parameters;
 	}
@@ -51,7 +51,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 		return $form;
 	}
-	public function getJsvar() {
+	public function getJsVar() {
 		return "js_" . $this->getHtmlId();
 	}
 
@@ -67,7 +67,7 @@ abstract class DefaultScript implements ScriptI, \Models\HideableI {
 		}
 
 		if (!empty($inputErrors)) {
-			$errorOutput = "There some were problems with the parameters you submitted:<ul>";
+			$errorOutput = "There were some problems with the parameters you submitted:<ul>";
 			foreach ($inputErrors as $error) {
 				$errorOutput .= "<li>{$error}</li>";
 			}

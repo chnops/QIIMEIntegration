@@ -3,25 +3,11 @@
 namespace Controllers;
 
 class UploadController extends Controller {
-
-	public function getSubTitle() {
-		return "Upload Input Files";
-	}
 	private $fileType = NULL;
 	private $url = "";
 
-	private function getFileType() {
-		if (!$this->fileType) {
-			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
-			if (isset($_POST['type'])) {
-				$this->fileType = $project->getFileTypeFromHtmlId($_POST['type']);
-			}
-			else {
-				$fileTypes = $project->getFileTypes();
-				$this->fileType = $fileTypes[0];
-			}
-		}
-		return $this->fileType;
+	public function getSubTitle() {
+		return "Upload Input Files";
 	}
 
 	public function retrievePastResults() {
@@ -35,13 +21,12 @@ class UploadController extends Controller {
 		$output = "";
 
 		$output .= "<h3>Previously Uploaded files:</h3><div class=\"accordion\">\n";
-		$helper = \Utils\Helper::getHelper();
-		$previousFilesFormatted = $helper->categorizeArray($previousFiles, 'type');
+		$previousFilesFormatted = $this->helper->categorizeArray($previousFiles, 'type');
 
 		foreach ($previousFilesFormatted as $fileType => $files) {
 			$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><ul>\n";
 			foreach ($files as $file) {
-				$output .= "<li>" . $helper->htmlentities($file['name']) . " ({$file['status']})</li>\n";
+				$output .= "<li>" . $this->helper->htmlentities($file['name']) . " ({$file['status']})</li>\n";
 			}
 			$output .= "</ul></div>\n";
 		}
@@ -61,43 +46,30 @@ class UploadController extends Controller {
 
 		if (!$this->getFileType()) {
 			$this->isResultError = true;
-			$this->result = "A the file you uploaded had an unrecognized type.<br/>";
+			$this->result = "The file you uploaded had an unrecognized type.";
 			return;
 		}
 		else {
 			$this->result = "";
 		}
-		
-		// TODO if is valid form
 
 		$isDownload = isset($_POST['url']);
-		if ($isDownload) {
-			$this->url = $_POST['url'];
-			$urlParts = explode('/', $this->url);
-			$fileName = "";
-			while (!$fileName && $urlParts) {
-				$fileName = array_pop($urlParts);
-			}
-			if (!$fileName) {
-				$this->isResultError = true;
-				$this->result = "Unable to determine file name from given url";
-				return;
-			}
+		$fileName = $this->getFileName($isDownload);
+		if (!$fileName) {
+			$this->isResultError = true;
+			$this->result = "Unable to determine file name";
+			return;
 		}
-		else {
-			$fileName = $_FILES['file']['name'];
+
+		if ($this->fileNameExists($fileName)) {
+			$this->isResultError = true;
+			$this->result .= "You have already uploaded a file with that file name. File names must be unique";
+			return;
 		}
-		$pastFiles = $this->project->retrieveAllUploadedFiles();
-		foreach ($pastFiles as $extantFile) {
-			if ($extantFile['name'] == $fileName) {
-				$this->isResultError = true;
-				$this->result .= "You have already uploaded a file with that file name. File names must be unique";
-				return;
-			}
-		}
+		
 		if ($isDownload) {
 			try {
-				$this->result = $this->downloadFile($this->url, $fileName, $this->getFileType());
+				$this->result = $this->downloadFile($this->url, $fileName);
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
@@ -108,34 +80,78 @@ class UploadController extends Controller {
 			}
 		}
 		else {
-			$this->uploadFile($_FILES['file'], $this->getFileType());
+			$this->uploadFile($_FILES['file']);
 		}
 	}
 
-	private function downloadFile($url, $fileName, \Models\FileType $fileType) {
-		$helper = \Utils\Helper::getHelper();
+	public function getFileName($isDownload) {
+		$fileName = "";
+		if ($isDownload && isset($_POST['url'])) {
+			$this->url = $_POST['url'];
+			$urlParts = explode('/', $this->url);
+			while (!$fileName && $urlParts) {
+				$fileName = array_pop($urlParts);
+			}
+		}
+		else {
+			if (isset($_FILES['file']) && isset($_FILES['file']['name'])) {
+				$fileName = $_FILES['file']['name'];
+			}
+		}
+		return $fileName;
+	}
+
+	public function fileNameExists($fileName) {
+		if (!$this->project) {
+			return false;
+		}
+		$pastFiles = $this->project->retrieveAllUploadedFiles();
+		foreach ($pastFiles as $extantFile) {
+			if ($extantFile['name'] == $fileName) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function setFileType(\Models\FileType $fileType) {
+		$this->fileType = $fileType;
+	}
+	public function getFileType() {
+		if (!$this->fileType) {
+			$project = ($this->project) ? $this->project : $this->workflow->getNewProject();
+			if (isset($_POST['type'])) {
+				$this->fileType = $project->getFileTypeFromHtmlId($_POST['type']);
+			}
+			else {
+				$fileTypes = $project->getFileTypes();
+				$this->fileType = $fileTypes[0];
+			}
+		}
+		return $this->fileType;
+	}
+
+	public function downloadFile($url, $fileName) {
 		$output = "File downloaded has started.";
-		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $fileType);
+		$consoleOutput = $this->project->receiveDownloadedFile($url, $fileName, $this->getFileType());
 		if ($consoleOutput) {
-			$output .= "<br/>The console returned the following output:<br/>" . $helper->htmlentities($consoleOutput);
+			$output .= "<br/>The console returned the following output:<br/>" . $this->helper->htmlentities($consoleOutput);
 		}
 		return $output;
 	}
 
-	private function uploadFile(array $file, \Models\FileType $fileType) {
-		$helper = \Utils\Helper::getHelper();
+	public function uploadFile(array $file) {
 		if ($file['error'] > 0) {
 			$this->isResultError = true;
 			$fileUploadErrors = new FileUploadErrors();
 			$this->result = "There was an error uploading your file: " . $fileUploadErrors->getErrorMessage($file['error']);
 			return;
 		}
-		// TODO if type is valid
 
 		$givenName = $file['name'];
 		try {
-			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $fileType);
-			$this->result = "File " . $helper->htmlentities($givenName) . " successfully uploaded!";
+			$this->project->receiveUploadedFile($givenName, $file['tmp_name'],  $file['size'], $this->getFileType());
+			$this->result = "File " . $this->helper->htmlentities($givenName) . " successfully uploaded!";
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
@@ -151,7 +167,7 @@ class UploadController extends Controller {
 			<form method=\"POST\" action=\"index.php\" enctype=\"multipart/form-data\">
 				<input type=\"hidden\" name=\"step\" value=\"{$this->step}\"/>
 				<label for=\"file\">Select a file to upload:
-				<input type=\"file\" name=\"file\"/{$this->disabled}></label>
+				<input type=\"file\" name=\"file\"{$this->disabled}/></label>
 				<label for=\"type\">File type:
 				<select name=\"type\" onchange=\"displayHideables(this[this.selectedIndex].getAttribute('value'));\"{$this->disabled}>";
 
@@ -199,6 +215,7 @@ class UploadController extends Controller {
 		}
 		return $help;
 	}
+
 	public function renderSpecificStyle() {
 		return "";
 	}

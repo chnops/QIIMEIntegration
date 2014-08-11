@@ -8,20 +8,22 @@ class LoginController extends Controller {
 
 	public function __construct(\Models\WorkflowI $workflow) {
 		parent::__construct($workflow);
-		$this->roster = \Utils\Roster::getDefaultRoster();
+		$this->roster = \Utils\Roster::getRoster();
 	}
 
-	public function getSubTitle() {
-		return "Login";
+	public function retrievePastResults() {
+		return "";
 	}
 	public function parseInput() {
 		if (isset($_POST['logout'])) {
 			$this->logout();
 			$this->result = "Logout successful";
+			return;
 		}
 		if (!isset($_POST['username'])) {
 			return;
 		}
+		
 		$username = $_POST['username'];
 		$userExists = $this->roster->userExists($username);
 		
@@ -31,16 +33,7 @@ class LoginController extends Controller {
 				$this->result = "That username is already taken.  Did you mean to log in?";
 			}
 			else {
-				try {
-					$this->createUser($username);
-					$this->login($username);
-					$this->result = "You have successfully created a new user.";
-				}
-				catch (\Exception $ex) {
-					error_log($ex->getMessage());
-					$this->isResultError = true;
-					$this->result = "We were unable to create a new user.  Please see the error log or contact your system administrator";
-				}
+				$this->createUser($username);
 			}
 		}
 		else {
@@ -54,21 +47,34 @@ class LoginController extends Controller {
 		}
 	}
 
-	private function logout() {
+	public function logout() {
 		$_SESSION = array();
 		$this->username = NULL;
 		$this->project = NULL;
 	}
-	private function login($username) {
+	public function login($username) {
 		$this->logout();
 		$_SESSION['username'] = $username;
 		$this->username = $username;
 		$this->result = "You have successfully logged in.";
 	}
-	private function createUser($username) {
-		$this->roster->createUser($username);
+	public function createUser($username) {
+		try {
+			$this->roster->createUser($username);
+		}
+		catch (\Exception $ex) {
+			error_log($ex->getMessage());
+			$this->isResultError = true;
+			$this->result = "We were unable to create a new user.  Please see the error log or contact your system administrator";
+			return;
+		}
+		$this->result = "You have successfully created a new user.";
+		$this->login($username);
 	}
 
+	public function getSubTitle() {
+		return "Login";
+	}
 	public function renderInstructions() {
 		return "";
 	}
@@ -98,14 +104,11 @@ class LoginController extends Controller {
 			</form>";
 		return $loginForm . "<strong>-OR-</strong><br/>" . $createForm . "<strong>-OR-</strong><br/>" . $logoutForm;
 	}
-
-	public function retrievePastResults() {
-		return "";
-	}
 	public function renderHelp() {
 		return "<p>You don't actually need credentials to log in. By entering your name here, you are simply keeping track of your projects.
 			We expect everyone on this system to play nicely, and work only on their own projects. We recognize this assumption is naive.</p>";
 	}
+
 	public function renderSpecificStyle() {
 		return "";
 	}

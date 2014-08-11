@@ -38,7 +38,7 @@ class PDODatabase implements DatabaseI {
 			error_log("Error checking user ({$username}) existance: " . $ex->getMessage());
 			// TODO error handling
 			// TODO transactions
-			return -1;
+			return FALSE;
 		}
 	}
 
@@ -117,7 +117,7 @@ class PDODatabase implements DatabaseI {
 			$pdoStatement = $this->pdo->prepare("INSERT INTO projects (owner, id, name) VALUES (:owner, :id, :name)"); 
 			$result = $pdoStatement->execute(array(
 				"owner" => $username,
-				"id" => "$id",
+				"id" => $id,
 				"name" => $projectName,
 			));
 			$errorInfo = $pdoStatement->errorInfo();
@@ -148,13 +148,13 @@ class PDODatabase implements DatabaseI {
 				return $result;
 			}
 			else {
-				return "ERROR";
+				return false;
 			}
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to find project name: " . $ex->getMessage());
-			// TODO error hendling
-			return "ERROR";
+			// TODO error handling
+			return false;
 		}
 	}
 
@@ -172,7 +172,7 @@ class PDODatabase implements DatabaseI {
 			$errorInfo = $pdoStatement->errorInfo();
 			$pdoStatement->closeCursor();
 			if (!$insertSuccess) {
-				throw new \PDOException("Unable to insert uploaded_file: " . $errorInfo[2]);
+				throw new \Exception("Unable to insert uploaded_file: " . $errorInfo[2]);
 			}
 			return true;
 		}
@@ -243,8 +243,10 @@ class PDODatabase implements DatabaseI {
 		try {
 			$pdoStatement = $this->pdo->prepare("UPDATE script_runs SET run_status = :pid WHERE id = :id");
 			$execResult = $pdoStatement->execute(array("id" => $runId, "pid" => $pid));
+			$rowCount = $pdoStatement->rowCount();
+			$success = $execResult && ($rowCount > 0);
 			$pdoStatement->closeCursor();
-			return $execResult;
+			return $success;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to give run pid: " . $ex->getMessage());
@@ -321,8 +323,10 @@ class PDODatabase implements DatabaseI {
 				project_owner = :owner AND project_id = :id AND name = :oldName");
 			$execResult = $pdoStatement->execute(array("owner" => $username, "id" => $projectId, 
 				"newName" => $newFileName, "oldName" => $fileName));
+			$rowCount = $pdoStatement->rowCount();
+			$success = $execResult && ($rowCount > 0);
 			$pdoStatement->closeCursor();
-			return $execResult;
+			return $success;
 		}
 		catch (\Exception $ex) {
 			error_log("Unable to : " . $ex->getMessage());
@@ -331,14 +335,4 @@ class PDODatabase implements DatabaseI {
 			return false;
 		}
 	}
-
-	/*Try catch block commong to all functions
-		try {
-		}
-		catch (\Exception $ex) {
-			error_log("Unable to : " . $ex->getMessage());
-			// TODO error handling
-			// TODO transactions
-		}
-	 */
 }

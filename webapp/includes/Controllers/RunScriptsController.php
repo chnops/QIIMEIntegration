@@ -3,11 +3,11 @@
 namespace Controllers;
 
 class RunScriptsController extends Controller {
+	private $scriptId = "";
 
 	public function getSubTitle() {
 		return "Run Scripts";
 	}
-	private $scriptId = "";
 	
 	public function retrievePastResults() {
 		if (!$this->project) {
@@ -18,8 +18,7 @@ class RunScriptsController extends Controller {
 			return "";
 		}
 
-		$helper = \Utils\Helper::getHelper();
-		$pastScriptRunsFormatted = $helper->categorizeArray($pastScriptRuns, 'name');
+		$pastScriptRunsFormatted = $this->helper->categorizeArray($pastScriptRuns, 'name');
 
 		$output = "";
 		foreach ($this->project->getScripts() as $scriptName => $scriptObject) {
@@ -30,13 +29,13 @@ class RunScriptsController extends Controller {
 				continue;
 			}
 			foreach ($pastScriptRunsFormatted[$scriptName] as $run) {
-				$status = ($run['is_finished']) ? "ready" : "still running";
+				$status = ($run['is_finished']) ? "done" : "still running";
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">Run {$run['id']} (<em>{$status}</em>)</h4>";
-				$output .= "<div><strong>User input:</strong> " . $helper->htmlentities($run['input']);
+				$output .= "<div><strong>User input:</strong> " . $this->helper->htmlentities($run['input']);
 				if (!empty($run['file_names'])) {
 					$output .= "<br/><strong>Generated files</strong><ul>";
 					foreach($run['file_names'] as $fileName) {
-						$output .= "<li>" . $helper->htmlentities($fileName) . "</li>";
+						$output .= "<li>" . $this->helper->htmlentities($fileName) . "</li>";
 					}
 					$output .= "</ul>";
 				}
@@ -45,15 +44,11 @@ class RunScriptsController extends Controller {
 			$output .= "</div>\n";
 		}
 
-		if ($output) {
-			return $output;
-		}
-		return "";
+		return $output;
 	}
 
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
-			$this->disabled = " disabled";
 			$this->isResultError = true;
 			$this->result = "In order to run scripts, you must be logged in and have a project selected.";
 			return;
@@ -61,18 +56,22 @@ class RunScriptsController extends Controller {
 		if (!isset($_POST['step'])) {
 			return;
 		}
-		$_GET['step'] = $_POST['step'];
-		unset($_POST['step']);
 
 		$this->scriptId = $_POST['script'];
-
 		try {
 			$this->result = $this->project->runScript($_POST);
 		}
 		catch (\Exception $ex) {
 			$this->isResultError = true;
-			$this->result = $ex->getMessage();
+			$this->result = "Unable to run script: " . $ex->getMessage();
 		}
+	}
+
+	public function setScriptId($scriptId) {
+		$this->scriptId = $scriptId;
+	}
+	public function getScriptId() {
+		return $this->scriptId;
 	}
 
 	public function renderInstructions() {
@@ -107,12 +106,10 @@ class RunScriptsController extends Controller {
 		$project = ($this->project) ? $this->project : $this->workflow->getNewProject();	
 		$help = "";
 		$scripts = $project->getScripts();
-		if ($scripts) {
-			foreach ($scripts as $script) {
-				$help .= "<div class=\"hideable\" id=\"help_{$script->getHtmlId()}\">\n";
-				$help .= $script->renderHelp();
-				$help .= "</div>\n";
-			}
+		foreach ($scripts as $script) {
+			$help .= "<div class=\"hideable\" id=\"help_{$script->getHtmlId()}\">\n";
+			$help .= $script->renderHelp();
+			$help .= "</div>\n";
 		}
 		return $help;
 	}

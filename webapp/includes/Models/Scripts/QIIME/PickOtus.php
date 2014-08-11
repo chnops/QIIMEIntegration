@@ -13,9 +13,19 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class PickOtus extends DefaultScript {
+	public function getScriptName() {
+		return "pick_otus.py";
+	}
+	public function getScriptTitle() {
+		return "Pick OTUs";
+	}
+	public function getHtmlId() {
+		return "pick_otus";
+	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
+
 		$inputSeqsFilePath = new OldFileParameter("--input_seqs_filepath", $this->project);
 		$inputSeqsFilePath->requireIf();
 
@@ -29,7 +39,7 @@ class PickOtus extends DefaultScript {
 
 		$clusteringAlgorithm = new ChoiceParameter("--clustering_algorithm", "furthest",
 			array("furthest", "nearest", "average"));
-		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mother");
+		$clusteringAlgorithm->excludeButAllowIf($otuPickingMethod, "mothur");
 
 		$maxCdhitMemory = new TextArgumentParameter("--max_cdhit_memory", "400", TextArgumentParameter::PATTERN_DIGIT); // TODO units = Mbyte
 		$maxCdhitMemory->excludeButAllowIf($otuPickingMethod, "cdhit");
@@ -78,9 +88,9 @@ class PickOtus extends DefaultScript {
 		$wordLength->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
 
-		$suppressPresortByAbundanceUclut = new TrueFalseParameter("--suppress_presort_by_abundance_uclust");
-		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust");
-		$suppressPresortByAbundanceUclut->excludeButAllowIf($otuPickingMethod, "uclust_ref");
+		$suppressPresortByAbundanceUclust = new TrueFalseParameter("--suppress_presort_by_abundance_uclust");
+		$suppressPresortByAbundanceUclust->excludeButAllowIf($otuPickingMethod, "uclust");
+		$suppressPresortByAbundanceUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref");
 		$optimalUclust = new TrueFalseParameter("--optimal_uclust");
 		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust");
 		$optimalUclust->excludeButAllowIf($otuPickingMethod, "uclust_ref"); // TODO really?
@@ -118,7 +128,6 @@ class PickOtus extends DefaultScript {
 		$maxRejects->excludeButAllowIf($otuPickingMethod, "usearch61_ref");
 
 		$usearchFastCluster = new TrueFalseParameter("--usearch_fast_cluster"); // TODO forces usearch61_sort_method = long
-				// TODO has different exclude criteria than its linked parameter
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch_ref");
 		$usearchFastCluster->excludeButAllowIf($otuPickingMethod, "usearch61");
@@ -212,9 +221,10 @@ class PickOtus extends DefaultScript {
 		$threads = new TextArgumentParameter("--threads", "1.0", TextArgumentParameter::PATTERN_NUMBER);
 		$threads->excludeButAllowIf($otuPickingMethod, "usearch61");
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$inputSeqsFilePath,
+
 			new Label("Optional Parameters"),
 			$triePrefilter,
 			$prefixPrefilterLength,
@@ -231,7 +241,7 @@ class PickOtus extends DefaultScript {
 			$suppressNewClusters,
 			$similarity,
 			$wordLength,
-			$suppressPresortByAbundanceUclut,
+			$suppressPresortByAbundanceUclust,
 			$optimalUclust,
 			$exactUclust,
 			$userSort,
@@ -263,14 +273,6 @@ class PickOtus extends DefaultScript {
 			new TrueFalseParameter("--verbose"),
 			new NewFileParameter("--output_dir", "uclust_picked_otus", $isDir = true) // TODO dynamic default
 		);
-	}
-	public function getScriptName() {
-		return "pick_otus.py";
-	}
-	public function getScriptTitle() {
-		return "Pick OTUs";
-	}
-	public function getHtmlId() {
-		return "pick_otus";
+		return $parameters;
 	}
 }

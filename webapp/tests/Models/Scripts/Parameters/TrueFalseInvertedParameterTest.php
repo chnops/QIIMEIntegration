@@ -3,47 +3,64 @@
 namespace Models\Scripts\Parameters;
 
 class TrueFalseInvertedParameterTest extends \PHPUnit_Framework_TestCase {
-
-	private $name = "--true_false_inverted";
-	private $parameter;
-
 	public static function setUpBeforeClass() {
 		error_log("TrueFalseInvertedParameterTest");
 	}
 
+	private $mockScript = NULL;
+	private $name = "--name";
+	private $object;
+	public function __construct($name = null, array $data = array(), $dataName = '')  {
+		parent::__construct($name, $data, $dataName);
+
+		$this->mockScript = $this->getMockBuilder('\Models\Scripts\DefaultScript')
+			->disableOriginalConstructor()
+			->setMethods(array("getJsVar"))
+			->getMockForAbstractClass();
+		$this->mockScript->expects($this->any())->method("getJsVar")->will($this->returnValue("js_script"));
+	}
+
 	public function setUp() {
-		$this->parameter = new TrueFalseInvertedParameter($this->name);
+		$this->object = new TrueFalseInvertedParameter($this->name);
 	}
 
 	/**
-	 * @test
-	 * @covers TrueFalseInvertedParameter::__construct
+	 * @covers \Models\Scripts\Parameters\TrueFalseInvertedParameter::__construct
 	 */
 	public function testConstructor() {
-		$this->assertTrue($this->parameter->getValue());
-		$this->parameter = new TrueFalseInvertedParameter($this->name, FALSE);
-		$this->assertTrue($this->parameter->getValue());
+		$expecteds = array(
+			"name" => $this->name,
+			"value" => true,
+		);
+		$actuals = array();
+
+		$this->object = new TrueFalseInvertedParameter($this->name);
+
+		$actuals['name'] = $this->object->getName();
+		$actuals['value'] = $this->object->getValue();
+		$this->assertEquals($expecteds, $actuals);
 	}
 
 	/**
-	 * @test
-	 * @covers TrueFalseInvertedParameter::renderForOperatingSystem
+	 * @covers \Models\Scripts\Parameters\TrueFalseInvertedParameter::renderForOperatingSystem
 	 */
-	public function testRenderForOperatingSystem() {
-		$this->assertEmpty($this->parameter->renderForOperatingSystem());
-		$this->parameter->setValue(FALSE);
-		$this->assertEquals($this->name, $this->parameter->renderForOperatingSystem());
-	}
+	public function testRenderForOperatingSystem_valueTrue() {
+		$expected = $this->name;
+		$this->object->setValue(false);
 
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertEquals($expected, $actual);
+	}
 	/**
-	 * @test
-	 * @covers TrueFalseInvertedParameter::renderForForm
+	 * @covers \Models\Scripts\Parameters\TrueFalseInvertedParameter::renderForOperatingSystem
 	 */
-	public function testRenderForForm() {
-		$expectedIfTrue = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\" checked/> {$this->name}</label>";
-		$this->assertEquals($expectedIfTrue, $this->parameter->renderForForm());
-		$this->parameter->setValue(FALSE);
-		$expectedIfFalse = "<label for=\"{$this->name}\"><input type=\"checkbox\" name=\"{$this->name}\"/> {$this->name}</label>";
-		$this->assertEquals($expectedIfFalse, $this->parameter->renderForForm());
+	public function testRenderForOperatingSystem_valueFalse() {
+		$expected = "";
+		$this->object->setValue(true);
+
+		$actual = $this->object->renderForOperatingSystem();
+
+		$this->assertEquals($expected, $actual);
 	}
 }

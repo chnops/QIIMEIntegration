@@ -27,62 +27,65 @@ class QIIMEProject extends DefaultProject {
 			throw $ex;
 		}
 	}
-	public function initializeScripts() {
+	public function getInitialScripts() {
+		$scripts = array();
+
 		$script = new \Models\Scripts\QIIME\ValidateMappingFile($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Validate input'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\JoinPairedEnds($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\SplitLibraries($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ExtractBarcodes($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\SplitLibrariesFastq($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ConvertFastaQualFastq($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Prepare libraries'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\PickOtus($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Organize into OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\PickRepSet($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Organize into OTUs'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\AssignTaxonomy($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\MakeOtuTable($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\ManipulateOtuTable($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Count/analyze OTUs'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
 
 		$script = new \Models\Scripts\QIIME\AlignSeqs($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\FilterAlignment($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
-
+		$scripts[$script->getHtmlId()] = $script;
 		$script = new \Models\Scripts\QIIME\MakePhylogeny($this);
-		$this->scripts[$script->getHtmlId()] = $script;
-		$this->scriptsFormatted['Perform phylogeny analysis'][] = $script;
+		$scripts[$script->getHtmlId()] = $script;
+
+		return $scripts;
+	}
+
+	public function getFormattedScripts() {
+		if (!$this->scriptsFormatted) {
+			$scriptsInOrder = array_values($this->getScripts());
+			$index = 0;
+			$this->scriptsFormatted['Validate input'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Prepare libraries'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Organize into OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Organize into OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Count/analyze OTUs'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index++];
+			$this->scriptsFormatted['Perform phylogeny analysis'][] = $scriptsInOrder[$index];
+		}
+		return $this->scriptsFormatted;
 	}
 
 	public function getInitialFileTypes() {
@@ -93,66 +96,6 @@ class QIIMEProject extends DefaultProject {
 			new FastqFileType(),
 		);
 	}
-	public function runScript(array $allInput) {
-		$helper = \Utils\Helper::getHelper();
-		$this->generatedFiles = array();
-		$this->pastScriptRuns = array();
-
-		$scripts = $this->getScripts();
-		$scriptId = $allInput['script'];
-		unset($allInput['script']);
-		if (!isset($scripts[$scriptId])) {
-			throw new \Exception("Unable to find script: " . $helper->htmlentities($scriptId));
-		}
-		$script = $scripts[$scriptId];
-
-		$script->acceptInput($allInput); // will throw an error if bad input
-		$result = "Able to validate script input-";
-		$code = $script->renderCommand();
-
-		$this->database->startTakingRequests();
-		$runId = $this->database->createRun($this->owner, $this->id, $scriptId, $code);
-		if (!$runId) {
-			$result .= "<br/>However, we were unable to save the run in the database.";
-			throw new \Exception($result);
-		}
-
-		try {
-			$pid = $this->operatingSystem->runScript($this, $runId, $script, $this->database);
-
-			$pidResult = $this->database->giveRunPid($runId, $pid);
-			if (!$pidResult) {
-				$result .= "<br/>However, we were unable to save the run in the database.";
-				$this->database->forgetAllRequests();
-				throw new \Exception($result);
-			}
-
-			$this->database->executeAllRequests();
-			return $result . "<br/>Script was started successfully";
-		}
-		catch (\Exception $ex) {
-			$this->database->forgetAllRequests();
-			throw $ex;
-		}
-	}
-
-	public function renderOverview() {
-		$overview = "<div id=\"project_overview\">\n";
-
-		if (!$this->scriptsFormatted) {
-			$this->initializeScripts();
-		}
-		foreach ($this->scriptsFormatted as $category => $scriptArray) {
-			$overview .= "<div><span>{$category}</span>";
-			foreach ($scriptArray as $script) {
-				$overview .= "<span><a class=\"button\" onclick=\"displayHideables('{$script->getHtmlId()}');\" title=\"{$script->getScriptName()}\">{$script->getScriptTitle()}</a></span>";
-			}
-			$overview .= "</div>\n";
-		}
-		$overview .= "</div>\n";
-		return $overview;
-	}
-
 	public function retrieveAllBuiltInFiles() {
 		if (empty($this->builtInFiles)) {
 			try {

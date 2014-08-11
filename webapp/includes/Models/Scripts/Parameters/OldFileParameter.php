@@ -4,16 +4,24 @@ namespace Models\Scripts\Parameters;
 use \Models\Scripts\ScriptException;
 
 class OldFileParameter extends DefaultParameter {
+
 	private $project = NULL;
 	public function __construct($name, \Models\ProjectI $project, $default = "") {
 		$this->name = $name;
 		$this->project = $project;
 		$this->value = $default;
 	}
+
+	public function getProject() {
+		return $this->project;
+	}
+	public function setProject(\Models\ProjectI $project) {
+		$this->project = $project;
+	}
+
 	public function renderForForm($disabled, \Models\Scripts\ScriptI $script) {
 		$helper = \Utils\Helper::getHelper();
 		$disabledString = ($disabled) ? " disabled" : "";
-		$helper = \Utils\Helper::getHelper();
 		$output = "{$this->name} <a class=\"param_help\" id=\"{$this->getJsVar($script->getJsVar())}\">&amp;</a><select name=\"{$this->name}\" size=\"5\"{$disabledString}>\n";
 
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
@@ -39,7 +47,7 @@ class OldFileParameter extends DefaultParameter {
 
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
-			$output .= "{$this->name}<optgroup label=\"generated files\" class=\"big\">\n";
+			$output .= "<optgroup label=\"generated files\" class=\"big\">\n";
 			
 			$generatedFilesFormatted = $helper->categorizeArray($generatedFiles, 'run_id', 'name');
 
@@ -60,13 +68,14 @@ class OldFileParameter extends DefaultParameter {
 
 		$builtInFiles = $this->project->retrieveAllBuiltInFiles();
 		if (!empty($builtInFiles)) {
-			$output .= "{$this->name}<optgroup label=\"built in files\" class=\"big\">\n";
-			$output .= "{$this->name}<optgroup>\n";
+			$output .= "<optgroup label=\"built in files\" class=\"big\">\n";
+			$output .= "<optgroup>\n";
 
 			foreach ($builtInFiles as $fileName) {
 				$selected = ($this->value == $fileName) ? " selected" : "";
 				$output .= "<option value=\"{$fileName}\"{$selected}>" . $helper->htmlentities($fileName) . "</option>\n";
 			}
+			$output .= "</optgroup>\n";
 		}
 
 		$output .= "</select>\n";

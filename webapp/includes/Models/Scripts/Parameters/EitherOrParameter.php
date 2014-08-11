@@ -7,8 +7,8 @@ class EitherOrParameter extends DefaultParameter {
 	protected $default;
 	protected $alternative;
 
-	protected $currentSelection = NULL;
-	protected $currentNonSelection = NULL;
+	protected $selection = NULL;
+	protected $nonSelection = NULL;
 
 	protected $displayName;
 
@@ -23,6 +23,25 @@ class EitherOrParameter extends DefaultParameter {
 		else {
 			$this->displayName = $this->default->getName() . " or " . $this->alternative->getName();
 		}
+	}
+
+	public function getDefault() {
+		return $this->default;
+	}
+	public function setDefault(ParameterI $parameter) {
+		$this->default = $parameter;
+	}
+	public function getAlternative() {
+		return $this->alternative;
+	}
+	public function setAlternative(ParameterI $parameter) {
+		$this->alternative = $parameter;
+	}
+	public function getDisplayName() {
+		return $this->displayName;
+	}
+	public function setDisplayName($displayName) {
+		$this->displayName = $displayName;
 	}
 
 	public function renderForOperatingSystem() {
@@ -76,10 +95,10 @@ class EitherOrParameter extends DefaultParameter {
 		if (!$value) {
 			return true;
 		}
-		if ($this->default->getName() == $value) {
+		if ($this->default->getName() === $value) {
 			return true;
 		}
-		if ($this->alternative->getName() == $value) {
+		if ($this->alternative->getName() === $value) {
 			return true;
 		}
 		return false;
@@ -88,36 +107,47 @@ class EitherOrParameter extends DefaultParameter {
 	public function setValue($value) {
 		parent::setValue($value);
 		if ($this->value == $this->default->getName()) {
-			$this->currentSelection = $this->default;
-			$this->currentNonSelection = $this->alternative;
+			$this->selection = $this->default;
+			$this->nonSelection = $this->alternative;
 		}
 		else {
-			$this->currentSelection = $this->alternative;
-			$this->currentNonSelection = $this->default;
+			$this->selection = $this->alternative;
+			$this->nonSelection = $this->default;
 		}
 	}
 
 	public function getUnselectedValue() {
-		if (!$this->value || !$this->currentNonSelection) {
+		if (!$this->value || !$this->nonSelection) {
 			return "";
 		}
-		return $this->currentNonSelection->getName();
+		return $this->nonSelection->getName();
+	}
+
+	public function getSelection() {
+		return $this->selection;
+	}
+	public function setSelection(ParameterI $parameter = NULL) {
+		$this->selection = $parameter;
+	}
+	public function getNonSelection() {
+		return $this->nonSelection;
+	}
+	public function setNonSelection(ParameterI $parameter = NULL) {
+		$this->nonSelection = $parameter;
 	}
 
 	public function acceptInput(array $input) {
 		parent::acceptInput($input);
-		if (!isset($input[$this->name]) || !$input[$this->name]) {
-			$this->setValue("");
+		if (!$this->value) {
 			return;
 		}
 
-		$this->setValue($input[$this->name]);
-		if (!isset($input[$this->value])) {
+		if (!isset($input[$this->value]) || $input[$this->value] === "") {
 			throw new ScriptException("Since {$this->name} is set to {$this->value}, that parameter must be specified.");
 		}
-		if (isset($input[$this->getUnselectedValue()])) {
+		if (isset($input[$this->getUnselectedValue()]) && $input[$this->getUnselectedValue()] !== "") {
 			throw new ScriptException("Since {$this->name} is set to {$this->value}, {$this->getUnselectedValue()} is not allowed.");
 		}
-		$this->currentSelection->acceptInput($input);
+		$this->selection->acceptInput($input);
 	}
 }

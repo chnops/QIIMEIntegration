@@ -13,39 +13,6 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class FilterAlignment extends DefaultScript {
-
-	public function initializeParameters() {
-		parent::initializeParameters();
-		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
-		$inputFastaFile->requireIf();
-
-		$removeOutliers = new TrueFalseParameter("--remove_outliers");
-		$threshold = new TextArgumentParameter("--threshold", "3.0", TextArgumentParameter::PATTERN_NUMBER);
-		$threshold->excludeButAllowIf($removeOutliers);
-
-		$laneMaskFp = new OldFileParameter("--lane_mask_fp", $this->project, '/macqiime/greengenes/lanemask_in_1s_and_0s');
-		$entropyThreshold = new TextArgumentParameter("--entropy_threshold", "", TextArgumentParameter::PATTERN_PROPORTION);
-		$laneMaskFp->excludeIf($entropyThreshold);
-		$suppressLaneMaskFilter = new TrueFalseParameter("--suppress_lane_mask_filter");
-		$suppressLaneMaskFilter->excludeIf($entropyThreshold);
-		$laneMaskFp->excludeIf($suppressLaneMaskFilter);
-
-
-		array_push($this->parameters,
-			new Label("Required Parameters"),
-			$inputFastaFile,
-			new Label("Optional Parameters"),
-			$entropyThreshold,
-			$suppressLaneMaskFilter,
-			$laneMaskFp,
-			new TextArgumentParameter("--allowed_gap_frac", "0.999999", TextArgumentParameter::PATTERN_PROPORTION),
-			$removeOutliers,
-			$threshold,
-			new Label('Output Options'),
-			new TrueFalseParameter("--verbose"),
-			new NewFileParameter("--output_dir", ".", $isDir = true)
-		);
-	}
 	public function getScriptName() {
 		return "filter_alignment.py";
 	}
@@ -54,5 +21,41 @@ class FilterAlignment extends DefaultScript {
 	}
 	public function getHtmlId() {
 		return "filter_alignment";
+	}
+
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
+
+		$inputFastaFile = new OldFileParameter("--input_fasta_file", $this->project);
+		$inputFastaFile->requireIf();
+
+		$removeOutliers = new TrueFalseParameter("--remove_outliers");
+		$threshold = new TextArgumentParameter("--threshold", "3.0", TextArgumentParameter::PATTERN_NUMBER);
+		$laneMaskFp = new OldFileParameter("--lane_mask_fp", $this->project, '/macqiime/greengenes/lanemask_in_1s_and_0s');
+		$entropyThreshold = new TextArgumentParameter("--entropy_threshold", "", TextArgumentParameter::PATTERN_PROPORTION);
+		$suppressLaneMaskFilter = new TrueFalseParameter("--suppress_lane_mask_filter");
+
+		$threshold->excludeButAllowIf($removeOutliers);
+		$suppressLaneMaskFilter->excludeIf($entropyThreshold);
+		$laneMaskFp->excludeIf($entropyThreshold);
+		$laneMaskFp->excludeIf($suppressLaneMaskFilter);
+
+		array_push($parameters,
+			new Label("Required Parameters"),
+			$inputFastaFile,
+
+			new Label("Optional Parameters"),
+			$entropyThreshold,
+			$suppressLaneMaskFilter,
+			$laneMaskFp,
+			new TextArgumentParameter("--allowed_gap_frac", "0.999999", TextArgumentParameter::PATTERN_PROPORTION),
+			$removeOutliers,
+			$threshold,
+
+			new Label('Output Options'),
+			new TrueFalseParameter("--verbose"),
+			new NewFileParameter("--output_dir", ".", $isDir = true)
+		);
+		return $parameters;
 	}
 }

@@ -7,6 +7,22 @@ class ViewResultsController extends Controller {
 	public function getSubTitle() {
 		return "View Results";
 	}
+	public function retrievePastResults() {
+		if (!$this->project) {
+			return "<p>In order to view results, you must <a href=\"?step=login\">log in</a> and <a href=\"?step=select\">select a project</a></p>";
+		}
+
+		$output = "<h3>" . $this->helper->htmlentities($this->project->getName()) . "</h3>";
+		$output .= "<ul>
+			<li>Owner: " . $this->helper->htmlentities($this->project->getOwner()) . "</li>
+			<li>Unique id: " . $this->helper->htmlentities($this->project->getId()) . "</li>
+			</ul>";
+
+		$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
+			<div class=\"file_example\" id=\"file_preview\"></div>";
+
+		return $output;
+	}
 
 	public function parseInput() {
 		if (!$this->username || !$this->project) {
@@ -23,12 +39,13 @@ class ViewResultsController extends Controller {
 		$file = $_POST['file'];
 		
 		if (!is_numeric($run)) {
-			$this->isResulsError = true;
+			$this->isResultError = true;
 			$this->result = "Run id must be numeric";
+			return;
 		}
 		$isUploaded = ($run == -1);
-		$helper = \Utils\Helper::getHelper();
-		$fileDisplay = $helper->htmlentities($file);
+
+		$fileDisplay = $this->helper->htmlentities($file);
 
 		if ($action == 'delete') {
 			try {
@@ -42,7 +59,7 @@ class ViewResultsController extends Controller {
 			}
 			catch (\Exception $ex) {
 				$this->isResultError = true;
-				$this->result = $ex->getMessage();
+				$this->result = "Unable to delete '{$fileDisplay}': " . $ex->getMessage();
 			}
 		}
 		else if ($action == 'unzip') {
@@ -53,14 +70,14 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->unzipGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully unzipped file: " . $fileDisplay; 
+				$this->result = "Unzipped file: " . $fileDisplay; 
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
 					error_log($ex->getConsoleOutput());
 				}
 				$this->isResultError = true;
-				$this->result = $ex->getMessage();
+				$this->result = "Unable to unzip '{$fileDisplay}': " . $ex->getMessage();
 			}
 		}
 		else if ($action == 'gzip') {
@@ -71,14 +88,14 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->compressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully compressed file: " . $fileDisplay;
+				$this->result = "File compressed: " . $fileDisplay;
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
 					error_log($ex->getConsoleOutput());
 				}
 				$this->isResultError = true;
-				$this->result = $ex->getMessage();
+				$this->result = "Unable to compress '{$fileDisplay}': " . $ex->getMessage();
 			}
 		}
 		else if ($action == 'gunzip') {
@@ -89,38 +106,22 @@ class ViewResultsController extends Controller {
 				else {
 					$this->project->decompressGeneratedFile($file, $run);
 				}
-				$this->result = "Successfully de-compressed file: " . $fileDisplay;
+				$this->result = "File de-compressed: " . $fileDisplay;
 			}
 			catch (\Exception $ex) {
 				if ($ex instanceof \Models\OperatingSystemException) {
 					error_log($ex->getConsoleOutput());
 				}
 				$this->isResultError = true;
-				$this->result = $ex->getMessage();
+				$this->result = "Unable to de-compress '{$fileDisplay}': " . $ex->getMessage();
 			}
 		}
-	}
-	public function retrievePastResults() {
-		if (!$this->project) {
-			return "<p>In order to view results, you must <a href=\"?step=login\">log in</a> and <a href=\"?step=select\">select a project</a></p>";
+		else {
+			$this->isResultError = true;
+			$this->result = "An invalid action was requested: " . $this->helper->htmlentities($action);
 		}
-
-		$helper = \Utils\Helper::getHelper();
-		$output = "<h3>" . $helper->htmlentities($this->project->getName()) . "</h3>";
-		$output .= "<ul>
-			<li>Owner:  " . $helper->htmlentities($this->project->getOwner()) . "</li>
-			<li>Unique id: " . $helper->htmlentities($this->project->getId()) . "</li>
-			</ul>";
-
-		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
-		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
-		if (!empty($uploadedFiles) || !empty($generatedFiles)) {
-			$output .= "<hr/>You can see a preview of the file you wish to download here:<br/>
-				<div class=\"file_example\" id=\"file_preview\"></div>";
-		}
-
-		return $output;
 	}
+
 	public function renderInstructions() {
 		return "";
 	}
@@ -130,12 +131,11 @@ class ViewResultsController extends Controller {
 		}
 		$output = "";	
 
-		$helper = \Utils\Helper::getHelper();
 		$uploadedFiles = $this->project->retrieveAllUploadedFiles();
 		$rowHtmlId = 0;
 		if (!empty($uploadedFiles)) {
 			$output .= "<h3>Uploaded Files:</h3><div class=\"accordion\">\n";
-			$uploadedFilesFormatted = $helper->categorizeArray($uploadedFiles, 'type'); 
+			$uploadedFilesFormatted = $this->helper->categorizeArray($uploadedFiles, 'type'); 
 			foreach ($uploadedFilesFormatted as $fileType => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">{$fileType} files</h4><div><table>\n";
 				foreach ($files as $file) {
@@ -150,38 +150,36 @@ class ViewResultsController extends Controller {
 		$generatedFiles = $this->project->retrieveAllGeneratedFiles();
 		if (!empty($generatedFiles)) {
 			$output .= "<h3>Generated Files:</h3><div class=\"accordion\">\n";
-			$generatedFilesFormatted = $helper->categorizeArray($generatedFiles, 'run_id');
+			$generatedFilesFormatted = $this->helper->categorizeArray($generatedFiles, 'run_id');
 			foreach ($generatedFilesFormatted as $runId => $files) {
 				$output .= "<h4 onclick=\"hideMe($(this).next())\">files from run {$runId}</h4><div><table>\n";
 				foreach ($files as $file) {
-					// TODO status/size not set if coming from generated files
-					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'generated', -1, $file['run_id']);
+					$output .= $this->renderFileMenu($rowHtmlId, $file['name'], 'ready', -1, $file['run_id']);
 					$rowHtmlId++;
 				}
 				$output .= "</table></div>\n";
 			}
-			$output .= "</div>";
+			$output .= "</div>\n";
 		}
 
 		return $output;
 	}
-	private function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $fileSize, $runId = -1) {
+	public function renderFileMenu($rowHtmlId, $fileName, $fileStatus, $fileSize, $runId = -1) {
 		$downloadLink = "download.php?file_name={$fileName}&run={$runId}";
 
 		$sizeDisclaimer = ($fileSize && $fileSize >= 0) ? "<em>size: {$fileSize}B</em>" : "<em>size uncertain</em>";
 
-		$helper = \Utils\Helper::getHelper();	
-		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
+		$row = "<tr class=\"{$fileStatus}\" id=\"result_file_{$rowHtmlId}\"><td>" . $this->helper->htmlentities($fileName) . " ({$fileStatus}) ({$sizeDisclaimer})</td>
 			<td><a class=\"button\" onclick=\"previewFile('{$downloadLink}&as_text=true')\">Preview</a></td>
 			<td><a class=\"button\" onclick=\"window.location='{$downloadLink}'\">Download</a></td>
-			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>";
+			<td><a class=\"button more\" onclick=\"$(this).parents('tr').next().toggle('highlight', {}, 500);$(this).parents('tr').next().next().toggle('highlight', {}, 500);\">More...</a></td></tr>\n";
 
 		$fileTypeInput = "<input type=\"hidden\" name=\"run\" value=\"{$runId}\">";
 		$fileNameInput = "<input type=\"hidden\" name=\"file\" value=\"{$fileName}\">";
-		$genericForm = "<td><form action=\"#result_file_{$rowHtmlId}\" method=\"POST\" %s>%s{$fileTypeInput} {$fileNameInput}<input type=\"submit\" name=\"action\" value=\"%s\"></form></td>";
+		$genericForm = "<td><form action=\"#result_file_{$rowHtmlId}\" method=\"POST\"%s>%s{$fileTypeInput}{$fileNameInput}<input type=\"submit\" name=\"action\" value=\"%s\"></form></td>\n";
 
 		$row .= "<tr><td>&nbsp;</td>";
-		$row .= $deleteForm = sprintf($genericForm, $jScript = "onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
+		$row .= $deleteForm = sprintf($genericForm, $jScript = " onsubmit=\"return confirm('Are you sure you want to delete this file? Action cannot be undone');\"",
 			$extraInput = "", $action = "delete");
 		$row .= $compressForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "gzip");
 		$row .= $unzipForm = sprintf($genericForm, $jScript = "", $extraInput = "", $action = "unzip");
@@ -195,6 +193,7 @@ class ViewResultsController extends Controller {
 		return "<p>Here is the moment you've been waiting for... your results! From this page, you can preview, download, and manage any of the files that
 			you have uploaded or generated by running scripts.</p>";
 	}
+
 	public function renderSpecificStyle() {
 		return "div#file_preview{margin:.75em;display:none}
 			div.form table{border-collapse:collapse;margin:0px;width:100%}

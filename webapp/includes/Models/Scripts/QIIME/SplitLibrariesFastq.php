@@ -13,18 +13,28 @@ use Models\Scripts\Parameters\ChoiceParameter;
 use Models\Scripts\Parameters\Label;
 
 class SplitLibrariesFastq extends DefaultScript {
+	public function getScriptName() {
+		return "split_libraries_fastq.py";
+	}
+	public function getScriptTitle() {
+		return "De-multiplex fastq";
+	}
+	public function getHtmlId() {
+		return "split_libraries_fastq";
+	}
 
-	public function initializeParameters() {
-		parent::initializeParameters();
+	public function getInitialParameters() {
+		$parameters = parent::getInitialParameters();
 
 		$sequenceReadFps = new OldFileParameter("--sequence_read_fps", $this->project); 
-		$sequenceReadFps->requireIf();
 		$mappingFps = new OldFileParameter("--mapping_fps", $this->project);
-		$mappingFps->requireIf();
 		$outputDir = new NewFileParameter("--output_dir", "", $isDir = true);
+
+		$sequenceReadFps->requireIf();
+		$mappingFps->requireIf();
 		$outputDir->requireIf();
 
-		array_push($this->parameters,
+		array_push($parameters,
 			new Label("Required Parameters"),
 			$sequenceReadFps,
 			$mappingFps,
@@ -35,7 +45,7 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--samples_ids", "", TextArgumentParameter::PATTERN_NO_WHITE_SPACE),
 			new TrueFalseParameter("--rev_comp_barcode"),
 			new TrueFalseParameter("--rev_comp_mapping_barcodes"),
-			new TextArgumentParameter("--barcode_type", "golay_12", '/.*/'),
+			new TextArgumentParameter("--barcode_type", "golay_12", TextArgumentParameter::PATTERN_ANYTHING_GOES),
 
 			new Label("Optional Parameters - Filtering (not quality)"),
 			new TextArgumentParameter("--sequence_max_n", "0", TextArgumentParameter::PATTERN_DIGIT),
@@ -55,14 +65,6 @@ class SplitLibrariesFastq extends DefaultScript {
 			new TextArgumentParameter("--start_seq_id", "0", TextArgumentParameter::PATTERN_DIGIT),
 			new TrueFalseParameter("--rev_comp")
 		);
-	}
-	public function getScriptName() {
-		return "split_libraries_fastq.py";
-	}
-	public function getScriptTitle() {
-		return "De-multiplex fastq";
-	}
-	public function getHtmlId() {
-		return "split_libraries_fastq";
+		return $parameters;
 	}
 }
