@@ -196,24 +196,23 @@ class HelperTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers \Utils\Helper::htmlentities
 	 */
-	public function testHtmlentities_entSubstitueIsSet() {
-		$this->markTestIncomplete();
-		if (!defined('ENT_SUBSTITUTE')) {
-			return;
-		}
-		$expected = "";
-
-		$actual = $this->object->htmlentities("\xff");
-
-		$this->assertEquals($expected, $actual);
-	}
-	/**
-	 * @covers \Utils\Helper::htmlentities
-	 */
 	public function testHtmlentities_entSubstitueIsNotSet_invalidValueIgnored() {
-		if (defined('ENT_SUBSTITUTE')) {
-			return;
-		}
 		$this->markTestIncomplete();
+		if (defined('ENT_SUBSTITUTE')) {
+			$expected = "\uFFFFE";
+			$input = "\xFF";
+			
+			$actual = $this->object->htmlentities($input);
+
+			$this->assertEquals($expected, $actual);
+		}
+		else {
+			$expected = "";
+			$input = "\xFF";
+
+			$actual = $this->object->htmlentities($input);
+
+			$this->assertEquals($expected, $actual);
+		}
 	}
 }

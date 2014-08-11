@@ -681,12 +681,6 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::downloadFile
 	 */
-	public function testDownloadFile_escapingOccursCorrectly() {
-		$this->markTestIncomplete();
-	}
-	/**
-	 * @covers MacOperatingSystem::downloadFile
-	 */
 	public function testDownloadFile_sourceFails() {
 		$expected = new OperatingSystemException("Unable to download file");
 		$expected->setConsoleOutput("sh: /tmp/file_that_does_not_exist.fake: No such file or directory\n");
@@ -813,16 +807,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::downloadFile
 	 */
-	public function testDownloadFile_wgetDoesNotSucceed() {
-		$this->markTestIncomplete();
-		// This is a hard one to test...
-	}
-	/**
-	 * @covers MacOperatingSystem::downloadFile
-	 */
-	public function testDownloadFile_wgetStartsSuccessfully() {
-		$this->markTestIncomplete();
-		//TODO can't check if file actually downloads, because it is started in background
+	public function testDownloadFile_nothingFails() {
 		$expecteds = array(
 			"function_return" => "",
 		);
@@ -966,7 +951,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
 		$actuals['function_return'] = $this->object->deleteFile($mockProject, $fileName, $runId = -1);
 
-		exec("if [ -e '{$fileName}']; then echo '1'; else echo '0'; fi;", $output);
+		exec("if [ -e '{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
 		$actuals['file_exists_after'] = $output[0];
 		$this->assertEquals($expecteds, $actuals);
 	}
@@ -996,7 +981,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch(OperatingSystemException $ex) {
 			$actuals['exception'] = $ex;
 		}
-		exec("if [ -e '{$fileName}']; then echo '1'; else echo '0'; fi;", $output);
+		exec("if [ -e '{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
 		$actuals['file_exists_after'] = $output[0];
 		$this->assertEquals($expecteds, $actuals);
 	}
@@ -1021,7 +1006,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
 		$actuals['function_return'] = $this->object->deleteFile($mockProject, $fileName, $runId = -1);
 
-		exec("if [ -e '{$fileName}']; then echo '1'; else echo '0'; fi;", $output);
+		exec("if [ -e '{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
 		$actuals['file_exists_after'] = $output[0];
 		$this->assertEquals($expecteds, $actuals);
 	}
@@ -1031,7 +1016,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	public function testDeleteFile_fullDir_doesExist() {
 		$expecteds = array(
 			"exception" => new OperatingSystemException("Unable to remove file"),
-			"file_exists_after" => "0",
+			"file_exists_after" => "1",
 		);
 		$actuals = array();
 		$fileName = $this->projectHome . "fileName";
@@ -1052,7 +1037,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		catch(OperatingSystemException $ex) {
 			$actuals['exception'] = $ex;
 		}
-		exec("if [ -e '{$fileName}']; then echo '1'; else echo '0'; fi;", $output);
+		exec("if [ -e '{$fileName}' ]; then echo '1'; else echo '0'; fi;", $output);
 		$actuals['file_exists_after'] = $output[0];
 		$this->assertEquals($expecteds, $actuals);
 	}
@@ -1090,20 +1075,20 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers MacOperatingSystem::unzipFile
 	 */
-	public function testUnzipFile_emptyZipFile() {
-		$this->markTestIncomplete();
+	public function testUnzipFile_nonEmptyZipFile() {
+		error_log("nonEmptyZipFile_UnzipFile");
 		$expecteds = array(
 			"function_return" => array("zipper/file1.ext", "zipper/file2.ext"),
 			"zip_file_exists_after" => "0",
+			"file1_exists_after" => "1",
+			"file2_exists_after" => "1",
 		);
 		$actuals = array();
 		$zipFile = $this->projectHome . "zipper.zip";
 		$mockProject = $this->getMockBuilder('\Models\DefaultProject')
 			->disableOriginalConstructor()
 			->getMockForAbstractClass();
-		system("mkdir {$this->projectHome}/zipper; touch {$this->projectHome}/zipper/file1.ext;" .
-			"touch {$this->projectHome}/zipper/file2.ext; zip {$zipFile} {$this->projectHome}/zipper/*;" . 
-			"rm -r {$this->projectHome}/zipper;");
+		system("cd {$this->projectHome}; mkdir zipper; touch zipper/file1.ext; touch zipper/file2.ext; zip -qq zipper.zip zipper/*; rm -r zipper");
 		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
 			->setMethods(array("findFileName"))
 			->getMock();
@@ -1111,17 +1096,14 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
 		$actuals['function_return'] = $this->object->unzipFile($mockProject, $zipFile, $runId = -1);
 
-		exec("if [ -e '{$zipFile}' ]; then echo '1'; else echo '0'; fi;", $output);
+		exec("if [ -e '{$zipFile}' ]; then echo '1'; else echo '0'; fi;
+			if [ -e {$this->projectHome}zipper/file1.ext ]; then echo '1'; else echo '0'; fi;
+			if [ -e {$this->projectHome}zipper/file2.ext ]; then echo '1'; else echo '0'; fi;
+			", $output);
 		$actuals['zip_file_exists_after'] = $output[0];
+		$actuals['file1_exists_after'] = $output[1];
+		$actuals['file2_exists_after'] = $output[2];
 		$this->assertEquals($expecteds, $actuals);
-	}
-	/**
-	 * @covers MacOperatingSystem::unzipFile
-	 */
-	public function testUnzipFile_nonEmptyZipFile() {
-		$this->markTestIncomplete();
-		$zipFile = "zipper.zip";
-		$makeZipCode = "mkdir zipper; touch zipper/file1.ext; touch zipper/file2.ext; zip {$zipFile} zipper/*";
 	}
 
 	/**

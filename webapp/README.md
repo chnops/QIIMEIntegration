@@ -30,7 +30,6 @@ Contents of this directory:
 
 Outstanding issues:
 ------------------
-* Incomplete tests
 * De-noise step of QIIME not implemented
 * env.txt in run results displays server information
 * Dangerous inputs are allowed

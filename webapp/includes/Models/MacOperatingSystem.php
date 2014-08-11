@@ -188,8 +188,9 @@ class MacOperatingSystem implements OperatingSystemI {
 		$fileNameEsc = escapeshellarg($fileNamePathway);
 		$code = $this->getFileExistsCode($fileNamePathway) .
 			//zipinfo prints out file names contained in zip
-			"zipinfo -1 {$fileNameEsc} 2> /dev/null;
-			unzip -qq {$fileNameEsc} &> /dev/null;
+			"targetDir=`dirname {$fileNameEsc}`;
+			zipinfo -1 {$fileNameEsc} 2> /dev/null;
+			unzip -d \"\$targetDir\" -qq {$fileNameEsc} &> /dev/null;
 			if [ $? -eq 0 ]; then rm {$fileNameEsc};
 			else echo 'Unable to unzip file'; exit 1; fi;";
 		system($code, $returnCode);
