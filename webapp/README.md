@@ -23,3 +23,14 @@ directories
 	Each project has a folder: u1/p1/, u1/p2/, u2/p1/...
 	Each project folder has an uploads folder: u1/p1/uploads/, u1/p2/uploads/, u2/p1/uploads/...
 	Each time a script is run, a new folder is created: /u1/p1/r1/, u1/p2/r2, /u2/p1/r3/...
+
+Program overview:
+----------------
+
+Outstanding issues:
+------------------
+* Incomplete unit tests
+* To do items in code
+* De-noise step of QIIME not implemented
+* env.txt in run results displays server information
+* We should convert this into a training utility: <ul><li>remove the database and operating system</li><li>leave the scripts and parameters</li><li>change Project's "runScript" function to print the code to screen so users can cut and paste it</li></ul>
