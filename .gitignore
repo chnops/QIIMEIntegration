@@ -1,7 +1,6 @@
-taxonomies
-webapp/projects
-webapp/data/database.sqlite
-webapp/tests/data/database.sqlite
-webapp/tests/projects/*
+projects/*
+data/database.sqlite
+test_environment/data/database.sqlite
+test_environment/projects/*
 .*.swp
 .this_commit

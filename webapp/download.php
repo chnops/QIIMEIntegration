@@ -1,16 +1,14 @@
 <?php
-require_once './includes/setup.php';
+/*
+ * Copyright (C) 2014 Aaron Sharp
+ * Released under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+ */
+require_once '../includes/setup.php';
 
 // Verify that the user is logged in and has selected a project
 if (!isset($_SESSION['username']) || !isset($_SESSION['project_id'])) {
 	header('HTTP/1.0 403 Forbidden');
 	echo "<p>You must <a href=\"index.php\">login</a> and select a project</p>";
-	exit;
-}
-$projectId = $_SESSION['project_id'];
-if (!is_numeric($projectId)) {
-	header('HTTP/1.1 400 Bad request');
-	echo "<p>Project id must be numeric</p>";
 	exit;
 }
 
@@ -28,8 +26,7 @@ if (!is_numeric($runId)) {
 }
 $isUpload = ($_GET['run'] == -1);
 
-$fileName = $_GET['file_name'];
-if(preg_match("/\//", $fileName) || preg_match("/\n/", $fileName)) {
+if(preg_match('/\.\./', $_GET['file_name'])) {
 	header('HTTP/1.1 400 Bad request');
 	echo "<p>File name contained invalid characters</p>";
 	exit;
@@ -38,7 +35,7 @@ if(preg_match("/\//", $fileName) || preg_match("/\n/", $fileName)) {
 // Find the actual path for the file
 $operatingSystem = new \Models\MacOperatingSystem();
 $database = new \Database\PDODatabase($operatingSystem);
-$actualPath = "./projects/u" . $database->getUserRoot($_SESSION['username']) . "/p" . $projectId;
+$actualPath = "../projects/u" . $database->getUserRoot($_SESSION['username']) . "/p" . $_SESSION['project_id'];
 if ($isUpload) {
 	$actualPath .= "/uploads/" . $_GET['file_name'];
 }
