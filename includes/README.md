@@ -3,27 +3,32 @@ QIIMEIntegration code
 
 ### Controllers
 * Controllers are responsible for user interaction
-* Controllers are the only classes to interact with the superglobals, $_SESSION, $_REQUEST, and $_POST
+* Controllers are the only classes to interact with the superglobals, $_SESSION, $_GET, and $_POST
 * Controllers generate most of the HTML (with help from the views)
 
 ### Models
 * The most important model class is the Project, which accepts input from the Controller, and coordinates everything else
-* The Controller gets its Project object from a Workflow object
+* The Workflow object is used to provide a Project object to the Controller
 
 ### OperatingSystem (in Models)
 * The OperatingSystem is coordinated by the Project, and by the Roster (in Utils)
-* All system commands are contained in this class.
+* All system() and exec() commands are contained in this class.
+* It is responsible for abstracting OS behavior, like creating and listing directories
 
 ### Database
 * The Database is coordinated by the Project
-* It stores users, projects, uploaded/downloaded files, and script runs
+* It keeps track of 
+	* users
+	* projects
+	* uploaded/downloaded files
+	* script runs
 
 ### Scripts (in Models)
 * Scripts are coordinated by the Project
 * Each script represents a QIIME python script, such as split_libraries.py
-* Each script contains Parameters
-* Each script also has names and identifiers
-* Most specific Script classes are stored in the \Models\Scripts\QIIME namespace
+* Each script has names and identifiers
+* Each script has a collection of Parameters
+* Most concrete Script classes are stored in the \Models\Scripts\QIIME namespace
 
 ### Parameters (in Scripts)
 * Parameters are coordinated by their Script
