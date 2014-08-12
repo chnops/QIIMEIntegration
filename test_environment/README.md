@@ -1,5 +1,7 @@
 Unit Tests
 ==========
+Copyright (C) 2014 Aaron Sharp
+Released under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
 There are a rather large number of unit tests.  Here are some heuristics to make managing them easier:
 

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (C) 2014 Aaron Sharp
+ * Released under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+ */
 require_once '../includes/setup.php';
 
 // Verify that the user is logged in and has selected a project

@@ -1,5 +1,7 @@
 QIIMEIntegration
 ================
+Copyright (C) 2014 Aaron Sharp
+Released under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
 1. Installation
  * I used MacQIIME (http://www.wernerlab.org/software/macqiime) for easy installation. Out of box, everything worked fine. 

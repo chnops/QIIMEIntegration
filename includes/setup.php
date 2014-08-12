@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (C) 2014 Aaron Sharp
+ * Released under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+ */
+
 // setup $_SESSION
 session_start();
 
