@@ -30,7 +30,9 @@ Contents of this directory:
 	Each project folder has an uploads folder: u1/p1/uploads/, u1/p2/uploads/, u2/p1/uploads/...
 	Each time a script is run, a new folder is created: /u1/p1/r1/, u1/p2/r2, /u2/p1/r3/...
 
-Outstanding issues:
-------------------
-* Convert hard-coding of QIIME scripts/parameters/relationships into text/json config files
-* We should convert this into a training--not a doing it for you--utility
+Future functionality
+--------------------
+* Instead of hard-coding of QIIME scripts/parameters into PHP, we should use a separate code/implementation-agnostic file
+* Remove the OperatingSystem branch of the program.  Instead of having it run QIIME for the user on the server, let it print out the code that can be copied and pasted into the terminal
+* Provide utilities for tracking past runs (the code that would be copied and pasted).  Let users save/name individual runs/sequences of runs for reuse with or without modification
+* Create separete files for other useful programs, so that this application can teach lab members how to use, for example, BLAST, uclust, PyNAST, the tuxedo suite, etc.
