@@ -30,6 +30,5 @@ Contents of this directory:
 
 Outstanding issues:
 ------------------
-* env.txt in run results displays potentially dangerous server information
 * Convert hard-coding of QIIME scripts/parameters/relationships into text/json config files
 * We should convert this into a training--not a doing it for you--utility

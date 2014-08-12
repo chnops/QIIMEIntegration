@@ -248,9 +248,8 @@ class MacOperatingSystem implements OperatingSystemI {
 			if [ $? -ne 0 ]; then printf 'Unable to create run dir'; exit 1; fi;
 			cd {$runDir};
 			source " . escapeshellarg($project->getEnvironmentSource()) . " 2>&1;
-			printenv > env.txt;
-			{$script->renderVersionCommand()} >> env.txt;
-			if [ $? -ne 0 ]; then echo 'There was a problem getting this script'\''s version' >> error_log.txt; fi;
+			{$script->renderVersionCommand()} > version.txt;
+			if [ $? -ne 0 ]; then echo 'There was a problem getting this script'\''s version' > error_log.txt; fi;
 			jobs &> /dev/null;
 			({$script->renderCommand()};cd \$OLDPWD;{$database->renderCommandRunComplete($runId)})  > output.txt 2>> error_log.txt &
 			job_id=`jobs -n`;

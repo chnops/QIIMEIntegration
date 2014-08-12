@@ -1430,7 +1430,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"exception" => new OperatingSystemException("There was a problem initializing your script"),
 			"run_dir_exists" => "0",
-			"env_exists" => "0",
+			"version_exists" => "0",
 			"error_log_exists" => "0",
 			"output_exists" => "0",
 		);
@@ -1449,7 +1449,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($projectDir));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
-		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("echo 'version'"));
 		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
 		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
 		try {
@@ -1463,12 +1463,12 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
+		$actuals['version_exists'] = $output[1];
 		$actuals['error_log_exists'] = $output[2];
 		$actuals['output_exists'] = $output[3];
 		$this->assertEquals($expecteds, $actuals);
@@ -1480,7 +1480,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"exception" => new OperatingSystemException("There was a problem initializing your script"),
 			"run_dir_exists" => "1",
-			"env_exists" => "0",
+			"version_exists" => "0",
 			"error_log_exists" => "0",
 			"output_exists" => "0",
 		);
@@ -1500,7 +1500,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($projectDir));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
-		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("echo 'version'"));
 		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
 		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
 		system("mkdir {$this->projectHome}/{$projectDir};mkdir {$this->projectHome}/{$projectDir}/r{$runId}");
@@ -1515,12 +1515,12 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
+		$actuals['version_exists'] = $output[1];
 		$actuals['error_log_exists'] = $output[2];
 		$actuals['output_exists'] = $output[3];
 		$this->assertEquals($expecteds, $actuals);
@@ -1532,7 +1532,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"exception" => new OperatingSystemException("There was a problem initializing your script"),
 			"run_dir_exists" => "1",
-			"env_exists" => "0",
+			"version_exists" => "0",
 			"error_log_exists" => "0",
 			"output_exists" => "0",
 		);
@@ -1552,7 +1552,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($projectDir));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/tmp/file_that_does_not_exist.ext"));
-		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("echo 'version'"));
 		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff'"));
 		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'true'"));
 		system("mkdir {$this->projectHome}/{$projectDir}");
@@ -1567,12 +1567,12 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
+		$actuals['version_exists'] = $output[1];
 		$actuals['error_log_exists'] = $output[2];
 		$actuals['output_exists'] = $output[3];
 		$this->assertEquals($expecteds, $actuals);
@@ -1583,8 +1583,8 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	public function testRunScript_badVersionCommand() {
 		$expecteds = array(
 			"run_dir_exists" => "1",
-			"env_exists" => "1",
-			"version_changes_to_env.txt" => array(),
+			"version_exists" => "1",
+			"version_contents.txt" => "",
 			"error_log_exists" => "1",
 			"error_log_contents" => "There was a problem getting this script's version",
 			"output_exists" => "1",
@@ -1616,22 +1616,20 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then cat '{$runDir}/version.txt'; echo; else echo ''; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then cat '{$runDir}/error_log.txt'; else echo ''; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then cat '{$runDir}/output.txt'; else echo ''; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
-		$actuals['error_log_exists'] = $output[2];
-		$actuals['error_log_contents'] = $output[3];
-		$actuals['output_exists'] = $output[4];
-		$actuals['output_contents'] = $output[5];
-		exec("cd {$runDir}; printenv > .expected; sort .expected > .tmp; mv .tmp .expected;
-			cat env.txt > .actual; sort .actual > .tmp; mv .tmp .actual;
-			diff .expected .actual; rm .expected .actual", $output2);
-		$actuals['version_changes_to_env.txt'] = $output2;
+		$actuals['version_exists'] = $output[1];
+		$actuals['version_contents.txt'] = $output[2];
+		$actuals['error_log_exists'] = $output[3];
+		$actuals['error_log_contents'] = $output[4];
+		$actuals['output_exists'] = $output[5];
+		$actuals['output_contents'] = $output[6];
 		$this->assertEquals($expecteds, $actuals);
 		$this->assertRegExp($expectedFunctionReturnRegex, $actualFunctionReturn);
 	}
@@ -1642,8 +1640,8 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$expecteds = array(
 			"exception" => new OperatingSystemException("There was a problem initializing your script"),
 			"run_dir_exists" => "1",
-			"env_exists" => "1",
-			"version_changes_to_env.txt" => array('19a20', '> version'),
+			"version_exists" => "1",
+			"version_contents" => "version",
 			"error_log_exists" => "1",
 			"error_log_contents" => "",
 			"output_exists" => "1",
@@ -1664,7 +1662,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($projectDir));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
-		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("echo 'version'"));
 		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff. '"));
 		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue(") > output.txt 2>> error_log.txt;jobs &> /dev/null;\n("));
 		system("mkdir {$this->projectHome}/{$projectDir}");
@@ -1679,22 +1677,20 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then cat '{$runDir}/version.txt'; else echo ''; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then cat '{$runDir}/error_log.txt'; echo; else echo ''; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then cat '{$runDir}/output.txt'; else echo ''; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
-		$actuals['error_log_exists'] = $output[2];
-		$actuals['error_log_contents'] = $output[3];
-		$actuals['output_exists'] = $output[4];
-		$actuals['output_contents'] = $output[5];
-		exec("cd {$runDir}; printenv > .expected; sort .expected > .tmp; mv .tmp .expected;
-			cat env.txt > .actual; sort .actual > .tmp; mv .tmp .actual;
-			diff .expected .actual; rm .expected .actual", $output2);
-		$actuals['version_changes_to_env.txt'] = $output2;
+		$actuals['version_exists'] = $output[1];
+		$actuals['version_contents'] = $output[2];
+		$actuals['error_log_exists'] = $output[3];
+		$actuals['error_log_contents'] = $output[4];
+		$actuals['output_exists'] = $output[5];
+		$actuals['output_contents'] = $output[6];
 		$this->assertEquals($expecteds, $actuals);
 	}
 	/**
@@ -1703,8 +1699,8 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	public function testRunScript_ableToStartScript() {
 		$expecteds = array(
 			"run_dir_exists" => "1",
-			"env_exists" => "1",
-			"version_changes_to_env.txt" => array('19a20', '> version'),
+			"version_exists" => "1",
+			"version_contents" => "version",
 			"error_log_exists" => "1",
 			"error_log_contents" => "",
 			"output_exists" => "1",
@@ -1726,7 +1722,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($projectDir));
 		$mockProject->expects($this->once())->method("getEnvironmentSource")->will($this->returnValue("/dev/null"));
-		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("printf 'version'"));
+		$mockScript->expects($this->once())->method("renderVersionCommand")->will($this->returnValue("echo 'version'"));
 		$mockScript->expects($this->once())->method("renderCommand")->will($this->returnValue("printf 'did stuff. '"));
 		$mockDatabase->expects($this->once())->method("renderCommandRunComplete")->will($this->returnValue("printf 'altered database.'"));
 		system("mkdir {$this->projectHome}/{$projectDir}");
@@ -1736,22 +1732,20 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$runDir = $this->projectHome . "/" . $projectDir . "/r" . $runId;
 		exec("
 			if [ -a '{$runDir}' ]; then echo '1'; else echo '0'; fi;
-			if [ -a '{$runDir}/env.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then echo '1'; else echo '0'; fi;
+			if [ -a '{$runDir}/version.txt' ]; then cat '{$runDir}/version.txt'; else echo ''; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/error_log.txt' ]; then cat '{$runDir}/error_log.txt'; echo; else echo ''; fi;
 			if [ -a '{$runDir}/output.txt' ]; then echo '1'; else echo '0'; fi;
 			if [ -a '{$runDir}/output.txt' ]; then cat '{$runDir}/output.txt'; else echo ''; fi;
 			", $output);
 		$actuals['run_dir_exists'] = $output[0];
-		$actuals['env_exists'] = $output[1];
-		$actuals['error_log_exists'] = $output[2];
-		$actuals['error_log_contents'] = $output[3];
-		$actuals['output_exists'] = $output[4];
-		$actuals['output_contents'] = $output[5];
-		exec("cd {$runDir}; printenv > .expected; sort .expected > .tmp; mv .tmp .expected;
-			cat env.txt > .actual; sort .actual > .tmp; mv .tmp .actual;
-			diff .expected .actual; rm .expected .actual", $output2);
-		$actuals['version_changes_to_env.txt'] = $output2;
+		$actuals['version_exists'] = $output[1];
+		$actuals['version_contents'] = $output[2];
+		$actuals['error_log_exists'] = $output[3];
+		$actuals['error_log_contents'] = $output[4];
+		$actuals['output_exists'] = $output[5];
+		$actuals['output_contents'] = $output[6];
 		$this->assertEquals($expecteds, $actuals);
 		$this->assertRegExp($expectedFunctionReturnRegex, $actualFunctionReturn);
 	}
