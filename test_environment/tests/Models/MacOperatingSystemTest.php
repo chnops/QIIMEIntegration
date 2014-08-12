@@ -9,7 +9,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 
 	private $projectBuilder = NULL;
 	private $databaseBuilder = NULL;
-	private $projectHome = "./projects/";
+	private $projectHome = "../projects/";
 	private $object = NULL;
 	public function __construct($name = null, array $data = array(), $dataName = '')  {
 		parent::__construct($name, $data, $dataName);
@@ -21,7 +21,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 	}
 	public function setUp() {
 		$this->object = new MacOperatingSystem();
-		system('rm -rf ./projects/*');
+		system("rm -rf {$this->projectHome}*");
 	}
 
 	/**
@@ -761,7 +761,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1"));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
-		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		system("mkdir {$this->projectHome}u1/; mkdir {$this->projectHome}u1/uploads/");
 		try {
 
 			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
@@ -793,7 +793,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue("u1; alias which=false; cd ."));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
-		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		system("mkdir {$this->projectHome}u1/; mkdir {$this->projectHome}u1/uploads/");
 		try {
 
 			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
@@ -814,7 +814,7 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$actuals = array();
 		$url = "http://localhost/";
 		$outputName = "localhost.html";
-		system("mkdir ./projects/u1/; mkdir ./projects/u1/uploads/");
+		system("mkdir {$this->projectHome}u1/; mkdir {$this->projectHome}u1/uploads/");
 		$mockProject = $this->projectBuilder
 			->setMethods(array("getOwner", "getId", "getEnvironmentSource", "getProjectDir"))
 			->getMockForAbstractClass();

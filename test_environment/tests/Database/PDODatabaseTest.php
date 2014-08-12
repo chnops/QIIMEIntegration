@@ -7,7 +7,7 @@ class PDODatabaseTest extends \PHPUnit_Framework_TestCase {
 		error_log("PDODatabaseTest");
 	}
 
-	private $testDSN = "sqlite:./data/database.sqlite";
+	private $testDSN = "sqlite:../data/database.sqlite";
 	private $pdo;
 
 	private $userStatement = NULL;

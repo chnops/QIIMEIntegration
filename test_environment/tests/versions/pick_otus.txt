@@ -1,1 +1,1 @@
-File: public/versions/pick_otus.txt
+File: versions/pick_otus.txt

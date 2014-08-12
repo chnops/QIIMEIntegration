@@ -1,1 +1,1 @@
-File: public/versions/extract_barcodes.txt
+File: versions/extract_barcodes.txt

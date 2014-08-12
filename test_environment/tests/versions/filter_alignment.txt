@@ -1,1 +1,1 @@
-File: public/versions/filter_alignment.xt
+File: versions/filter_alignment.xt

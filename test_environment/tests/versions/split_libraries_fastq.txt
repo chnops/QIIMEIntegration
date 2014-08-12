@@ -1,1 +1,1 @@
-File: public/versions/split_libraries_fastq.txt
+File: versions/split_libraries_fastq.txt

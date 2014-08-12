@@ -5,7 +5,7 @@ namespace Database;
 class PDODatabase implements DatabaseI {
 	private static $dbProgram = "sqlite3";
 	private static $dbDriver = "sqlite";
-	private static $dbFile = "./data/database.sqlite";
+	private static $dbFile = "../data/database.sqlite";
 
 	private $pdo = NULL;
 

@@ -1,5 +1,5 @@
 <?php
-require_once './includes/setup.php';
+require_once '../includes/setup.php';
 
 // Initialize system defaults
 $operatingSystem = new \Models\MacOperatingSystem();

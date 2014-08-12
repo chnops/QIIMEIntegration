@@ -1,1 +1,1 @@
-File: public/versions/split_libraries.txt
+File: versions/split_libraries.txt

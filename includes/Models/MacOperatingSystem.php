@@ -3,7 +3,7 @@
 namespace Models;
 
 class MacOperatingSystem implements OperatingSystemI {
-	private $home = "./projects/";
+	private $home = "../projects/";
 
 	public function getHome() {
 		return $this->home;

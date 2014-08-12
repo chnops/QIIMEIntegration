@@ -1,1 +1,1 @@
-File: public/versions/convert_fastaqual_fastq.txt
+File: versions/convert_fastaqual_fastq.txt

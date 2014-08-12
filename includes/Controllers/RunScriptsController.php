@@ -132,7 +132,7 @@ class RunScriptsController extends Controller {
 			$displayHideables.= "displayHideables('{$this->scriptId}');";
 		}
 		$perParamHelp = "$('.param_help').click(function() {
-			$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });";
+			$('#per_param_help').html('-loading-').load('help/' + $(this).attr('id') + '.txt') });";
 		$hideAccordionChildren = "$('.accordion div').css('display', 'none')";
 		return "$(function() {{$displayHideables};{$perParamHelp};{$hideAccordionChildren}});";
 	}

@@ -29,7 +29,7 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	public function testConstructor() {
 		$expecteds = array(
 			'name' => "--version",
-			'version_string' => "File: public/versions/script.txt"
+			'version_string' => "File: versions/script.txt"
 		);
 		$actuals = array();
 
@@ -55,7 +55,7 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\VersionParameter::renderForForm
 	 */
 	public function testRenderForForm() {
-		$expected = "<a class=\"button\" onclick=\"alert('File: public/versions/script.txt');\">Version</a>";
+		$expected = "<a class=\"button\" onclick=\"alert('File: versions/script.txt');\">Version</a>";
 
 		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
 
@@ -66,7 +66,7 @@ class VersionParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\VersionParameter::getVersionString
 	 */
 	public function testGetVersionString() {
-		$expected = "File: public/versions/script.txt";
+		$expected = "File: versions/script.txt";
 
 		$actual = $this->object->getVersionString();
 

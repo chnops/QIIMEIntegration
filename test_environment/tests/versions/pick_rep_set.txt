@@ -1,1 +1,1 @@
-File: public/versions/pick_rep_sets.txt
+File: versions/pick_rep_sets.txt

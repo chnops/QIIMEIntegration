@@ -531,7 +531,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderSpecificScript_scriptIdNotSet() {
 		$expected = "$(function() {hideableFields=['form', 'help', 'past_results'];;$('.param_help').click(function() {
-			$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });;$('.accordion div').css('display', 'none')});";
+			$('#per_param_help').html('-loading-').load('help/' + $(this).attr('id') + '.txt') });;$('.accordion div').css('display', 'none')});";
 
 		$actual = $this->object->renderSpecificScript();
 
@@ -543,7 +543,7 @@ class RunScriptsControllerTest extends \PHPUnit_Framework_TestCase {
 	public function testRenderSpecificScript_scriptIdSet() {
 		$expectedId = "scriptId";
 		$expected = "$(function() {hideableFields=['form', 'help', 'past_results'];displayHideables('{$expectedId}');;$('.param_help').click(function() {
-			$('#per_param_help').html('-loading-').load('public/help/' + $(this).attr('id') + '.txt') });;$('.accordion div').css('display', 'none')});";
+			$('#per_param_help').html('-loading-').load('help/' + $(this).attr('id') + '.txt') });;$('.accordion div').css('display', 'none')});";
 		$this->object->setScriptId($expectedId);
 
 		$actual = $this->object->renderSpecificScript();

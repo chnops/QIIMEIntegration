@@ -1,1 +1,1 @@
-File: public/versions/align_seqs.txt
+File: versions/align_seqs.txt

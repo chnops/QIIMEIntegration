@@ -1,1 +1,1 @@
-File: public/versions/script.txt
+File: versions/script.txt

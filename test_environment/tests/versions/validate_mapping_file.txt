@@ -1,1 +1,1 @@
-File: public/versions/validate_mapping_file.txt
+File: versions/validate_mapping_file.txt

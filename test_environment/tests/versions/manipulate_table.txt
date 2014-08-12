@@ -1,1 +1,1 @@
-File: public/versions/manipulate_otu_table.txt
+File: versions/manipulate_otu_table.txt

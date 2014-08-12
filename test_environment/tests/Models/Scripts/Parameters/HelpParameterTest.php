@@ -39,7 +39,7 @@ class HelpParameterTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Models\Scripts\Parameters\HelpParameter::renderForForm
 	 */
 	public function testRenderForForm() {
-		$expected = "<a href=\"public/manual/{$this->mockScript->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
+		$expected = "<a href=\"manual/{$this->mockScript->getHtmlId()}.txt\" target=\"_blank\" class=\"button\">See manual page</a>";
 
 		$actual = $this->object->renderForForm($disabled = false, $this->mockScript);
 

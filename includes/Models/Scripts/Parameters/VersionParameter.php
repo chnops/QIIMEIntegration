@@ -9,7 +9,7 @@ class VersionParameter extends DefaultParameter {
 	public function __construct(\Models\Scripts\ScriptI $script) {
 		$this->name = "--version";
 		ob_start();
-		include "public/versions/{$script->getHtmlId()}.txt";
+		include "versions/{$script->getHtmlId()}.txt";
 		$this->versionString = preg_replace("/\n+/", "\\n", trim(ob_get_clean()));
 	}
 
