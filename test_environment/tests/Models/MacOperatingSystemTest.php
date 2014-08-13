@@ -798,6 +798,10 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
 		system("mkdir {$this->projectHome}u1/; mkdir {$this->projectHome}u1/uploads/");
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("getUrlExistsCode"))
+			->getMock();
+		$this->object->expects($this->once())->method("getUrlExistsCode")->will($this->returnValue("true;"));
 		try {
 
 			$this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
@@ -831,9 +835,18 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 			->getMock();	
 		$mockDatabase->expects($this->once())->method("renderCommandUploadSuccess")->will($this->returnValue("true"));
 		$mockDatabase->expects($this->once())->method("renderCommandUploadFailure")->will($this->returnValue("false"));
+		$this->object = $this->getMockBuilder('\Models\MacOperatingSystem')
+			->setMethods(array("getUrlExistsCode"))
+			->getMock();
+		$this->object->expects($this->once())->method("getUrlExistsCode")->will($this->returnValue("true;"));
+		try {
 
 		$actuals['function_return'] = $this->object->downloadFile($mockProject, $url, $outputName, $mockDatabase);
 
+		}
+		catch(OperatingSystemException $ex) {
+			echo $ex->getConsoleOutput();
+		}
 		$this->assertEquals($expecteds, $actuals);
 	}
 
@@ -872,6 +885,35 @@ class MacOperatingSystemTest extends \PHPUnit_Framework_TestCase {
 		$mockProject->expects($this->once())->method("getProjectDir")->will($this->returnValue($expectedProjectDir));
 
 		$actual = $this->object->findFileName($mockProject, $expectedFileName, $runDirInput);
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @coverse MacOperatingSystem::getUrlExistsCode
+	 */
+	public function testGetUrlExistsCode_noQuotesToEscape() {
+		$expected = "let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' 'http://localhost/'`;
+			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
+				then printf 'The requested URL does not exist';
+				exit 1;
+			fi;";
+
+		$actual = $this->object->getUrlExistsCode("http://localhost/");
+
+		$this->assertEquals($expected, $actual);
+	}
+	/**
+	 * @coverse MacOperatingSystem::getUrlExistsCode
+	 */
+	public function testGetUrlExistsCode_quotesToEscape() {
+		$expected = "let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' 'http://loca'\''lhost/'`;
+			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
+				then printf 'The requested URL does not exist';
+				exit 1;
+			fi;";
+
+		$actual = $this->object->getUrlExistsCode("http://loca'lhost/");
 
 		$this->assertEquals($expected, $actual);
 	}

@@ -120,13 +120,9 @@ class MacOperatingSystem implements OperatingSystemI {
 
 		$scriptCommand = "source " . escapeshellarg($project->getEnvironmentSource()) . " 2>&1;
 			cd {$this->home}{$project->getProjectDir()}/uploads 2>/dev/null;
-			if [ $? -ne 0 ]; then printf 'Unable to find project directory'; exit 1; fi;
-			let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
-			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
-				then printf 'The requested URL does not exist';
-				exit 1;
-			fi;
-			which wget &>/dev/null;
+			if [ $? -ne 0 ]; then printf 'Unable to find project directory'; exit 1; fi;" .
+			$this->getUrlExistsCode($url) .
+			"which wget &>/dev/null;
 			if [ $? != 0 ]; then printf 'wget not found'; exit 1; fi;
 			(wget {$urlEsc} --limit-rate=1M --quiet --output-document={$outputNameEsc};
 				let wget_success=$?;
@@ -156,6 +152,14 @@ class MacOperatingSystem implements OperatingSystemI {
 		return $this->concatFileNames($dir, $fileName);
 	}
 
+	public function getUrlExistsCode($url) {
+		$urlEsc = escapeshellarg($url);
+		return "let exists=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' {$urlEsc}`;
+			if [ \$exists -lt 200 ] || [ \$exists -ge 400 ];
+				then printf 'The requested URL does not exist';
+				exit 1;
+			fi;";
+	}
 	public function getFileExistsCode($fileName) {
 		return "if [ ! -e " . escapeshellarg($fileName) . " ]; then printf 'The requested file does not exist.'; exit 1; fi;";
 	}

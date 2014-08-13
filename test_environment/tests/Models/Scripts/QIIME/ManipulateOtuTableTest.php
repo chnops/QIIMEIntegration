@@ -78,6 +78,26 @@ class ManiuplateOtuTableTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testScriptExists() {
+		$expecteds = array(
+			"script_location" => "/macqiime/bin/{$this->object->getScriptName()}",
+			"which_return" => "0",
+		);
+		$actuals = array();
+		$mockProject = $this->getMockBuilder('\Models\QIIMEProject')
+			->disableOriginalConstructor()
+			->setMethods(NULL)
+			->getMock();
+		$sourceFile = $mockProject->getEnvironmentSource();
+		$systemCommand = "source {$sourceFile}; which {$this->object->getScriptName()}; echo $?";
+
+		exec($systemCommand, $output);
+
+		$actuals['script_location'] = $output[0];
+		$actuals['which_return'] = $output[1];
+		$this->assertEquals($expecteds, $actuals);
+	}
+
 	/**
 	 * @covers \Models\Scripts\QIIME\ManipulateOtuTable::renderCommand
 	 */
